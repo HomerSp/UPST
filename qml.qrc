@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>main_provisionmode.qml</file>
+        <file>main_manualmode.qml</file>
+    </qresource>
+</RCC>
