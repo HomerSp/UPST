@@ -3,7 +3,8 @@
 using namespace Serial;
 
 SerialCommand::SerialCommand(SerialCommunicator* communicator)
-    : mCommunicator(communicator)
+    : mCommunicator(communicator),
+      mTimeout(1000)
 {
 
 }

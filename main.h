@@ -19,6 +19,7 @@ public slots:
     void deviceRemove(const QString& port);
 
     void viewChanged();
+    void viewUpdate();
 
     void provision();
 

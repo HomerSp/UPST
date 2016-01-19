@@ -114,6 +114,8 @@ void Main::deviceAdd(Serial::SerialDevice* device) {
 
     device->update();
 
+    viewUpdate();
+
     emit deviceChanged(*device, true);
 }
 
@@ -139,13 +141,25 @@ void Main::viewChanged() {
     if(view == "manual") {
 
     } else if(view == "provision") {
-        if(mDevices.size() > 0) {
-            QObject* textMDN = rootObject->findChild<QObject*>("textMdn");
-            textMDN->setProperty("text", mDevices.at(0)->mdn());
-        }
-
         QObject* provisionButton = rootObject->findChild<QObject*>("provisionButton");
         QObject::connect(provisionButton, SIGNAL(clicked()), this, SLOT(provision()));
+
+        viewUpdate();
+    }
+}
+
+void Main::viewUpdate() {
+    QObject* rootObject = mEngine->rootObjects().first();
+    QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
+
+    QString view = pageLoader->property("currentView").toString();
+    if(view == "manual") {
+
+    } else if(view == "provision") {
+        if(mDevices.size() > 0) {
+            QObject* textMDN = rootObject->findChild<QObject*>("textMDN");
+            textMDN->setProperty("text", mDevices.at(0)->mdn());
+        }
     }
 }
 
