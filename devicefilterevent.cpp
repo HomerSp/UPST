@@ -11,6 +11,12 @@ DeviceFilterEvent::DeviceFilterEvent()
 
 }
 
+#ifndef _WIN32
+bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* message, long*) {
+    return false;
+}
+#endif
+
 void DeviceFilterEvent::handleDeviceChanged(const QString &port, bool added) {
     qDebug()<<"handleDeviceChanged availablePorts"<<QSerialPortInfo::availablePorts().size();
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
