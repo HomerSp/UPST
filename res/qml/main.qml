@@ -225,6 +225,7 @@ ApplicationWindow {
             width: 20
             source: "qrc:/res/images/logo.png"
             fillMode: Image.PreserveAspectFit
+            mipmap: true
         }
     }
 
