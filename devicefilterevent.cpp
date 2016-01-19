@@ -11,7 +11,7 @@ DeviceFilterEvent::DeviceFilterEvent()
 
 }
 
-#ifndef _WIN32
+#ifdef NATIVEFILTER_MISSING
 bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* message, long*) {
     return false;
 }

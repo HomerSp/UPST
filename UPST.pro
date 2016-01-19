@@ -9,6 +9,8 @@ SOURCES += main.cpp \
 win32 {
     SOURCES += devicefilterevent_win.cpp
     LIBS += -lsetupapi
+} else {
+    DEFINES += NATIVEFILTER_MISSING=1
 }
 
 HEADERS += devicefilterevent.h \
