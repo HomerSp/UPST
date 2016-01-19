@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>main_provisionmode.qml</file>
-        <file>main_manualmode.qml</file>
+        <file>res/qml/main.qml</file>
+        <file>res/qml/main_provisionmode.qml</file>
+        <file>res/qml/main_manualmode.qml</file>
+        <file>res/qml/main_devices.qml</file>
     </qresource>
 </RCC>

@@ -4,6 +4,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QAbstractNativeEventFilter>
+#include <QQmlContext>
 
 #include "main.h"
 #include "devicefilterevent.h"
@@ -16,7 +17,31 @@
 #include "serial/qcdm/commands/nv/imeicommand.h"
 #include "serial/crcutils.h"
 
-Main::Main(QQmlApplicationEngine* engine) : mEngine(engine) {
+ConnectedDevicesModel::ConnectedDevicesModel(QObject* parent)
+    : QAbstractListModel(parent) {
+
+}
+
+QVariant ConnectedDevicesModel::data(const QModelIndex& index, int role) const {
+    return mDevices.at(index.row());
+}
+int ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
+    return mDevices.size();
+}
+
+QHash<int, QByteArray> ConnectedDevicesModel::roleNames() const {
+    QHash<int, QByteArray> roles;
+    roles[NameRole] = "name";
+    return roles;
+}
+
+void ConnectedDevicesModel::addDevice(const QString& name) {
+    mDevices.append(name);
+}
+
+Main::Main(QQmlApplicationEngine* engine)
+    : mEngine(engine)
+{
     QObject* rootObject = engine->rootObjects().first();
 
     // Hide advanced menu item if we are not using a debug build
@@ -28,7 +53,11 @@ Main::Main(QQmlApplicationEngine* engine) : mEngine(engine) {
     QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
     QObject::connect(pageLoader, SIGNAL(viewChanged()), this, SLOT(viewChanged()));
 
+    QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
+    QObject::connect(connectedDevicesList, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDeviceChanged(int)));
+
     viewChanged();
+    currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
 }
 
 Main::~Main() {
@@ -45,6 +74,8 @@ void Main::provision() {
     QString mdn = textMDN->property("text").toString();
 
     qDebug()<<"provision"<<mdn;
+
+    return;
 
     Serial::SerialDevice* device = mDevices.at(0);
 
@@ -131,6 +162,24 @@ void Main::deviceRemove(const QString& port) {
     }
 }
 
+void Main::currentDeviceChanged(int index) {
+    qDebug()<<"currentDeviceChanged"<<index;
+
+    QString device = "";
+    switch(index) {
+    case 0:
+        device = "SAMSUNG GT-i9100";
+        break;
+    default:
+        device = "HTC Rezound";
+        break;
+    }
+
+    QObject* rootObject = mEngine->rootObjects().first();
+    QObject* currentDeviceLabel = rootObject->findChild<QObject*>("currentDeviceNameLabel");
+    currentDeviceLabel->setProperty("text", device);
+}
+
 void Main::viewChanged() {
     QObject* rootObject = mEngine->rootObjects().first();
     QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
@@ -167,8 +216,13 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+    ConnectedDevicesModel devicesModel;
+    devicesModel.addDevice("SAMSUNG GT-i9100");
+    devicesModel.addDevice("HTC Rezound");
+
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.rootContext()->setContextProperty("devicesModel", &devicesModel);
+    engine.load(QUrl(QStringLiteral("qrc:/res/qml/main.qml")));
 
     QObject::connect(&engine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
