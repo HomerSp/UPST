@@ -3,5 +3,6 @@
         <file>res/fonts/OpenSans-Bold.ttf</file>
         <file>res/fonts/OpenSans-Regular.ttf</file>
         <file>res/images/logo.png</file>
+        <file>res/images/up_arrow.png</file>
     </qresource>
 </RCC>

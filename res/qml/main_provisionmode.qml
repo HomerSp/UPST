@@ -86,11 +86,39 @@ Item {
                 id: provisionButton
                 objectName: "provisionButton"
                 text: qsTr("Provision")
-                width: 100
-                height: 30
+                width: minContainerRect.width / 2
+                height: 40
                 anchors.top: minContainerRect.bottom
                 anchors.right: minContainerRect.right
                 anchors.topMargin: 20
+
+                style: ButtonStyle {
+                    id: provisionButtonStyle
+                    background: Rectangle {
+                        implicitWidth: provisionButton.width
+                        implicitHeight: provisionButton.height
+                        border.width: control.activeFocus ? 2 : 0
+                        border.color: "#ccc"
+                        color: control.pressed ? "#4c75bc" : (control.hovered ? "#7fa8ef" : "#5f92eb")
+                        radius: 4
+
+                        Behavior on color {
+                            ColorAnimation { duration: 100 }
+                        }
+
+                        transitions: Transition {
+                            NumberAnimation { properties: "border.width"; duration: 100 }
+                        }
+                    }
+                    label: Text {
+                        color: "white"
+                        text: provisionButton.text
+                        font.family: openSansRegularFont.name
+                        font.pointSize: 11
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
             }
         }
     }
