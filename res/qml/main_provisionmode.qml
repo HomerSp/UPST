@@ -2,11 +2,16 @@ import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.2
+import "components"
 
 Item {
     id: provisionView
     objectName: "provisionView"
     anchors.fill: parent
+
+    Units {
+        id: unit
+    }
 
     FontLoader {
         id: openSansRegularFont;
@@ -26,8 +31,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 20
-                anchors.rightMargin: 20
+                anchors.leftMargin: unit.dp(20)
+                anchors.rightMargin: anchors.leftMargin
                 width: parent.width
                 height: childrenRect.height
                 color: "transparent"
@@ -36,15 +41,17 @@ Item {
                     id: labelMDN
                     text: qsTr("MDN")
                     font.family: openSansRegularFont.name
+                    font.pixelSize: unit.em(1)
                 }
 
                 TextField {
                     id: textMDN
                     objectName: "textMDN"
                     anchors.top: labelMDN.bottom
-                    anchors.topMargin: 6
+                    anchors.topMargin: unit.dp(4)
                     width: parent.width
-                    height: 30
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: labelMDN.font.pointSize
                 }
             }
         }
@@ -60,8 +67,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 20
-                anchors.rightMargin: 20
+                anchors.leftMargin: unit.dp(20)
+                anchors.rightMargin: anchors.leftMargin
                 width: parent.width
                 height: childrenRect.height
                 color: "transparent"
@@ -70,15 +77,17 @@ Item {
                     id: labelMIN
                     text: qsTr("MIN")
                     font.family: openSansRegularFont.name
+                    font.pixelSize: unit.em(1)
                 }
 
                 TextField {
                     id: textMIN
                     objectName: "textMIN"
                     anchors.top: labelMIN.bottom
-                    anchors.topMargin: 6
+                    anchors.topMargin: unit.dp(4)
                     width: parent.width
-                    height: 30
+                    font.family: openSansRegularFont.name
+                    font.pointSize: labelMIN.font.pointSize
                 }
             }
 
@@ -87,10 +96,9 @@ Item {
                 objectName: "provisionButton"
                 text: qsTr("Provision")
                 width: minContainerRect.width / 2
-                height: 40
                 anchors.top: minContainerRect.bottom
                 anchors.right: minContainerRect.right
-                anchors.topMargin: 20
+                anchors.topMargin: unit.dp(20)
 
                 style: ButtonStyle {
                     id: provisionButtonStyle
@@ -100,7 +108,7 @@ Item {
                         border.width: control.activeFocus ? 2 : 0
                         border.color: "#ccc"
                         color: control.pressed ? "#4c75bc" : (control.hovered ? "#7fa8ef" : "#5f92eb")
-                        radius: 4
+                        radius: unit.dp(4)
 
                         Behavior on color {
                             ColorAnimation { duration: 100 }
@@ -114,7 +122,7 @@ Item {
                         color: "white"
                         text: provisionButton.text
                         font.family: openSansRegularFont.name
-                        font.pointSize: 11
+                        font.pixelSize: unit.em(1)
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }

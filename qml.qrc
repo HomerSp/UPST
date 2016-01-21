@@ -4,5 +4,7 @@
         <file>res/qml/main_provisionmode.qml</file>
         <file>res/qml/main_manualmode.qml</file>
         <file>res/qml/main_devices.qml</file>
+        <file>res/qml/components/DeviceInfoBox.qml</file>
+        <file>res/qml/components/Units.qml</file>
     </qresource>
 </RCC>

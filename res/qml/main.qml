@@ -3,15 +3,18 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
+import "components"
 
 ApplicationWindow {
     id: mainWindow
-    width: 640
-    height: 480
     visible: true
-    minimumWidth: 800
-    minimumHeight: 480
+    minimumWidth: unit.dp(640)
+    minimumHeight: unit.dp(480)
     color: "#f1f1f1"
+
+    Units {
+        id: unit
+    }
 
     function updateTitle() {
         if(mainPageLoader.currentView == "manual") {
@@ -57,36 +60,93 @@ ApplicationWindow {
         }
     }
 
-    Rectangle {
-        id: connectedDevices
-        width: (childrenRect.width < 200)?200:childrenRect.width
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+    GridLayout {
+        anchors.fill: parent
+        columnSpacing: 0
+        rowSpacing: 0
+        flow: GridLayout.LeftToRight
+        columns: 2
 
         Rectangle {
             id: connectedDevicesLabel
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 50
+            implicitWidth: childrenRect.width + unit.dp(16)
+            implicitHeight: connectedDevicesLabelText.height + unit.dp(22)
             color: "#21242b"
 
             Text {
+                id: connectedDevicesLabelText
                 color: "#ffffff"
                 text: qsTr("Connected Devices")
-                font.pointSize: 11
+                font.pixelSize: unit.em(1.3)
                 font.family: openSansRegularFont.name
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.leftMargin: 10
+                anchors.leftMargin: unit.dp(8)
+            }
+        }
+
+
+        Rectangle {
+            id: currentDeviceRect
+
+            Layout.fillWidth: true
+            implicitHeight: connectedDevicesLabel.height
+
+            color: "#5f92eb"
+
+            RowLayout {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: unit.dp(8)
+                anchors.rightMargin: anchors.leftMargin
+                spacing: anchors.leftMargin
+
+                Text {
+                    id: currentDeviceLabel
+                    color: "#ffffff"
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: unit.em(1.3)
+                    text: "Device"
+                }
+
+                Text {
+                    id: currentDevicePointLabel
+                    color: "#ffffff"
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: currentDeviceLabel.font.pixelSize
+                    text: ">"
+                }
+
+                Text {
+                    id: currentDeviceNameLabel
+                    objectName: "currentDeviceNameLabel"
+                    color: "#ffffff"
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: currentDeviceLabel.font.pixelSize
+                    text: "None"
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Image {
+                        id: currentDeviceRectLogo
+                        anchors.right: parent.right
+                        height: parent.height
+                        source: "qrc:/res/images/logo.png"
+                        fillMode: Image.PreserveAspectFit
+                        mipmap: true
+                    }
+                }
             }
         }
 
         Rectangle {
             id: connectedDevicesListRectangle
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: connectedDevicesLabel.bottom
-            anchors.bottom: parent.bottom
+            implicitWidth: connectedDevicesLabel.width
+            Layout.fillHeight: true
             color: "#232b2e"
 
             ListView {
@@ -106,10 +166,10 @@ ApplicationWindow {
                 delegate: Component {
                     id: deviceListDelegate
                     Rectangle {
-                        id: wrapper
+                        id: deviceInfoWrapper
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        height: 50
+                        height: deviceInfo.height + unit.dp(18)
                         x: 0
                         color: "#00ffffff"
 
@@ -117,23 +177,18 @@ ApplicationWindow {
                             ColorAnimation {}
                         }
 
-                        Rectangle {
-                            id: textContainer
+                        Text {
+                            id: deviceInfo
+
                             anchors.left: parent.left
                             anchors.right: parent.right
+                            anchors.leftMargin: unit.dp(8)
                             anchors.verticalCenter: parent.verticalCenter
-                            height: childrenRect.height
-                            color: "transparent"
 
-                            Text {
-                                id: contactInfo
-                                text: name
-                                color: "white"
-                                font.pointSize: 9
-                                font.family: openSansRegularFont.name
-                                anchors.left: parent.left
-                                anchors.leftMargin: 10
-                            }
+                            text: name
+                            color: "white"
+                            font.pixelSize: unit.em(1.1)
+                            font.family: openSansRegularFont.name
                         }
 
                         MouseArea {
@@ -149,12 +204,12 @@ ApplicationWindow {
                                 when: mouser.containsMouse && !mouser.pressed
 
                                 PropertyChanges {
-                                    target: wrapper
+                                    target: deviceInfoWrapper
                                     color: "#33ffffff"
                                 }
                                 PropertyChanges {
-                                    target: textContainer
-                                    anchors.leftMargin: 10
+                                    target: deviceInfo
+                                    anchors.leftMargin: unit.dp(12)
                                 }
                             },
                             State {
@@ -162,12 +217,12 @@ ApplicationWindow {
                                 when: mouser.pressed
 
                                 PropertyChanges {
-                                    target: wrapper
+                                    target: deviceInfoWrapper
                                     color: "#33000000"
                                 }
                                 PropertyChanges {
-                                    target: textContainer
-                                    anchors.leftMargin: 10
+                                    target: deviceInfo
+                                    anchors.leftMargin: unit.dp(12)
                                 }
                             }
                         ]
@@ -181,7 +236,7 @@ ApplicationWindow {
                     Rectangle {
                         color: "#5f92eb"
                         width: parent.width
-                        height: 70
+                        height: deviceListDelegate.height
                     }
                 }
 
@@ -189,288 +244,11 @@ ApplicationWindow {
                 focus: true
             }
         }
-    }
-
-    Rectangle {
-        id: currentDeviceRect
-        anchors.left: connectedDevices.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-        height: 50
-        color: "#5f92eb"
-
-        Text {
-            id: currentDeviceLabel
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            color: "#ffffff"
-            font.family: openSansRegularFont.name
-            font.pointSize: 11
-            text: "Device"
-        }
-
-        Text {
-            id: currentDevicePointLabel
-            anchors.left: currentDeviceLabel.right
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            color: "#ffffff"
-            font.family: openSansRegularFont.name
-            font.pointSize: 11
-            text: ">"
-        }
-
-        Text {
-            id: currentDeviceNameLabel
-            objectName: "currentDeviceNameLabel"
-            anchors.left: currentDevicePointLabel.right
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            color: "#ffffff"
-            font.family: openSansRegularFont.name
-            font.pointSize: 11
-            text: "None"
-        }
-
-        Image {
-            id: currentDeviceRectLogo
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.top: parent.top
-            anchors.margins: 15
-            width: 20
-            source: "qrc:/res/images/logo.png"
-            fillMode: Image.PreserveAspectFit
-            mipmap: true
-        }
-    }
-
-    Item {
-        id: columnLayout1
-        anchors.left: connectedDevices.right
-        anchors.top: currentDeviceRect.bottom
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        z: 1
-
-        RectangularGlow {
-            id: mainPageBottomTabShadow
-            anchors.fill: mainPageBottomTabRect
-            color: "#30000000"
-            glowRadius: 4
-            cornerRadius: mainPageBottomTabRect.radius + glowRadius
-            spread: 0.1
-            z: 1
-        }
-
-        Rectangle {
-            id: mainPageBottomTabRect
-            height: 100
-            Layout.maximumHeight: 100
-            Layout.alignment: Qt.AlignBottom
-            color: "white"
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            z: 3
-
-            states: [
-                State {
-                    name: "hidden"
-                    PropertyChanges {
-                        target: mainPageBottomTabRect
-                        height: 0
-                    }
-                }
-            ]
-            Behavior on height { SpringAnimation { spring: 2; damping: 0.4; duration: 300 } }
-
-            GridLayout {
-                id: mainPageBottomTab
-                anchors.fill: parent
-                anchors.margins: 6
-                flow: GridLayout.TopToBottom
-                rows: 2
-                columnSpacing: 0
-                rowSpacing: 0
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "Make"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "Samsung"
-                        color: "#000"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "Model"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "GT-i9100"
-                        color: "#000"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "MIN"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "0000000000"
-                        color: "#000"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "MDN"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "0000000000"
-                        color: "#000"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "ESN"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "80512b74"
-                        color: "#000"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#000"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "IMEI/MEID"
-                        color: "#FFF"
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "#f1f1f1"
-
-                    Text {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        font.family: openSansRegularFont.name
-                        text: "99000033839416"
-                        color: "#000"
-                    }
-                }
-            }
-        }
 
         Item {
             id: mainPageRect
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.bottom: mainPageBottomTabRect.top
-            anchors.top: parent.top
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             z: 2
 
             Loader {
@@ -481,7 +259,10 @@ ApplicationWindow {
                 source: "main_provisionmode.qml"
                 objectName: "mainPageLoader"
 
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: mainPageBottomTabRect.top
 
                 currentView: ""
 
@@ -513,17 +294,17 @@ ApplicationWindow {
 
             Rectangle {
                 id: mainPageBottomTabArrowRect
-                width: 30
-                height: 30
+                height: currentDeviceRect.height * 0.7
+                width: height
                 color: "white"
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
+                anchors.bottom: mainPageBottomTabRect.top
                 z: 3
 
                 Image {
                     id: mainPageBottomTabArrow
                     anchors.fill: parent
-                    anchors.margins: 5
+                    anchors.margins: unit.dp(4)
                     source: "qrc:/res/images/up_arrow.png"
                     smooth: true
                     mipmap: true
@@ -547,6 +328,92 @@ ApplicationWindow {
                     onClicked: {
                         mainPageBottomTabRect.state == 'hidden' ? mainPageBottomTabRect.state = '' : mainPageBottomTabRect.state = 'hidden'
                         mainPageBottomTabArrow.state == 'hidden' ? mainPageBottomTabArrow.state = '' : mainPageBottomTabArrow.state = 'hidden'
+                    }
+                }
+            }
+
+            RectangularGlow {
+                id: mainPageBottomTabShadow
+                anchors.fill: mainPageBottomTabRect
+                color: "#30000000"
+                glowRadius: unit.dp(4)
+                cornerRadius: mainPageBottomTabRect.radius + glowRadius
+                spread: 0.1
+                z: 1
+            }
+
+            Rectangle {
+                id: mainPageBottomTabRect
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: mainPageBottomTab.childrenRect.height + (unit.dp(8) * 2)
+                Layout.maximumHeight: mainPageBottomTab.childrenRect.height + (unit.dp(8) * 2)
+                color: "white"
+                z: 3
+
+                states: [
+                    State {
+                        name: "hidden"
+                        PropertyChanges {
+                            target: mainPageBottomTabRect
+                            height: 0
+                        }
+                    }
+                ]
+
+                Behavior on height { SpringAnimation { spring: 2; damping: 0.4; duration: 300 } }
+
+                GridLayout {
+                    id: mainPageBottomTab
+                    anchors.fill: parent
+                    anchors.margins: unit.dp(8)
+                    flow: GridLayout.TopToBottom
+                    rows: 2
+                    columnSpacing: 0
+                    rowSpacing: 0
+
+                    DeviceInfoBox {
+                        id: currentDeviceMake
+                        header: "Make"
+                        value: "Samsung"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceESN
+                        header: "ESN"
+                        value: "80512b74"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceModel
+                        header: "Model"
+                        value: "GT-i9100"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceMEID
+                        header: "MEID"
+                        value: "99000033839416"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceMIN
+                        header: "MIN"
+                        value: "0000000000"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceIMEI
+                        Layout.columnSpan: 2
+                        header: "IMEI"
+                        value: "99000033839416"
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceMDN
+                        header: "MDN"
+                        value: "0000000000"
                     }
                 }
             }
