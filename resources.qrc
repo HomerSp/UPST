@@ -4,5 +4,8 @@
         <file>res/fonts/OpenSans-Regular.ttf</file>
         <file>res/images/logo.png</file>
         <file>res/images/up_arrow.png</file>
+        <file>res/images/icons/phone.svg</file>
+        <file>res/images/icons/tablet.svg</file>
+        <file>res/images/icons/computer.svg</file>
     </qresource>
 </RCC>
