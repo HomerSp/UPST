@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QQmlApplicationEngine>
+#include <QPair>
 
 #include "serial/serialdevice.h"
 
@@ -10,7 +11,8 @@ class ConnectedDevicesModel : public QAbstractListModel {
     Q_OBJECT
 public:
     enum DevicesRoles {
-        NameRole = Qt::UserRole + 1
+        NameRole = Qt::UserRole + 1,
+        PortRole
     };
 
     ConnectedDevicesModel(QObject* parent = 0);
@@ -19,17 +21,17 @@ public:
     virtual QHash<int, QByteArray> roleNames() const;
     virtual int rowCount(const QModelIndex &parent) const;
 
-    void addDevice(const QString& name);
+    void addDevice(const QString& name, const QString& port);
 
 private:
-    QList<QString> mDevices;
+    QList<QPair<QString, QString>> mDevices;
 };
 
 
 class Main : public QObject {
     Q_OBJECT
 public:
-    Main(QQmlApplicationEngine* engine);
+    Main(QQmlApplicationEngine* engine, ConnectedDevicesModel* model);
     ~Main();
 
 signals:
@@ -48,6 +50,8 @@ public slots:
 
 private:
     QQmlApplicationEngine *mEngine;
+
+    ConnectedDevicesModel* mModel;
 
     QList<Serial::SerialDevice*> mDevices;
 };

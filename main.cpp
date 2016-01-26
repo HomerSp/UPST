@@ -5,6 +5,7 @@
 #include <QSerialPortInfo>
 #include <QAbstractNativeEventFilter>
 #include <QQmlContext>
+#include <QScreen>
 
 #include "main.h"
 #include "devicefilterevent.h"
@@ -23,7 +24,12 @@ ConnectedDevicesModel::ConnectedDevicesModel(QObject* parent)
 }
 
 QVariant ConnectedDevicesModel::data(const QModelIndex& index, int role) const {
-    return mDevices.at(index.row());
+    switch(role) {
+    case PortRole:
+        return mDevices.at(index.row()).second;
+    }
+
+    return mDevices.at(index.row()).first;
 }
 int ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
     return mDevices.size();
@@ -32,15 +38,19 @@ int ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
 QHash<int, QByteArray> ConnectedDevicesModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
+    roles[PortRole] = "port";
     return roles;
 }
 
-void ConnectedDevicesModel::addDevice(const QString& name) {
-    mDevices.append(name);
+void ConnectedDevicesModel::addDevice(const QString& name, const QString& port) {
+    QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
+    mDevices.append(QPair<QString,QString>(name, port));
+    QAbstractListModel::endInsertRows();
 }
 
-Main::Main(QQmlApplicationEngine* engine)
-    : mEngine(engine)
+Main::Main(QQmlApplicationEngine* engine, ConnectedDevicesModel* model)
+    : mEngine(engine),
+      mModel(model)
 {
     QObject* rootObject = engine->rootObjects().first();
 
@@ -70,10 +80,12 @@ Main::~Main() {
 
 void Main::provision() {
     QObject* rootObject = mEngine->rootObjects().first();
-    QObject* textMDN = rootObject->findChild<QObject*>("textMDN");
-    QString mdn = textMDN->property("text").toString();
+    QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();
+    QString min = rootObject->findChild<QObject*>("textMIN")->property("text").toString();
 
     qDebug()<<"provision"<<mdn;
+
+    mModel->addDevice(mdn, min);
 
     return;
 
@@ -217,16 +229,18 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     ConnectedDevicesModel devicesModel;
-    devicesModel.addDevice("SAMSUNG GT-i9100");
-    devicesModel.addDevice("HTC Rezound");
+    devicesModel.addDevice("SAMSUNG GT-i9100", "COM1");
+    devicesModel.addDevice("HTC Rezound", "COM3");
+    devicesModel.addDevice("HTC Rezound 123451235454", "COM5");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("devicesModel", &devicesModel);
+
     engine.load(QUrl(QStringLiteral("qrc:/res/qml/main.qml")));
 
     QObject::connect(&engine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
-    Main main(&engine);
+    Main main(&engine, &devicesModel);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceAdd, &main, &Main::deviceAdd);
