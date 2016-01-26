@@ -29,6 +29,11 @@ ApplicationWindow {
         source: "qrc:/res/fonts/OpenSans-Regular.ttf"
     }
 
+    FontLoader {
+        id: openSansBoldFont;
+        source: "qrc:/res/fonts/OpenSans-Bold.ttf"
+    }
+
     menuBar: MenuBar {
         Menu {
             title: qsTr("File")
@@ -69,18 +74,40 @@ ApplicationWindow {
 
         Rectangle {
             id: connectedDevicesLabel
-            implicitWidth: childrenRect.width + unit.dp(16)
-            implicitHeight: connectedDevicesLabelText.height + unit.dp(22)
+            anchors.left: parent.left
+            anchors.top: parent.top
+            Layout.minimumWidth: Math.max(connectedDevicesListRectangle.width, connectedDevicesLabelText.width + connectedDevicesLabelIcon.width + unit.dp(24))
+            implicitHeight: connectedDevicesLabelText.height + unit.dp(32)
             color: "#21242b"
+            z: 5
+
+            Image {
+                id: connectedDevicesLabelIcon
+
+                anchors.left: parent.left
+                anchors.leftMargin: unit.dp(8)
+                anchors.verticalCenter: parent.verticalCenter
+
+                source: "qrc:/res/images/icons/computer.svg"
+                fillMode: Image.PreserveAspectFit
+                mipmap: true
+                sourceSize.height: connectedDevicesLabelText.height
+            }
+
+            ColorOverlay {
+                anchors.fill: connectedDevicesLabelIcon
+                source: connectedDevicesLabelIcon
+                color: "#ffffff"
+            }
 
             Text {
                 id: connectedDevicesLabelText
                 color: "#ffffff"
                 text: qsTr("Connected Devices")
-                font.pixelSize: unit.em(1.3)
+                font.pixelSize: unit.em(1.35)
                 font.family: openSansRegularFont.name
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
+                anchors.left: connectedDevicesLabelIcon.right
                 anchors.leftMargin: unit.dp(8)
             }
         }
@@ -93,6 +120,7 @@ ApplicationWindow {
             implicitHeight: connectedDevicesLabel.height
 
             color: "#5f92eb"
+            z: 5
 
             RowLayout {
                 anchors.left: parent.left
@@ -145,30 +173,49 @@ ApplicationWindow {
 
         Rectangle {
             id: connectedDevicesListRectangle
-            implicitWidth: connectedDevicesLabel.width
+            width: connectedDevicesList.contentItem.childrenRect.width
+            Layout.minimumWidth: connectedDevicesLabel.Layout.minimumWidth
             Layout.fillHeight: true
             color: "#232b2e"
+            z: 4
 
             ListView {
                 signal currentIndexChanged(int index)
 
                 id: connectedDevicesList
                 objectName: "connectedDevicesList"
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.top: parent.top
+                anchors.fill: parent
+                orientation: ListView.Vertical
+
+                function updateWidth() {
+                    for(var i = 0; i < contentItem.children.length; i++) {
+                        var w = contentItem.children[i].width;
+                        if(w < width) {
+                            contentItem.children[i].width = width;
+                        }
+                    }
+                }
 
                 onCurrentItemChanged: {
                     this.currentIndexChanged(this.currentIndex)
                 }
 
+                onCountChanged: {
+                    updateWidth();
+                }
+
+                onWidthChanged: {
+                    updateWidth();
+                }
+
                 delegate: Component {
                     id: deviceListDelegate
                     Rectangle {
+                        objectName: "deviceInfoWrapper"
                         id: deviceInfoWrapper
                         anchors.left: parent.left
-                        anchors.right: parent.right
+                        Layout.fillWidth: true
+                        width: deviceInfoIcon.width + deviceInfoText.width + unit.dp(28)
                         height: deviceInfo.height + unit.dp(18)
                         x: 0
                         color: "#00ffffff"
@@ -177,18 +224,63 @@ ApplicationWindow {
                             ColorAnimation {}
                         }
 
-                        Text {
+                        RowLayout {
                             id: deviceInfo
 
                             anchors.left: parent.left
-                            anchors.right: parent.right
                             anchors.leftMargin: unit.dp(8)
+                            anchors.right: parent.right
+                            anchors.rightMargin: unit.dp(8)
                             anchors.verticalCenter: parent.verticalCenter
 
-                            text: name
-                            color: "white"
-                            font.pixelSize: unit.em(1.1)
-                            font.family: openSansRegularFont.name
+                            spacing: 0
+                            clip: true
+
+                            Image {
+                                id: deviceInfoIcon
+
+                                Layout.fillHeight: true
+                                Layout.rowSpan: 2
+
+                                source: "qrc:/res/images/icons/phone.svg"
+                                fillMode: Image.PreserveAspectFit
+                                mipmap: true
+                                sourceSize.height: deviceInfoText.height
+                            }
+
+                            ColorOverlay {
+                                anchors.fill: deviceInfoIcon
+                                source: deviceInfoIcon
+                                color: "#ffffff"
+                            }
+
+                            Column {
+                                id: deviceInfoText
+
+                                anchors.left: deviceInfoIcon.right
+                                anchors.leftMargin: unit.dp(8)
+
+                                Text {
+                                    id: deviceInfoName
+
+                                    text: name
+                                    color: "white"
+                                    font.pixelSize: unit.em(1.1)
+                                    font.family: openSansRegularFont.name
+                                    clip: true
+                                }
+
+                                Text {
+                                    id: deviceInfoPort
+
+                                    text: port
+                                    color: "white"
+                                    font.pixelSize: unit.em(1.1)
+                                    font.family: openSansBoldFont.name
+                                    font.bold: true
+                                    clip: true
+                                }
+                            }
                         }
 
                         MouseArea {
@@ -235,7 +327,7 @@ ApplicationWindow {
                 highlight: Component {
                     Rectangle {
                         color: "#5f92eb"
-                        width: parent.width
+                        width: connectedDevicesListRectangle.width
                         height: deviceListDelegate.height
                     }
                 }

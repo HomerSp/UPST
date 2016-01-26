@@ -41,7 +41,7 @@ Item {
                     id: labelMDN
                     text: qsTr("MDN")
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1)
+                    font.pixelSize: unit.em(1.3)
                 }
 
                 TextField {
@@ -50,6 +50,7 @@ Item {
                     anchors.top: labelMDN.bottom
                     anchors.topMargin: unit.dp(4)
                     width: parent.width
+                    height: labelMDN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
                     font.pixelSize: labelMDN.font.pointSize
                 }
@@ -77,7 +78,7 @@ Item {
                     id: labelMIN
                     text: qsTr("MIN")
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1)
+                    font.pixelSize: unit.em(1.3)
                 }
 
                 TextField {
@@ -86,8 +87,9 @@ Item {
                     anchors.top: labelMIN.bottom
                     anchors.topMargin: unit.dp(4)
                     width: parent.width
+                    height: labelMIN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
-                    font.pointSize: labelMIN.font.pointSize
+                    font.pixelSize: labelMIN.font.pointSize
                 }
             }
 
@@ -96,6 +98,7 @@ Item {
                 objectName: "provisionButton"
                 text: qsTr("Provision")
                 width: minContainerRect.width / 2
+                height: textMIN.height
                 anchors.top: minContainerRect.bottom
                 anchors.right: minContainerRect.right
                 anchors.topMargin: unit.dp(20)
@@ -122,7 +125,7 @@ Item {
                         color: "white"
                         text: provisionButton.text
                         font.family: openSansRegularFont.name
-                        font.pixelSize: unit.em(1)
+                        font.pixelSize: unit.em(1.3)
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
