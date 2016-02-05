@@ -5,8 +5,10 @@ HEADERS += \
     $$PWD/mob_firmwarerev.h \
     $$PWD/imeicommand.h \
     $$PWD/meidcommand.h \
-    $$PWD/esncommand.h
+    $$PWD/esncommand.h \
+    $$PWD/mincommand.h
 SOURCES += \  
     $$PWD/nvcommand.cpp \
     $$PWD/mdncommand.cpp \
-    $$PWD/imeicommand.cpp
+    $$PWD/imeicommand.cpp \
+    $$PWD/mincommand.cpp

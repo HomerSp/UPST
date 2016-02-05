@@ -21,21 +21,24 @@ public:
     virtual QHash<int, QByteArray> roleNames() const;
     virtual int rowCount(const QModelIndex &parent) const;
 
-    void addDevice(const QString& name, const QString& port);
+    void addDevice(Serial::SerialDevice* device);
+
+public slots:
+    void deviceChanged(Serial::SerialDevice* device, bool added);
 
 private:
-    QList<QPair<QString, QString>> mDevices;
+    QList<Serial::SerialDevice*> mDevices;
 };
 
 
 class Main : public QObject {
     Q_OBJECT
 public:
-    Main(QQmlApplicationEngine* engine, ConnectedDevicesModel* model);
+    Main(QQmlApplicationEngine* engine);
     ~Main();
 
 signals:
-    void deviceChanged(const Serial::SerialDevice& device, bool added);
+    void deviceChanged(Serial::SerialDevice* device, bool added);
 
 public slots:
     void deviceAdd(Serial::SerialDevice* device);
@@ -50,8 +53,6 @@ public slots:
 
 private:
     QQmlApplicationEngine *mEngine;
-
-    ConnectedDevicesModel* mModel;
 
     QList<Serial::SerialDevice*> mDevices;
 };

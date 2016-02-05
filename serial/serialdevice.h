@@ -41,6 +41,10 @@ namespace Serial {
             return mPort;
         }
 
+        const QString& description() const {
+            return mDescription;
+        }
+
         bool isAndroid() const {
             return mIsAndroid;
         }
@@ -58,8 +62,24 @@ namespace Serial {
             return mStopBits;
         }
 
-        QString mdn() const {
+        const QString &mdn() const {
             return mMdn;
+        }
+
+        uint64_t min() const {
+            return mMin;
+        }
+
+        uint32_t esn() const {
+            return mESN;
+        }
+
+        uint64_t imei() const {
+            return mIMEI;
+        }
+
+        uint64_t meid() const {
+            return mMEID;
         }
 
     private:
@@ -78,6 +98,10 @@ namespace Serial {
         QSerialPort::StopBits mStopBits;
 
         QString mMdn;
+        uint64_t mMin;
+        uint32_t mESN;
+        uint64_t mIMEI;
+        uint64_t mMEID;
     };
 }
 

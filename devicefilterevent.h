@@ -21,7 +21,8 @@ signals:
     void deviceRemove(const QString& port);
 
 protected:
-    void handleDeviceChanged(const QString& port, bool added = true);
+    void handleDeviceAdded();
+    void handleDeviceRemoved(const QString& port);
 
     bool checkAndroidDevice(const QString& port, const QString& vid, const QString& pid);
 

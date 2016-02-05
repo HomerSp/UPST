@@ -6,14 +6,32 @@
 using namespace Serial::QCDM::Commands;
 
 QcdmCommand::QcdmCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data)
-    : SerialCommand(communicator),
-     mCmd(cmd),
-     mData(data)
+    : SerialCommand(communicator)
 {
-
+    mCmds.append(new QcdmCommandItem(cmd, data));
 }
 
-bool QcdmCommand::execute(QByteArray& result, uint16_t* errorCode) {
+QcdmCommand::QcdmCommand(SerialCommunicator* communicator, QcdmCommandItem *cmd)
+    : SerialCommand(communicator)
+{
+    mCmds.append(cmd);
+}
+
+QcdmCommand::QcdmCommand(SerialCommunicator* communicator, const QList<QcdmCommandItem*>& cmds)
+    : SerialCommand(communicator)
+{
+    foreach(QcdmCommandItem *cmd, cmds) {
+        mCmds.append(cmd);
+    }
+}
+
+QcdmCommand::~QcdmCommand() {
+    foreach(QcdmCommandItem* cmd, mCmds) {
+        delete cmd;
+    }
+}
+
+bool QcdmCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
     if(errorCode != nullptr) {
         *errorCode = 0;
     }
@@ -24,58 +42,80 @@ bool QcdmCommand::execute(QByteArray& result, uint16_t* errorCode) {
         return false;
     }
 
-    QByteArray request;
-    getRequest(request);
+    QList<QByteArray> requests;
+    getRequest(requests);
 
 
-    qDebug()<<"QcdmCommand writing"<<QString(request.toHex());
-    if(!communicator()->write(request)) {
-        return false;
-    }
-    qDebug()<<"QcdmCommand reading...";
-    if(!communicator()->read(result, timeout())) {
-        return false;
-    }
+    for(int i = 0; i < requests.size(); i++) {
+        QByteArray request = requests[i];
 
-    if(result.size() < 1) {
-        qDebug()<<"QcdmCommand read less than 1 bytes";
-        return false;
-    }
-
-    qDebug()<<"QcdmCommand read"<<QString(result.toHex());
-
-    uint8_t cmd = result[0];
-    if(cmd == Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F) {
-        if(errorCode != nullptr) {
-            *errorCode = Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F;
+        QByteArray data;
+        qDebug()<<"QcdmCommand writing"<<QString(request.toHex());
+        if(!communicator()->write(request)) {
             return false;
         }
+        qDebug()<<"QcdmCommand reading...";
+        if(!communicator()->read(data, timeout())) {
+            return false;
+        }
+
+        if(data.size() < 1) {
+            qDebug()<<"QcdmCommand read less than 1 bytes";
+            return false;
+        }
+
+        qDebug()<<"QcdmCommand read"<<QString(data.toHex());
+
+        uint8_t cmd = data[0];
+        if(cmd == Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F) {
+            if(errorCode != nullptr) {
+                *errorCode = Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F;
+                return false;
+            }
+        }
+        if(cmd != command(i)) {
+            qDebug()<<"cmd"<<cmd<<"!="<<command(i);
+
+            return false;
+        }
+
+        int crcSize = Serial::CRCUtils::verifyCRC(data);
+        if(crcSize == 0) {
+            return false;
+        }
+
+        data.remove(data.size() - crcSize, crcSize);
+        data.remove(0, 1);
+
+        qDebug()<<"QcdmCommand read"<<QString(data.toHex());
+
+        result.append(data);
     }
-    if(cmd != command()) {
-        qDebug()<<"cmd"<<cmd<<"!="<<command();
-
-        return false;
-    }
-
-    int crcSize = Serial::CRCUtils::verifyCRC(result);
-    if(crcSize == 0) {
-        return false;
-    }
-
-    result.remove(result.size() - crcSize, crcSize);
-    result.remove(0, 1);
-
-    qDebug()<<"QcdmCommand read"<<QString(result.toHex());
 
     return true;
 }
 
-bool QcdmCommand::getRequest(QByteArray& request) {
-    request.clear();
-    request.append(command());
-    request.append(data());
+bool QcdmCommand::execute(QByteArray& result, uint16_t* errorCode) {
+    QList<QByteArray> ret;
+    if(!execute(ret, errorCode)) {
+        return false;
+    }
 
-    Serial::CRCUtils::addCRC(request);
+    result = ret.at(0);
+    return true;
+}
+
+bool QcdmCommand::getRequest(QList<QByteArray>& request) {
+    request.clear();
+
+    for(int i = 0; i < mCmds.size(); i++) {
+        QByteArray data;
+        data.append(mCmds.at(i)->cmd);
+        data.append(mCmds.at(i)->data);
+
+        Serial::CRCUtils::addCRC(data);
+        request.append(data);
+    }
 
     return true;
 }

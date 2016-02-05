@@ -5,56 +5,88 @@
 using namespace Serial::QCDM::Commands::Nv;
 
 NvCommand::NvCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data)
-    : QcdmCommand(communicator, cmd, data),
-      mItem(item)
+    : QcdmCommand(communicator, new NvCommandItem(cmd, item, data))
 {
 
 }
 
-bool NvCommand::execute(QByteArray& result, uint16_t* errorCode) {
+NvCommand::NvCommand(SerialCommunicator* communicator, const QList<NvCommandItem*>& cmds)
+    : QcdmCommand(communicator)
+{
+    QList<QcdmCommandItem*> items;
+    foreach(NvCommandItem* item, cmds) {
+        addItem(item);
+    }
+}
+
+bool NvCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
     if(!QcdmCommand::execute(result, errorCode)) {
         return false;
     }
 
-    if(result.size() < 2) {
-        return false;
+    for(int i = 0; i < result.size(); i++) {
+        QByteArray &resultData = result[i];
+        if(resultData.size() < 2) {
+            return false;
+        }
+
+        uint16_t item = ((uint16_t)resultData.at(1) << 8) | (uint8_t)resultData.at(0);
+        QCDM::NvItem nvItem = this->nvItem(i);
+        if(item != nvItem) {
+            qDebug()<<"NvCommand item"<<item<<"!="<<nvItem;
+            return false;
+        }
+
+        resultData.remove(0, 2);
+
+        if(resultData.size() < 2) {
+            return false;
+        }
+
+        uint16_t error = ((uint16_t)resultData.at(resultData.size() - 3) << 8) | (uint8_t)resultData.at(resultData.size() - 2);
+        if(errorCode != nullptr) {
+            *errorCode = error;
+        }
+
+        if(error != 0) {
+            return false;
+        }
     }
 
-    uint16_t item = ((uint16_t)result.at(1) << 8) | (uint8_t)result.at(0);
-    if(item != mItem) {
-        qDebug()<<"NvCommand item"<<item<<"!="<<mItem;
-        return false;
-    }
-
-    result.remove(0, 2);
-
-    if(result.size() < 2) {
-        return true;
-    }
-
-    uint16_t error = ((uint16_t)result.at(result.size() - 3) << 8) | (uint8_t)result.at(result.size() - 2);
-    if(errorCode != nullptr) {
-        *errorCode = error;
-    }
-
-    return error == 0;
+    return true;
 }
 
-bool NvCommand::getRequest(QByteArray &request) {
-    uint16_t nvValue = (uint16_t)mItem;
-    uint8_t nvByte1 = (uint8_t)((nvValue) & 0xFF);
-    uint8_t nvByte2 = (uint8_t)((nvValue >> 8) & 0xFF);
-
-    request.append(command());
-    request.append(nvByte1);
-    request.append(nvByte2);
-    request.append(data());
-
-    while(request.size() < 133) {
-        request.append(static_cast<char>(0x00));
+bool NvCommand::execute(QByteArray& result, uint16_t* errorCode) {
+    QList<QByteArray> results;
+    if(!execute(results, errorCode)) {
+        return false;
     }
 
-    Serial::CRCUtils::addCRC(request);
+    result = results[0];
+
+    return true;
+}
+
+bool NvCommand::getRequest(QList<QByteArray> &request) {
+    for(int i = 0; i < count(); i++) {
+        QByteArray reqData;
+        uint16_t nvValue = (uint16_t)this->nvItem(i);
+        uint8_t nvByte1 = (uint8_t)((nvValue) & 0xFF);
+        uint8_t nvByte2 = (uint8_t)((nvValue >> 8) & 0xFF);
+
+        reqData.append(command(i));
+        reqData.append(nvByte1);
+        reqData.append(nvByte2);
+        reqData.append(data(i));
+
+        while(reqData.size() < 133) {
+            reqData.append(static_cast<char>(0x00));
+        }
+
+        Serial::CRCUtils::addCRC(reqData);
+
+        request.append(reqData);
+    }
 
     return true;
 }

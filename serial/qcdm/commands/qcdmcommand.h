@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QPair>
 
 #include "../../serialcommand.h"
 #include "../../serialcommunicator.h"
@@ -11,31 +12,66 @@
 namespace Serial {
     namespace QCDM {
         namespace Commands {
+            class QcdmCommandItem {
+            public:
+                QcdmCommandItem(QCDM::DiagCommands cmd, QByteArray data) {
+                    this->cmd = cmd;
+                    this->data = data;
+                }
+
+                QcdmCommandItem(const QcdmCommandItem &item)
+                    : QcdmCommandItem(item.cmd, item.data)
+                {
+                }
+
+                QCDM::DiagCommands cmd;
+                QByteArray data;
+            };
+
             class QcdmCommand : public SerialCommand
             {
             public:
                 QcdmCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0);
+                QcdmCommand(SerialCommunicator* communicator, const QList<QcdmCommandItem *> &cmds);
+                ~QcdmCommand();
 
+                int count() {
+                    return mCmds.size();
+                }
+
+                virtual bool execute(QList<QByteArray>& result, uint16_t* errorCode = nullptr);
                 virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr);
 
             protected:
-                const QCDM::DiagCommands &command() {
-                    return mCmd;
+                QcdmCommand(SerialCommunicator* communicator) : SerialCommand(communicator) {
+
+                }
+                QcdmCommand(SerialCommunicator* communicator, QcdmCommandItem *cmd);
+
+                void addItem(QcdmCommandItem* item) {
+                    mCmds.append(item);
                 }
 
-                const QByteArray &data() {
-                    return mData;
+                QcdmCommandItem* item(int i = 0) {
+                    return mCmds[i];
                 }
 
-                void setData(const QByteArray& data) {
-                    mData = data;
+                const QCDM::DiagCommands &command(int i = 0) {
+                    return mCmds[i]->cmd;
                 }
 
-                virtual bool getRequest(QByteArray& request);
+                const QByteArray &data(int i = 0) {
+                    return mCmds[i]->data;
+                }
+
+                void setData(const QByteArray& data, int i = 0) {
+                    mCmds[i]->data = data;
+                }
+
+                virtual bool getRequest(QList<QByteArray>& request);
 
             private:
-                QCDM::DiagCommands mCmd;
-                QByteArray mData;
+                QList<QcdmCommandItem *> mCmds;
             };
         }
     }

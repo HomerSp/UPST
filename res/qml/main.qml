@@ -152,7 +152,11 @@ ApplicationWindow {
                     color: "#ffffff"
                     font.family: openSansRegularFont.name
                     font.pixelSize: currentDeviceLabel.font.pixelSize
-                    text: "None"
+                    text: qsTr("None")
+
+                    function reset() {
+                        text = qsTr("None")
+                    }
                 }
 
                 Item {
@@ -186,6 +190,7 @@ ApplicationWindow {
                 objectName: "connectedDevicesList"
                 anchors.fill: parent
                 orientation: ListView.Vertical
+                currentIndex: 0
 
                 function updateWidth() {
                     for(var i = 0; i < contentItem.children.length; i++) {
@@ -467,36 +472,42 @@ ApplicationWindow {
 
                     DeviceInfoBox {
                         id: currentDeviceMake
-                        header: "Make"
+                        objectName: "currentDeviceMake"
+                        header: qsTr("Make")
                         value: "Samsung"
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceESN
+                        objectName: "currentDeviceESN"
                         header: "ESN"
                         value: "80512b74"
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceModel
+                        objectName: "currentDeviceModel"
                         header: "Model"
                         value: "GT-i9100"
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceMEID
+                        objectName: "currentDeviceMEID"
                         header: "MEID"
                         value: "99000033839416"
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceMIN
+                        objectName: "currentDeviceMIN"
                         header: "MIN"
                         value: "0000000000"
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceIMEI
+                        objectName: "currentDeviceIMEI"
                         Layout.columnSpan: 2
                         header: "IMEI"
                         value: "99000033839416"
@@ -504,6 +515,7 @@ ApplicationWindow {
 
                     DeviceInfoBox {
                         id: currentDeviceMDN
+                        objectName: "currentDeviceMDN"
                         header: "MDN"
                         value: "0000000000"
                     }

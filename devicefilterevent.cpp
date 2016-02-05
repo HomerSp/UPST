@@ -17,35 +17,31 @@ bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* mes
 }
 #endif
 
-void DeviceFilterEvent::handleDeviceChanged(const QString &port, bool added) {
-    qDebug()<<"handleDeviceChanged availablePorts"<<QSerialPortInfo::availablePorts().size();
+void DeviceFilterEvent::handleDeviceAdded() {
+    qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        if(info.portName() == port) {
-            QString port, vid, pid;
-            port = info.portName();
-            vid.sprintf("%04X", info.vendorIdentifier());
-            pid.sprintf("%04X", info.productIdentifier());
+        QString port, vid, pid;
+        port = info.portName();
+        vid.sprintf("%04X", info.vendorIdentifier());
+        pid.sprintf("%04X", info.productIdentifier());
 
-            qDebug()<<"Device"<<port<<vid<<pid<<((added)?"added":"removed");
+        qDebug()<<"Device"<<port<<vid<<pid<<"added";
 
-            if(added) {
-                Serial::SerialDevice* device = new Serial::SerialDevice(info, true);
-                if(device->isValid()) {
-                    qDebug()<<"Device is valid"<<device->port();
-                    emit deviceAdd(device);
-                } else {
-                    qDebug()<<"Device is not valid"<<device->port();
-                    delete device;
-                }
-            } else {
-                emit deviceRemove(port);
-            }
+        Serial::SerialDevice* device = new Serial::SerialDevice(info, true);
+        if(device->isValid()) {
+            qDebug()<<"Device is valid"<<device->port();
+            emit deviceAdd(device);
+        } else {
+            qDebug()<<"Device is not valid"<<device->port();
+            delete device;
         }
     }
 }
 
+void DeviceFilterEvent::handleDeviceRemoved(const QString& port) {
+    emit deviceRemove(port);
+}
+
 void DeviceFilterEvent::refresh() {
-    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        handleDeviceChanged(info.portName(), true);
-    }
+    handleDeviceAdded();
 }

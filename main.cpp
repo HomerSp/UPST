@@ -24,12 +24,15 @@ ConnectedDevicesModel::ConnectedDevicesModel(QObject* parent)
 }
 
 QVariant ConnectedDevicesModel::data(const QModelIndex& index, int role) const {
+    Serial::SerialDevice* device = mDevices.at(index.row());
     switch(role) {
+    case NameRole:
+        return device->description();
     case PortRole:
-        return mDevices.at(index.row()).second;
+        return device->port();
     }
 
-    return mDevices.at(index.row()).first;
+    return "";
 }
 int ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
     return mDevices.size();
@@ -42,15 +45,26 @@ QHash<int, QByteArray> ConnectedDevicesModel::roleNames() const {
     return roles;
 }
 
-void ConnectedDevicesModel::addDevice(const QString& name, const QString& port) {
-    QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
-    mDevices.append(QPair<QString,QString>(name, port));
-    QAbstractListModel::endInsertRows();
+void ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool added) {
+    if(added) {
+        QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
+        mDevices.append(device);
+        QAbstractListModel::endInsertRows();
+    } else {
+        for(int i = 0; i< mDevices.size(); i++) {
+            if(mDevices[i] == device) {
+                QAbstractListModel::beginRemoveRows(QModelIndex(), i, i);
+                mDevices.removeAt(i);
+                QAbstractListModel::endRemoveRows();
+                break;
+            }
+        }
+    }
 }
 
-Main::Main(QQmlApplicationEngine* engine, ConnectedDevicesModel* model)
-    : mEngine(engine),
-      mModel(model)
+
+Main::Main(QQmlApplicationEngine* engine)
+    : mEngine(engine)
 {
     QObject* rootObject = engine->rootObjects().first();
 
@@ -85,11 +99,27 @@ void Main::provision() {
 
     qDebug()<<"provision"<<mdn;
 
-    mModel->addDevice(mdn, min);
+    /*if(mDevices.size() > 0) {
+        mModel->addDevice(mDevices.at(0));
+    }*/
+
+    Serial::SerialDevice* device = mDevices.at(0);
+
+    qDebug()<<"===== Resetting connection =====";
+
+    QByteArray resetArray;
+    resetArray.append((char)Serial::QCDM::Mode::MODE_RADIO_RESET);
+    resetArray.append((char)0x0);
+    Serial::QCDM::Commands::QcdmCommand resetCommand(device->communicator(), Serial::QCDM::DiagCommands::DIAG_CONTROL_F, resetArray);
+
+    QList<QByteArray> result;
+    if(!resetCommand.execute(result)) {
+        qDebug()<<"Could not reset device";
+    }
 
     return;
 
-    Serial::SerialDevice* device = mDevices.at(0);
+/*    Serial::SerialDevice* device = mDevices.at(0);
 
     qDebug()<<"===== Writing SPC =====";
     Serial::QCDM::Commands::QcdmCommand spcCommand(device->communicator(), Serial::QCDM::DiagCommands::DIAG_SPC_F, QString("000000").toLatin1());
@@ -129,7 +159,7 @@ void Main::provision() {
     QString ret;
     if(!mdnCmd.execute(ret)) {
         qDebug()<<"Could not get MDN from device"<<device->port();
-    }
+    }*/
 
     /*qDebug()<<"===== Resetting connection =====";
 
@@ -157,17 +187,18 @@ void Main::deviceAdd(Serial::SerialDevice* device) {
 
     device->update();
 
-    viewUpdate();
+    emit deviceChanged(device, true);
 
-    emit deviceChanged(*device, true);
+    viewUpdate();
 }
 
 void Main::deviceRemove(const QString& port) {
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
-            emit deviceChanged(*device, false);
+            emit deviceChanged(device, false);
             mDevices.removeAt(i);
+            delete device;
 
             break;
         }
@@ -175,21 +206,8 @@ void Main::deviceRemove(const QString& port) {
 }
 
 void Main::currentDeviceChanged(int index) {
-    qDebug()<<"currentDeviceChanged"<<index;
+    viewUpdate();
 
-    QString device = "";
-    switch(index) {
-    case 0:
-        device = "SAMSUNG GT-i9100";
-        break;
-    default:
-        device = "HTC Rezound";
-        break;
-    }
-
-    QObject* rootObject = mEngine->rootObjects().first();
-    QObject* currentDeviceLabel = rootObject->findChild<QObject*>("currentDeviceNameLabel");
-    currentDeviceLabel->setProperty("text", device);
 }
 
 void Main::viewChanged() {
@@ -210,7 +228,23 @@ void Main::viewChanged() {
 }
 
 void Main::viewUpdate() {
+    qDebug() << "viewUpdate";
+
     QObject* rootObject = mEngine->rootObjects().first();
+
+    QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
+    int currentIndex = connectedDevicesList->property("currentIndex").toInt();
+    if(currentIndex < 0 || currentIndex >= mDevices.size()) {
+        return;
+    }
+
+    QObject* currentDeviceLabel = rootObject->findChild<QObject*>("currentDeviceNameLabel");
+    if(mDevices.size() == 0) {
+        QMetaObject::invokeMethod(currentDeviceLabel, "reset");
+    } else {
+        currentDeviceLabel->setProperty("text", mDevices[currentIndex]->description());
+    }
+
     QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
 
     QString view = pageLoader->property("currentView").toString();
@@ -218,8 +252,12 @@ void Main::viewUpdate() {
 
     } else if(view == "provision") {
         if(mDevices.size() > 0) {
-            QObject* textMDN = rootObject->findChild<QObject*>("textMDN");
-            textMDN->setProperty("text", mDevices.at(0)->mdn());
+            Serial::SerialDevice* currentDevice = mDevices.at(currentIndex);
+            rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", currentDevice->mdn());
+            rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", QString("%1").arg(currentDevice->min(), 10, 10, QChar('0')));
+            rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", QString("%1").arg(currentDevice->esn(), 8, 16, QChar('0')));
+            rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", QString("%1").arg(currentDevice->meid(), 14, 16, QChar('0')));
+            rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", QString("%1").arg(currentDevice->imei(), 14, 16, QChar('0')));
         }
     }
 }
@@ -229,9 +267,6 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     ConnectedDevicesModel devicesModel;
-    devicesModel.addDevice("SAMSUNG GT-i9100", "COM1");
-    devicesModel.addDevice("HTC Rezound", "COM3");
-    devicesModel.addDevice("HTC Rezound 123451235454", "COM5");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("devicesModel", &devicesModel);
@@ -240,7 +275,8 @@ int main(int argc, char *argv[])
 
     QObject::connect(&engine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
-    Main main(&engine, &devicesModel);
+    Main main(&engine);
+    QObject::connect(&main, &Main::deviceChanged, &devicesModel, &ConnectedDevicesModel::deviceChanged);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceAdd, &main, &Main::deviceAdd);

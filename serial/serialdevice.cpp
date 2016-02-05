@@ -7,6 +7,7 @@
 #include "qcdm/commands/nv/imeicommand.h"
 #include "qcdm/commands/nv/meidcommand.h"
 #include "qcdm/commands/nv/mdncommand.h"
+#include "qcdm/commands/nv/mincommand.h"
 
 using namespace Serial;
 
@@ -47,29 +48,26 @@ bool SerialDevice::isValid() {
     Serial::QCDM::Commands::QcdmCommand cmd(communicator(), Serial::QCDM::DiagCommands::DIAG_VERNO_F);
     cmd.setTimeout(1000);
 
-    QByteArray result;
+    QList<QByteArray> result;
     return cmd.execute(result);
 }
 
 bool SerialDevice::update() {
-    uint32_t esn;
-    uint64_t imei, meid;
-
     qDebug()<<"===== GETTING ESN =====";
     Serial::QCDM::Commands::Nv::ESNCommand esnCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
-    if(!esnCmd.execute(esn)) {
+    if(!esnCmd.execute(mESN)) {
         return false;
     }
 
     qDebug()<<"===== GETTING IMEI =====";
     Serial::QCDM::Commands::Nv::IMEICommand imeiCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
-    if(!imeiCmd.execute(imei)) {
+    if(!imeiCmd.execute(mIMEI)) {
         return false;
     }
 
     qDebug()<<"===== GETTING MEID =====";
     Serial::QCDM::Commands::Nv::MEIDCommand meidCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
-    if(!meidCmd.execute(meid)) {
+    if(!meidCmd.execute(mMEID)) {
         return false;
     }
 
@@ -79,7 +77,13 @@ bool SerialDevice::update() {
         return false;
     }
 
-    qDebug()<<"ESN:"<<QString::number(esn, 16)<<"IMEI:"<<QString::number(imei, 16)<<"MEID:"<<QString::number(meid, 16)<<"MDN:"<<mMdn;
+    qDebug()<<"===== GETTING MIN =====";
+    Serial::QCDM::Commands::Nv::MINCommand minCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    if(!minCmd.execute(mMin)) {
+        return false;
+    }
+
+    qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin;
 
     return true;
 }

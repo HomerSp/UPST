@@ -9,6 +9,7 @@ namespace Serial {
     class SerialCommand
     {
     public:
+        virtual bool execute(QList<QByteArray>& result, uint16_t* errorCode = nullptr) = 0;
         virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr) = 0;
 
         int timeout() const {
