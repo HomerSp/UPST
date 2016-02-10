@@ -7,6 +7,7 @@ ColumnLayout {
     property string value
 
     id: deviceInfoBox
+    height: childrenRect.height
     Layout.minimumHeight: childrenRect.height
     spacing: 0
 

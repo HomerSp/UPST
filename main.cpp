@@ -258,6 +258,24 @@ void Main::viewUpdate() {
             rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", QString("%1").arg(currentDevice->esn(), 8, 16, QChar('0')));
             rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", QString("%1").arg(currentDevice->meid(), 14, 16, QChar('0')));
             rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", QString("%1").arg(currentDevice->imei(), 14, 16, QChar('0')));
+
+            rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 0.0f);
+
+            QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
+            bottomTab->setProperty("enabled", true);
+            bottomTab->setProperty("hidden", false);
+        } else {
+            rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 1.0f);
+
+            QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
+            bottomTab->setProperty("enabled", false);
+            bottomTab->setProperty("hidden", true);
+
+            rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", "");
+            rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", "");
+            rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", "");
+            rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", "");
+            rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", "");
         }
     }
 }

@@ -390,6 +390,10 @@ ApplicationWindow {
             }
 
             Rectangle {
+                property bool enabled
+                property bool hidden
+
+                objectName: "mainPageBottomTabArrow"
                 id: mainPageBottomTabArrowRect
                 height: currentDeviceRect.height * 0.7
                 width: height
@@ -397,6 +401,30 @@ ApplicationWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: mainPageBottomTabRect.top
                 z: 3
+                enabled: false
+                hidden: true
+
+                onEnabledChanged: {
+                    if(!enabled) {
+                        hidden = true;
+                    } else {
+                        hidden = hidden;
+                    }
+                }
+
+                onHiddenChanged: {
+                    if(!enabled) {
+                        return;
+                    }
+
+                    if(hidden) {
+                        mainPageBottomTabRect.state = 'hidden';
+                        mainPageBottomTabArrow.state = 'hidden';
+                    } else {
+                        mainPageBottomTabRect.state = '';
+                        mainPageBottomTabArrow.state = '';
+                    }
+                }
 
                 Image {
                     id: mainPageBottomTabArrow
@@ -406,6 +434,7 @@ ApplicationWindow {
                     smooth: true
                     mipmap: true
                     rotation: 180
+                    state: "hidden"
 
                     states: [
                         State {
@@ -421,10 +450,10 @@ ApplicationWindow {
 
                 MouseArea {
                     anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
+                    cursorShape: mainPageBottomTabArrowRect.enabled?Qt.PointingHandCursor:Qt.ArrowCursor
+
                     onClicked: {
-                        mainPageBottomTabRect.state == 'hidden' ? mainPageBottomTabRect.state = '' : mainPageBottomTabRect.state = 'hidden'
-                        mainPageBottomTabArrow.state == 'hidden' ? mainPageBottomTabArrow.state = '' : mainPageBottomTabArrow.state = 'hidden'
+                        mainPageBottomTabArrowRect.hidden = !mainPageBottomTabArrowRect.hidden;
                     }
                 }
             }
@@ -448,6 +477,7 @@ ApplicationWindow {
                 Layout.maximumHeight: mainPageBottomTab.childrenRect.height + (unit.dp(8) * 2)
                 color: "white"
                 z: 3
+                state: "hidden"
 
                 states: [
                     State {
@@ -474,35 +504,35 @@ ApplicationWindow {
                         id: currentDeviceMake
                         objectName: "currentDeviceMake"
                         header: qsTr("Make")
-                        value: "Samsung"
+                        value: ""
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceESN
                         objectName: "currentDeviceESN"
                         header: "ESN"
-                        value: "80512b74"
+                        value: ""
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceModel
                         objectName: "currentDeviceModel"
                         header: "Model"
-                        value: "GT-i9100"
+                        value: ""
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceMEID
                         objectName: "currentDeviceMEID"
                         header: "MEID"
-                        value: "99000033839416"
+                        value: ""
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceMIN
                         objectName: "currentDeviceMIN"
                         header: "MIN"
-                        value: "0000000000"
+                        value: ""
                     }
 
                     DeviceInfoBox {
@@ -510,14 +540,14 @@ ApplicationWindow {
                         objectName: "currentDeviceIMEI"
                         Layout.columnSpan: 2
                         header: "IMEI"
-                        value: "99000033839416"
+                        value: ""
                     }
 
                     DeviceInfoBox {
                         id: currentDeviceMDN
                         objectName: "currentDeviceMDN"
                         header: "MDN"
-                        value: "0000000000"
+                        value: ""
                     }
                 }
             }
