@@ -203,6 +203,8 @@ void Main::deviceRemove(const QString& port) {
             break;
         }
     }
+
+    viewUpdate();
 }
 
 void Main::currentDeviceChanged(int index) {
@@ -235,7 +237,7 @@ void Main::viewUpdate() {
     QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
     int currentIndex = connectedDevicesList->property("currentIndex").toInt();
     if(currentIndex < 0 || currentIndex >= mDevices.size()) {
-        return;
+       currentIndex = 0;
     }
 
     QObject* currentDeviceLabel = rootObject->findChild<QObject*>("currentDeviceNameLabel");
@@ -247,36 +249,44 @@ void Main::viewUpdate() {
 
     QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
 
+    if(mDevices.size() == 0) {
+        QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
+        bottomTab->setProperty("hidden", true);
+        bottomTab->setProperty("enabled", false);
+
+        rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 1.0f);
+    }
+
     QString view = pageLoader->property("currentView").toString();
     if(view == "manual") {
 
     } else if(view == "provision") {
         if(mDevices.size() > 0) {
             Serial::SerialDevice* currentDevice = mDevices.at(currentIndex);
-            rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", currentDevice->mdn());
-            rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", QString("%1").arg(currentDevice->min(), 10, 10, QChar('0')));
-            rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", QString("%1").arg(currentDevice->esn(), 8, 16, QChar('0')));
-            rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", QString("%1").arg(currentDevice->meid(), 14, 16, QChar('0')));
-            rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", QString("%1").arg(currentDevice->imei(), 14, 16, QChar('0')));
-
-            rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 0.0f);
-
-            QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
-            bottomTab->setProperty("enabled", true);
-            bottomTab->setProperty("hidden", false);
+            rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", currentDevice->makeStr());
+            rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", currentDevice->modelStr());
+            rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", currentDevice->mdnStr());
+            rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", currentDevice->minStr());
+            rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", currentDevice->esnStr());
+            rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", currentDevice->meidStr());
+            rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", currentDevice->imeiStr());
         } else {
-            rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 1.0f);
-
-            QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
-            bottomTab->setProperty("enabled", false);
-            bottomTab->setProperty("hidden", true);
-
+            rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", "");
+            rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", "");
             rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", "");
             rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", "");
             rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", "");
             rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", "");
             rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", "");
         }
+    }
+
+    if(mDevices.size() > 0) {
+        QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
+        bottomTab->setProperty("enabled", true);
+        bottomTab->setProperty("hidden", false);
+
+        rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 0.0f);
     }
 }
 

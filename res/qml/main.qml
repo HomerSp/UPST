@@ -380,6 +380,37 @@ ApplicationWindow {
                 }
             }
 
+            Rectangle {
+                id: noDeviceOverlay
+                objectName: "noDeviceOverlay"
+                anchors.fill: mainPageLoader
+
+                color: "#f1f1f1"
+                visible: true
+                opacity: 1.0
+
+                Text {
+                    anchors.centerIn: parent
+
+                    text: qsTr("No devices attached")
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: unit.em(1.4)
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 300
+                        onRunningChanged: {
+                            if(running && noDeviceOverlay.opacity < 1.0) {
+                                noDeviceOverlay.visible = true;
+                            } else if(!running && noDeviceOverlay.opacity == 0.0) {
+                                noDeviceOverlay.visible = false;
+                            }
+                        }
+                    }
+                }
+            }
+
             RectangularGlow {
                 anchors.fill: mainPageBottomTabArrowRect
                 color: mainPageBottomTabShadow.color

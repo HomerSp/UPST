@@ -20,7 +20,15 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid, cons
       mBaudRate(QSerialPort::Baud115200),
       mDataBits(QSerialPort::Data8),
       mParity(QSerialPort::NoParity),
-      mStopBits(QSerialPort::OneStop)
+      mStopBits(QSerialPort::OneStop),
+      mMake(""),
+      mModel(""),
+      mMdn(""),
+      mMin(0),
+      mESN(0),
+      mIMEI(0),
+      mMEID(0)
+
 {
     mCommunicator = new SerialCommunicator(*this);
     mCommunicator->open();

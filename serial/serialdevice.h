@@ -69,17 +69,64 @@ namespace Serial {
         uint64_t min() const {
             return mMin;
         }
-
         uint32_t esn() const {
             return mESN;
         }
-
         uint64_t imei() const {
             return mIMEI;
         }
-
         uint64_t meid() const {
             return mMEID;
+        }
+
+        QString makeStr() const {
+            if(mMake.length() == 0) {
+                return "-";
+            }
+
+            return mMake;
+        }
+        QString modelStr() const {
+            if(mModel.length() == 0) {
+                return "-";
+            }
+
+            return mModel;
+        }
+        QString mdnStr() const {
+            if(mMdn.length() == 0) {
+                return "-";
+            }
+
+            return mMdn;
+        }
+        QString minStr() const {
+            if(mMin == 0) {
+                return "-";
+            }
+
+            return QString("%1").arg(mMin, 10, 10, QChar('0'));
+        }
+        QString esnStr() const {
+            if(mESN == 0) {
+                return "-";
+            }
+
+            return QString("%1").arg(mESN, 8, 16, QChar('0'));
+        }
+        QString meidStr() const {
+            if(mMEID == 0) {
+                return "-";
+            }
+
+            return QString("%1").arg(mMEID, 14, 16, QChar('0'));
+        }
+        QString imeiStr() const {
+            if(mIMEI == 0) {
+                return "-";
+            }
+
+            return QString("%1").arg(mIMEI, 14, 16, QChar('0'));
         }
 
     private:
@@ -97,6 +144,8 @@ namespace Serial {
         QSerialPort::Parity mParity;
         QSerialPort::StopBits mStopBits;
 
+        QString mMake;
+        QString mModel;
         QString mMdn;
         uint64_t mMin;
         uint32_t mESN;
