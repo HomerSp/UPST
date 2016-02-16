@@ -6,6 +6,7 @@
 #include <QAbstractNativeEventFilter>
 #include <QQmlContext>
 #include <QScreen>
+#include <QFile>
 
 #include "main.h"
 #include "devicefilterevent.h"
@@ -68,8 +69,8 @@ Main::Main(QQmlApplicationEngine* engine)
 {
     QObject* rootObject = engine->rootObjects().first();
 
-    // Hide advanced menu item if we are not using a debug build
-#ifndef QT_DEBUG
+    // Hide advanced menu item if we are not using a testing build
+#ifndef TESTING_MODE
     QObject* advancedMenuObject = rootObject->findChild<QObject*>("advancedMenu");
     advancedMenuObject->setProperty("visible", false);
 #endif
@@ -221,6 +222,7 @@ void Main::viewChanged() {
 
     if(view == "manual") {
 
+        viewUpdate();
     } else if(view == "provision") {
         QObject* provisionButton = rootObject->findChild<QObject*>("provisionButton");
         QObject::connect(provisionButton, SIGNAL(clicked()), this, SLOT(provision()));
@@ -259,7 +261,54 @@ void Main::viewUpdate() {
 
     QString view = pageLoader->property("currentView").toString();
     if(view == "manual") {
+        if(mDevices.size() > 0) {
+            Serial::SerialDevice* currentDevice = mDevices.at(currentIndex);
 
+            QString data = "VID = " + currentDevice->vidStr() + "\nPID = " + currentDevice->pidStr();
+            {
+                Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_FIRM_REV_I);
+
+                uint16_t output = 0;
+                if(!swRevCmd.execute(output)) {
+                    qDebug()<<"Could not get data";
+                }
+
+                data += QString("\n") + "NV_MOB_FIRM_REV_I = 0x" + QString::number(output, 16);
+            }
+            {
+                Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I);
+
+                uint16_t output = 0;
+                if(!swRevCmd.execute(output)) {
+                    qDebug()<<"Could not get data";
+                }
+
+                data += QString("\n") + "NV_MOB_MODEL_I = 0x" + QString::number(output, 16);
+            }
+            {
+                Serial::QCDM::Commands::Nv::NvCommand32Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I);
+
+                uint32_t output = 0;
+                if(!swRevCmd.execute(output)) {
+                    qDebug()<<"Could not get data";
+                }
+
+                data += QString("\n") + "NV_MOB_CAI_REV_I = 0x" + QString::number(output, 16);
+            }
+            {
+                Serial::QCDM::Commands::Nv::NvCommandString swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I);
+
+                QString output = 0;
+                if(!swRevCmd.execute(output)) {
+                    qDebug()<<"Could not get data";
+                }
+
+                data += QString("\n") + "NV_SW_VERSION_INFO_I = " + output;
+            }
+
+            QObject* manualModeOutput = rootObject->findChild<QObject*>("manualModeOutput");
+            manualModeOutput->setProperty("text", data);
+        }
     } else if(view == "provision") {
         if(mDevices.size() > 0) {
             Serial::SerialDevice* currentDevice = mDevices.at(currentIndex);
@@ -290,8 +339,43 @@ void Main::viewUpdate() {
     }
 }
 
+void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    // Skip debug messages when not in testing mode
+#ifndef TESTING_MODE
+    if(type == QtDebugMsg) {
+        return;
+    }
+#endif
+    QString data = "";
+    switch(type) {
+    case QtDebugMsg:
+        data += "[Debug]";
+        break;
+    case QtWarningMsg:
+        data += "[Warning]";
+        break;
+    default:
+        data += "[Error]";
+        break;
+    }
+
+    data += " " + QString(msg) + "\n";
+
+    QFile file("log.txt");
+    file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+    QTextStream stream(&file);
+    stream << data;
+    stream.flush();
+    file.close();
+
+    QTextStream(stdout) << data;
+}
+
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(&logMessageHandler);
+
     QGuiApplication app(argc, argv);
 
     ConnectedDevicesModel devicesModel;

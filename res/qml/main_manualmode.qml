@@ -9,8 +9,15 @@ Item {
         id: unit
     }
 
-    TextEdit {
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: unit.dp(8)
+        color: "#FFFFFF"
+
+        TextEdit {
+            objectName: "manualModeOutput"
+            anchors.fill: parent
+            anchors.margins: unit.dp(8)
+            selectByMouse: true
+        }
     }
 }

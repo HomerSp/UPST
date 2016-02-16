@@ -32,7 +32,7 @@ void DeviceFilterEvent::handleDeviceAdded() {
             qDebug()<<"Device is valid"<<device->port();
             emit deviceAdd(device);
         } else {
-            qDebug()<<"Device is not valid"<<device->port();
+            qWarning()<<"Device is not valid"<<device->port();
             delete device;
         }
     }

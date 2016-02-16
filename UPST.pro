@@ -13,6 +13,9 @@ win32 {
     DEFINES += NATIVEFILTER_MISSING=1
 }
 
+# Remove this on production builds
+DEFINES += TESTING_MODE
+
 HEADERS += devicefilterevent.h \
     main.h
 

@@ -79,6 +79,13 @@ namespace Serial {
             return mMEID;
         }
 
+        QString vidStr() const {
+            return QString("%1").arg(mVid, 4, 16, QChar('0'));
+        }
+        QString pidStr() const {
+            return QString("%1").arg(mPid, 4, 16, QChar('0'));
+        }
+
         QString makeStr() const {
             if(mMake.length() == 0) {
                 return "-";
