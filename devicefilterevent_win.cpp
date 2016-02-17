@@ -7,7 +7,6 @@
 #include <setupapi.h>
 #include <devguid.h>
 
-#include "main.h"
 #include "devicefilterevent.h"
 
 bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* message, long*) {

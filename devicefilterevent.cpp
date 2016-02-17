@@ -3,7 +3,6 @@
 #include <QRegularExpressionMatch>
 #include <QSerialPortInfo>
 
-#include "main.h"
 #include "devicefilterevent.h"
 
 DeviceFilterEvent::DeviceFilterEvent()

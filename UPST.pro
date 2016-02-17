@@ -16,8 +16,7 @@ win32 {
 # Remove this on production builds
 DEFINES += TESTING_MODE
 
-HEADERS += devicefilterevent.h \
-    main.h
+HEADERS += devicefilterevent.h
 
 RESOURCES += qml.qrc \
     resources.qrc
@@ -29,6 +28,8 @@ include(serial/serial.pri)
 include(serial/qcdm/qcdm.pri)
 include(serial/qcdm/commands/commands.pri)
 include(serial/qcdm/commands/nv/nv.pri)
+include(ui/ui.pri)
+include(ui/section/section.pri)
 
 # Default rules for deployment.
 include(deployment.pri)
