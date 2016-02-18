@@ -10,8 +10,8 @@ namespace Serial {
                 class MobFirmwareRevCommand : public NvCommand16Bit
                 {
                 public:
-                    MobFirmwareRevCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0)
-                        : NvCommand16Bit(communicator, cmd, NvItem::NV_MOB_FIRM_REV_I, data)
+                    MobFirmwareRevCommand(SerialDevice* device, bool read = true, uint16_t data = 0)
+                        : NvCommand16Bit(device, read, NvItem::NV_MOB_FIRM_REV_I, data)
                     {
 
                     }

@@ -10,9 +10,12 @@ namespace Serial {
                 class MINCommand : public NvCommand
                 {
                 public:
-                    MINCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QString data = 0);
+                    MINCommand(SerialDevice* device, bool read = true, uint64_t data = 0);
 
                     virtual bool execute(uint64_t &result, uint16_t* errorCode = nullptr);
+
+                private:
+                    bool fromNv(const QList<QByteArray>& data, uint64_t& result);
                 };
             }
         }

@@ -31,8 +31,8 @@ namespace Serial {
             class QcdmCommand : public SerialCommand
             {
             public:
-                QcdmCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0);
-                QcdmCommand(SerialCommunicator* communicator, const QList<QcdmCommandItem *> &cmds);
+                QcdmCommand(SerialDevice* device, QCDM::DiagCommands cmd, QByteArray data = 0);
+                QcdmCommand(SerialDevice* device, const QList<QcdmCommandItem *> &cmds);
                 ~QcdmCommand();
 
                 int count() {
@@ -43,10 +43,10 @@ namespace Serial {
                 virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr);
 
             protected:
-                QcdmCommand(SerialCommunicator* communicator) : SerialCommand(communicator) {
+                QcdmCommand(SerialDevice* device) : SerialCommand(device) {
 
                 }
-                QcdmCommand(SerialCommunicator* communicator, QcdmCommandItem *cmd);
+                QcdmCommand(SerialDevice* device, QcdmCommandItem *cmd);
 
                 void addItem(QcdmCommandItem* item) {
                     mCmds.append(item);

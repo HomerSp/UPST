@@ -20,7 +20,7 @@ void UI::Section::Manual::update() {
     if(currentDevice != nullptr) {
         QString data = "VID = " + currentDevice->vidStr() + "\nPID = " + currentDevice->pidStr();
         {
-            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_FIRM_REV_I);
+            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_FIRM_REV_I);
 
             uint16_t output = 0;
             if(!swRevCmd.execute(output)) {
@@ -30,7 +30,7 @@ void UI::Section::Manual::update() {
             data += QString("\n") + "NV_MOB_FIRM_REV_I = 0x" + QString::number(output, 16);
         }
         {
-            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I);
+            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I);
 
             uint16_t output = 0;
             if(!swRevCmd.execute(output)) {
@@ -40,7 +40,7 @@ void UI::Section::Manual::update() {
             data += QString("\n") + "NV_MOB_MODEL_I = 0x" + QString::number(output, 16);
         }
         {
-            Serial::QCDM::Commands::Nv::NvCommand32Bit swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I);
+            Serial::QCDM::Commands::Nv::NvCommand32Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I);
 
             uint32_t output = 0;
             if(!swRevCmd.execute(output)) {
@@ -50,7 +50,7 @@ void UI::Section::Manual::update() {
             data += QString("\n") + "NV_MOB_CAI_REV_I = 0x" + QString::number(output, 16);
         }
         {
-            Serial::QCDM::Commands::Nv::NvCommandString swRevCmd(currentDevice->communicator(), Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I);
+            Serial::QCDM::Commands::Nv::NvCommandString swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I);
 
             QString output = 0;
             if(!swRevCmd.execute(output)) {

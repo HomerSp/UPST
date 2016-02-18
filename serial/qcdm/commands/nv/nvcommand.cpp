@@ -4,14 +4,14 @@
 
 using namespace Serial::QCDM::Commands::Nv;
 
-NvCommand::NvCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data)
-    : QcdmCommand(communicator, new NvCommandItem(cmd, item, data))
+NvCommand::NvCommand(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+    : QcdmCommand(device, new NvCommandItem((read)?QCDM::DIAG_NV_READ_F:QCDM::DIAG_NV_WRITE_F, item, data))
 {
 
 }
 
-NvCommand::NvCommand(SerialCommunicator* communicator, const QList<NvCommandItem*>& cmds)
-    : QcdmCommand(communicator)
+NvCommand::NvCommand(SerialDevice* device, const QList<NvCommandItem*>& cmds)
+    : QcdmCommand(device)
 {
     QList<QcdmCommandItem*> items;
     foreach(NvCommandItem* item, cmds) {
@@ -102,6 +102,19 @@ uint64_t byteArrayToInt64(const QByteArray &arr, unsigned int length) {
     return ret;
 }
 
+NvCommand8Bit::NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint8_t data)
+    : NvCommand(device)
+{
+    if(read) {
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, item));
+    } else {
+        QByteArray dataArr;
+        dataArr.append(uint8_t(data & 0xFF));
+
+        addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, item, dataArr));
+    }
+}
+
 bool NvCommand8Bit::execute(uint8_t& result, uint16_t* errorCode) {
     QByteArray ret;
     if(!NvCommand::execute(ret, errorCode)) {
@@ -114,6 +127,20 @@ bool NvCommand8Bit::execute(uint8_t& result, uint16_t* errorCode) {
 
     result = (uint8_t)byteArrayToInt64(ret, 1);
     return true;
+}
+
+NvCommand16Bit::NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint16_t data)
+    : NvCommand(device)
+{
+    if(read) {
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, item));
+    } else {
+        QByteArray dataArr;
+        dataArr.append(uint8_t(data & 0xFF));
+        dataArr.append(uint8_t((data >> 8) & 0xFF));
+
+        addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, item, dataArr));
+    }
 }
 
 bool NvCommand16Bit::execute(uint16_t& result, uint16_t* errorCode) {
@@ -130,6 +157,22 @@ bool NvCommand16Bit::execute(uint16_t& result, uint16_t* errorCode) {
     return true;
 }
 
+NvCommand32Bit::NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint32_t data)
+    : NvCommand(device)
+{
+    if(read) {
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, item));
+    } else {
+        QByteArray dataArr;
+        dataArr.append(uint8_t(data & 0xFF));
+        dataArr.append(uint8_t((data >> 8) & 0xFF));
+        dataArr.append(uint8_t((data >> 16) & 0xFF));
+        dataArr.append(uint8_t((data >> 24) & 0xFF));
+
+        addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, item, dataArr));
+    }
+}
+
 bool NvCommand32Bit::execute(uint32_t& result, uint16_t* errorCode) {
     QByteArray ret;
     if(!NvCommand::execute(ret, errorCode)) {
@@ -142,6 +185,26 @@ bool NvCommand32Bit::execute(uint32_t& result, uint16_t* errorCode) {
 
     result = (uint32_t)byteArrayToInt64(ret, 4);
     return true;
+}
+
+NvCommand64Bit::NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint64_t data)
+    : NvCommand(device)
+{
+    if(read) {
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, item));
+    } else {
+        QByteArray dataArr;
+        dataArr.append(uint8_t(data & 0xFF));
+        dataArr.append(uint8_t((data >> 8) & 0xFF));
+        dataArr.append(uint8_t((data >> 16) & 0xFF));
+        dataArr.append(uint8_t((data >> 24) & 0xFF));
+        dataArr.append(uint8_t((data >> 32) & 0xFF));
+        dataArr.append(uint8_t((data >> 40) & 0xFF));
+        dataArr.append(uint8_t((data >> 48) & 0xFF));
+        dataArr.append(uint8_t((data >> 56) & 0xFF));
+
+        addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, item, dataArr));
+    }
 }
 
 bool NvCommand64Bit::execute(uint64_t& result, uint16_t* errorCode) {

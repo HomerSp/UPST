@@ -12,8 +12,8 @@ namespace Serial {
                 class ESNCommand : public NvCommand32Bit
                 {
                 public:
-                    ESNCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0)
-                        : NvCommand32Bit(communicator, cmd, NvItem::NV_ESN_I, data) {
+                    ESNCommand(SerialDevice* device, bool read = true, uint32_t data = 0)
+                        : NvCommand32Bit(device, read, NvItem::NV_ESN_I, data) {
 
                     }
 

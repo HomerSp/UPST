@@ -5,11 +5,15 @@
 
 using namespace Serial::QCDM::Commands::Nv;
 
-MINCommand::MINCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QString data)
-    : NvCommand(communicator)
+MINCommand::MINCommand(SerialDevice* device, bool read, uint64_t data)
+    : NvCommand(device)
 {
-    addItem(new NvCommandItem(cmd, QCDM::NvItem::NV_MIN1_I));
-    addItem(new NvCommandItem(cmd, QCDM::NvItem::NV_MIN2_I));
+    if(read) {
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, QCDM::NvItem::NV_MIN1_I));
+        addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, QCDM::NvItem::NV_MIN2_I));
+    } else {
+
+    }
 }
 
 bool MINCommand::execute(uint64_t &result, uint16_t* errorCode) {
@@ -18,6 +22,10 @@ bool MINCommand::execute(uint64_t &result, uint16_t* errorCode) {
         return false;
     }
 
+    return fromNv(data, result);
+}
+
+bool MINCommand::fromNv(const QList<QByteArray>& data, uint64_t& result) {
     QByteArray min1Data;
     min1Data.append(data[0][8]);
     min1Data.append(data[0][7]);

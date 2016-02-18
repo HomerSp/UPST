@@ -10,7 +10,7 @@ namespace Serial {
                 class MDNCommand : public NvCommandString
                 {
                 public:
-                    MDNCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QString data = 0);
+                    MDNCommand(SerialDevice* device, bool read = true, QString data = 0);
                 };
             }
         }

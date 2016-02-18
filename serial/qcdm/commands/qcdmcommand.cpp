@@ -5,20 +5,20 @@
 
 using namespace Serial::QCDM::Commands;
 
-QcdmCommand::QcdmCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data)
-    : SerialCommand(communicator)
+QcdmCommand::QcdmCommand(SerialDevice* device, QCDM::DiagCommands cmd, QByteArray data)
+    : SerialCommand(device)
 {
     mCmds.append(new QcdmCommandItem(cmd, data));
 }
 
-QcdmCommand::QcdmCommand(SerialCommunicator* communicator, QcdmCommandItem *cmd)
-    : SerialCommand(communicator)
+QcdmCommand::QcdmCommand(SerialDevice* device, QcdmCommandItem *cmd)
+    : SerialCommand(device)
 {
     mCmds.append(cmd);
 }
 
-QcdmCommand::QcdmCommand(SerialCommunicator* communicator, const QList<QcdmCommandItem*>& cmds)
-    : SerialCommand(communicator)
+QcdmCommand::QcdmCommand(SerialDevice* device, const QList<QcdmCommandItem*>& cmds)
+    : SerialCommand(device)
 {
     foreach(QcdmCommandItem *cmd, cmds) {
         mCmds.append(cmd);

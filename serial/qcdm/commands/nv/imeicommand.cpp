@@ -4,8 +4,8 @@
 
 using namespace Serial::QCDM::Commands::Nv;
 
-IMEICommand::IMEICommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data)
-    : NvCommand64Bit(communicator, cmd, NvItem::NV_UE_IMEI_I, data)
+IMEICommand::IMEICommand(SerialDevice* device)
+    : NvCommand(device, true, NvItem::NV_UE_IMEI_I)
 {
 
 }

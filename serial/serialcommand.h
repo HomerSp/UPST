@@ -3,8 +3,11 @@
 
 #include <QByteArray>
 
+#include "serialdevice.h"
+
 namespace Serial {
     class SerialCommunicator;
+    class SerialDevice;
 
     class SerialCommand
     {
@@ -21,14 +24,14 @@ namespace Serial {
         }
 
     protected:
-        SerialCommand(SerialCommunicator *communicator);
+        SerialCommand(SerialDevice *device);
 
         SerialCommunicator* communicator() {
-            return mCommunicator;
+            return mDevice->communicator();
         }
 
     private:
-        SerialCommunicator* mCommunicator;
+        SerialDevice* mDevice;
 
         int mTimeout;
     };

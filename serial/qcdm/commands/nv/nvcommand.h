@@ -29,8 +29,8 @@ namespace Serial {
                 class NvCommand : public QcdmCommand
                 {
                 public:
-                    NvCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem nvItem, QByteArray data = 0);
-                    NvCommand(SerialCommunicator* communicator, const QList<NvCommandItem*>& cmds);
+                    NvCommand(SerialDevice* device, bool read, QCDM::NvItem nvItem, QByteArray data = 0);
+                    NvCommand(SerialDevice* device, const QList<NvCommandItem*>& cmds);
 
                     virtual bool execute(QList<QByteArray>& result, uint16_t* errorCode = nullptr);
                     virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr);
@@ -41,8 +41,8 @@ namespace Serial {
                     }
 
                 protected:
-                    NvCommand(SerialCommunicator* communicator)
-                        : QcdmCommand(communicator) {
+                    NvCommand(SerialDevice* device)
+                        : QcdmCommand(device) {
 
                     }
 
@@ -52,11 +52,7 @@ namespace Serial {
                 class NvCommand8Bit : public NvCommand
                 {
                 public:
-                    NvCommand8Bit(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data = 0)
-                        : NvCommand(communicator, cmd, item, data)
-                    {
-
-                    }
+                    NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint8_t data = 0);
 
                     bool execute(uint8_t& result, uint16_t* errorCode = nullptr);
 
@@ -65,11 +61,7 @@ namespace Serial {
                 class NvCommand16Bit : public NvCommand
                 {
                 public:
-                    NvCommand16Bit(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data = 0)
-                        : NvCommand(communicator, cmd, item, data)
-                    {
-
-                    }
+                    NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint16_t data = 0);
 
                     bool execute(uint16_t& result, uint16_t* errorCode = nullptr);
 
@@ -78,11 +70,7 @@ namespace Serial {
                 class NvCommand32Bit : public NvCommand
                 {
                 public:
-                    NvCommand32Bit(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data = 0)
-                        : NvCommand(communicator, cmd, item, data)
-                    {
-
-                    }
+                    NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint32_t data = 0);
 
                     bool execute(uint32_t& result, uint16_t* errorCode = nullptr);
 
@@ -91,11 +79,7 @@ namespace Serial {
                 class NvCommand64Bit : public NvCommand
                 {
                 public:
-                    NvCommand64Bit(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data = 0)
-                        : NvCommand(communicator, cmd, item, data)
-                    {
-
-                    }
+                    NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint64_t data = 0);
 
                     bool execute(uint64_t& result, uint16_t* errorCode = nullptr);
 
@@ -104,8 +88,8 @@ namespace Serial {
                 class NvCommandString : public NvCommand
                 {
                 public:
-                    NvCommandString(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QCDM::NvItem item, QByteArray data = 0)
-                        : NvCommand(communicator, cmd, item, data)
+                    NvCommandString(SerialDevice* device, bool read, QCDM::NvItem item, QString data = "")
+                        : NvCommand(device, read, item, data.toLatin1())
                     {
 
                     }

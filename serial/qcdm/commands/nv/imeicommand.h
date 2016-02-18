@@ -7,10 +7,10 @@ namespace Serial {
     namespace QCDM {
         namespace Commands {
             namespace Nv {
-                class IMEICommand : public NvCommand64Bit
+                class IMEICommand : public NvCommand
                 {
                 public:
-                    IMEICommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0);
+                    IMEICommand(SerialDevice* device);
 
                     bool execute(uint64_t& result, uint16_t* errorCode = nullptr);
                 };

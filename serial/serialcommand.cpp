@@ -2,8 +2,8 @@
 
 using namespace Serial;
 
-SerialCommand::SerialCommand(SerialCommunicator* communicator)
-    : mCommunicator(communicator),
+SerialCommand::SerialCommand(SerialDevice* device)
+    : mDevice(device),
       mTimeout(1000)
 {
 

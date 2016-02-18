@@ -40,9 +40,7 @@ bool SerialCommunicator::close() {
 }
 
 void SerialCommunicator::clear() {
-    if(mPort->bytesAvailable() > 0) {
-        mPort->readAll();
-    }
+    mPort->clear();
 }
 
 bool SerialCommunicator::read(QByteArray& data, int timeout) {

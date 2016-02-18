@@ -10,8 +10,8 @@ namespace Serial {
                 class MobModelCommand : public NvCommand8Bit
                 {
                 public:
-                    MobModelCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0)
-                        : NvCommand8Bit(communicator, cmd, NvItem::NV_MOB_MODEL_I, data)
+                    MobModelCommand(SerialDevice* device, bool read = true, uint8_t data = 0)
+                        : NvCommand8Bit(device, read, NvItem::NV_MOB_MODEL_I, data)
                     {
 
                     }

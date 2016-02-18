@@ -63,7 +63,7 @@ void UI::Section::Provision::provision() {
     QByteArray resetArray;
     resetArray.append((char)Serial::QCDM::Mode::MODE_RADIO_RESET);
     resetArray.append((char)0x0);
-    Serial::QCDM::Commands::QcdmCommand resetCommand(device->communicator(), Serial::QCDM::DiagCommands::DIAG_CONTROL_F, resetArray);
+    Serial::QCDM::Commands::QcdmCommand resetCommand(device, Serial::QCDM::DiagCommands::DIAG_CONTROL_F, resetArray);
 
     QList<QByteArray> result;
     if(!resetCommand.execute(result)) {

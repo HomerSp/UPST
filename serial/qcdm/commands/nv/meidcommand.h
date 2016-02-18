@@ -10,8 +10,8 @@ namespace Serial {
                 class MEIDCommand : public NvCommand64Bit
                 {
                 public:
-                    MEIDCommand(SerialCommunicator* communicator, QCDM::DiagCommands cmd, QByteArray data = 0)
-                        : NvCommand64Bit(communicator, cmd, NvItem::NV_MEID_I, data) {
+                    MEIDCommand(SerialDevice* device, bool read = true, uint64_t data = 0)
+                        : NvCommand64Bit(device, read, NvItem::NV_MEID_I, data) {
 
                     }
                 };

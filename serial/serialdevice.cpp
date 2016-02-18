@@ -53,7 +53,7 @@ SerialCommunicator* SerialDevice::communicator() {
 }
 
 bool SerialDevice::isValid() {
-    Serial::QCDM::Commands::QcdmCommand cmd(communicator(), Serial::QCDM::DiagCommands::DIAG_VERNO_F);
+    Serial::QCDM::Commands::QcdmCommand cmd(this, Serial::QCDM::DiagCommands::DIAG_VERNO_F);
     cmd.setTimeout(1000);
 
     QList<QByteArray> result;
@@ -62,31 +62,31 @@ bool SerialDevice::isValid() {
 
 bool SerialDevice::update() {
     qDebug()<<"===== GETTING ESN =====";
-    Serial::QCDM::Commands::Nv::ESNCommand esnCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    Serial::QCDM::Commands::Nv::ESNCommand esnCmd(this);
     if(!esnCmd.execute(mESN)) {
         return false;
     }
 
     qDebug()<<"===== GETTING IMEI =====";
-    Serial::QCDM::Commands::Nv::IMEICommand imeiCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    Serial::QCDM::Commands::Nv::IMEICommand imeiCmd(this);
     if(!imeiCmd.execute(mIMEI)) {
         return false;
     }
 
     qDebug()<<"===== GETTING MEID =====";
-    Serial::QCDM::Commands::Nv::MEIDCommand meidCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    Serial::QCDM::Commands::Nv::MEIDCommand meidCmd(this);
     if(!meidCmd.execute(mMEID)) {
         return false;
     }
 
     qDebug()<<"===== GETTING MDN =====";
-    Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(this);
     if(!mdnCmd.execute(mMdn)) {
         return false;
     }
 
     qDebug()<<"===== GETTING MIN =====";
-    Serial::QCDM::Commands::Nv::MINCommand minCmd(communicator(), Serial::QCDM::DiagCommands::DIAG_NV_READ_F);
+    Serial::QCDM::Commands::Nv::MINCommand minCmd(this);
     if(!minCmd.execute(mMin)) {
         return false;
     }
