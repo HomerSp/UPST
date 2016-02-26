@@ -39,8 +39,7 @@ namespace Serial {
                     return mCmds.size();
                 }
 
-                virtual bool execute(QList<QByteArray>& result, uint16_t* errorCode = nullptr);
-                virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr);
+                virtual void execute();
 
             protected:
                 QcdmCommand(SerialDevice* device) : SerialCommand(device) {

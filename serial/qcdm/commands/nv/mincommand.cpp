@@ -16,13 +16,28 @@ MINCommand::MINCommand(SerialDevice* device, bool read, uint64_t data)
     }
 }
 
-bool MINCommand::execute(uint64_t &result, uint16_t* errorCode) {
+void MINCommand::execute() {
+    NvCommand::execute();
+
     QList<QByteArray> data;
-    if(!NvCommand::execute(data, errorCode)) {
-        return false;
+
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    foreach(SerialCommandResult* result, results) {
+        if(!result->success()) {
+            continue;
+        }
+
+        data.append(result->data().toByteArray());
     }
 
-    return fromNv(data, result);
+    if(data.size() != 2) {
+        return;
+    }
+
+    uint64_t result = 0;
+    if(fromNv(data, result)) {
+        SerialCommand::result()->setData(result);
+    }
 }
 
 bool MINCommand::fromNv(const QList<QByteArray>& data, uint64_t& result) {

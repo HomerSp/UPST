@@ -17,7 +17,7 @@ public:
     void refresh();
 
 signals:
-    void deviceAdd(Serial::SerialDevice* device);
+    void devicesChanged();
     void deviceRemove(const QString& port);
 
 protected:
@@ -28,6 +28,7 @@ protected:
 
 private:
     bool getVidPid(const QString& port, QString& vid, QString& pid);
+
 };
 
 #endif // DEVICEFILTEREVENT_H

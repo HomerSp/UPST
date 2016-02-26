@@ -32,8 +32,7 @@ namespace Serial {
                     NvCommand(SerialDevice* device, bool read, QCDM::NvItem nvItem, QByteArray data = 0);
                     NvCommand(SerialDevice* device, const QList<NvCommandItem*>& cmds);
 
-                    virtual bool execute(QList<QByteArray>& result, uint16_t* errorCode = nullptr);
-                    virtual bool execute(QByteArray& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
 
                     QCDM::NvItem nvItem(int index = 0) {
                         QcdmCommandItem *item = QcdmCommand::item(index);
@@ -54,7 +53,10 @@ namespace Serial {
                 public:
                     NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint8_t data = 0);
 
-                    bool execute(uint8_t& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
+
+                    uint8_t resultData() {
+                        return result()->data().toChar().toLatin1();                    }
 
                 };
 
@@ -63,7 +65,11 @@ namespace Serial {
                 public:
                     NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint16_t data = 0);
 
-                    bool execute(uint16_t& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
+
+                    uint16_t resultData() {
+                        return result()->data().toUInt();
+                    }
 
                 };
 
@@ -72,7 +78,11 @@ namespace Serial {
                 public:
                     NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint32_t data = 0);
 
-                    bool execute(uint32_t& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
+
+                    uint32_t resultData() {
+                        return result()->data().toUInt();
+                    }
 
                 };
 
@@ -81,8 +91,11 @@ namespace Serial {
                 public:
                     NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint64_t data = 0);
 
-                    bool execute(uint64_t& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
 
+                    uint64_t resultData() {
+                        return result()->data().toULongLong();
+                    }
                 };
 
                 class NvCommandString : public NvCommand
@@ -94,8 +107,11 @@ namespace Serial {
 
                     }
 
-                    bool execute(QString& result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
 
+                    QString resultData() {
+                        return result()->data().toString();
+                    }
                 };
             }
         }

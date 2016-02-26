@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QQmlContext>
+#include <QThread>
 
 #include "ui.h"
 #include "section/manual.h"
@@ -37,14 +38,52 @@ UI::MainUI::MainUI(const QGuiApplication& app)
 
     viewChanged();
     currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
+
+    QThread* thread = new QThread;
+
+    mWorker = new SerialDeviceWorker();
+    mWorker->moveToThread(thread);
+
+    connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
+    connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
+
+    connect(thread, SIGNAL(started()), mWorker, SLOT(process()));
+    connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+
+    thread->start();
 }
 
 UI::MainUI::~MainUI() {
+    mWorker->stop();
+
     delete mEngine;
     delete mDevicesModel;
 
     if(mSection != nullptr) {
         delete mSection;
+    }
+}
+
+void UI::MainUI::devicesChanged() {
+    setStatus("Refreshing devices");
+
+    qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
+    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        QString port = info.portName();
+
+        bool shouldAdd = true;
+        foreach(Serial::SerialDevice* d, mDevices) {
+            if(*d == port) {
+                shouldAdd = false;
+                break;
+            }
+        }
+
+        if(shouldAdd) {
+            mWorker->addNewDevice(info);
+        }
     }
 }
 
@@ -60,8 +99,6 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
 
     mDevices.append(device);
 
-    device->update();
-
     emit deviceChanged(device, true);
 
     viewUpdate();
@@ -73,7 +110,8 @@ void UI::MainUI::deviceRemove(const QString& port) {
             Serial::SerialDevice* device = mDevices[i];
             emit deviceChanged(device, false);
             mDevices.removeAt(i);
-            delete device;
+
+            mWorker->removeDevice(device);
 
             break;
         }
@@ -84,6 +122,12 @@ void UI::MainUI::deviceRemove(const QString& port) {
 
 void UI::MainUI::currentDeviceChanged(int index) {
     viewUpdate();
+}
+
+void UI::MainUI::setStatus(const QString &status) {
+    QObject* rootObject = mEngine->rootObjects().first();
+    QObject* statusBarText = rootObject->findChild<QObject*>("statusBarText");
+    statusBarText->setProperty("text", status);
 }
 
 void UI::MainUI::viewChanged() {
@@ -163,8 +207,13 @@ void UI::UISection::endUpdate() {
 Serial::SerialDevice* UI::UISection::currentDevice() {
     QObject* connectedDevicesList = rootObject()->findChild<QObject*>("connectedDevicesList");
     int currentIndex = connectedDevicesList->property("currentIndex").toInt();
-    if(currentIndex < 0 || currentIndex >= devices().size()) {
-       return nullptr;
+
+    // The index defaults to -1, so we check the first item if it's the default.
+    if(currentIndex < 0) {
+        currentIndex = 0;
+    }
+    if(currentIndex >= devices().size()) {
+        return nullptr;
     }
 
     return devices().at(currentIndex);

@@ -10,28 +10,34 @@ IMEICommand::IMEICommand(SerialDevice* device)
 
 }
 
-bool IMEICommand::execute(uint64_t& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
-    }
+void IMEICommand::execute() {
+    NvCommand::execute();
 
-    if(ret.length() < 9 || ret.at(0) != 0x08) {
-        return false;
-    }
-
-    result = 0;
-    for(int i = 0; i < 8; i++) {
-        uint64_t c = ret.at(8 - i);
-        if(i < 1) {
-            result |= (c & 0x0F) << (i * 8);
+    const QList<SerialCommandResult*> results = SerialCommand::results();
+    foreach(SerialCommandResult* result, results) {
+        if(!result->success()) {
+            continue;
         }
 
-        if(i > 0) {
-            result |= ((c >> 4) & 0x0F) << ((i * 8) - 4);
+        QByteArray ret = result->data().toByteArray();
+        if(ret.length() < 9 || ret.at(0) != 0x08) {
+            result->setSuccess(false);
+            continue;
         }
-    }
 
-    return true;
+        uint64_t res = 0;
+        for(int i = 0; i < 8; i++) {
+            uint64_t c = ret.at(8 - i);
+            if(i < 1) {
+                res |= (c & 0x0F) << (i * 8);
+            }
+
+            if(i > 0) {
+                res |= ((c >> 4) & 0x0F) << ((i * 8) - 4);
+            }
+        }
+
+        result->setData(res);
+    }
 }
 

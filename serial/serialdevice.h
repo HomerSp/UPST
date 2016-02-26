@@ -11,8 +11,8 @@ namespace Serial {
     {
         Q_OBJECT
     public:
-        SerialDevice(const QString& port, uint16_t vid, uint16_t pid, const QString& manufacturer, const QString& description, bool isAndroid);
-        SerialDevice(const QSerialPortInfo& info, bool isAndroid);
+        SerialDevice(const QString& port, uint16_t vid, uint16_t pid, const QString& manufacturer, const QString& description);
+        SerialDevice(const QSerialPortInfo& info);
         ~SerialDevice();
 
         SerialCommunicator* communicator();
@@ -43,10 +43,6 @@ namespace Serial {
 
         const QString& description() const {
             return mDescription;
-        }
-
-        bool isAndroid() const {
-            return mIsAndroid;
         }
 
         QSerialPort::BaudRate baudRate() const {
@@ -144,7 +140,6 @@ namespace Serial {
         uint16_t mPid;
         QString mManufacturer;
         QString mDescription;
-        bool mIsAndroid;
 
         QSerialPort::BaudRate mBaudRate;
         QSerialPort::DataBits mDataBits;

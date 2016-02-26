@@ -31,20 +31,19 @@ QcdmCommand::~QcdmCommand() {
     }
 }
 
-bool QcdmCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
-    if(errorCode != nullptr) {
-        *errorCode = 0;
-    }
-
-    result.clear();
-
+void QcdmCommand::execute() {
     if(!communicator()->open()) {
-        return false;
+        addResult(false);
+        return;
     }
 
     QList<QByteArray> requests;
     getRequest(requests);
 
+    if(requests.size() == 0) {
+        addResult(false);
+        return;
+    }
 
     for(int i = 0; i < requests.size(); i++) {
         QByteArray request = requests[i];
@@ -52,36 +51,41 @@ bool QcdmCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
         QByteArray data;
         qDebug()<<"QcdmCommand writing"<<QString(request.toHex());
         if(!communicator()->write(request)) {
-            return false;
+            addResult(false);
+            return;
         }
         qDebug()<<"QcdmCommand reading...";
         if(!communicator()->read(data, timeout())) {
-            return false;
+            addResult(false);
+            return;
         }
 
         if(data.size() < 1) {
             qDebug()<<"QcdmCommand read less than 1 bytes";
-            return false;
+            addResult(false);
+            return;
         }
 
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
 
         uint8_t cmd = data[0];
         if(cmd == Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F) {
-            if(errorCode != nullptr) {
-                *errorCode = Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F;
-                return false;
-            }
+            addResult(false, 0, Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F);
+            return;
         }
         if(cmd != command(i)) {
             qDebug()<<"cmd"<<cmd<<"!="<<command(i);
 
-            return false;
+            addResult(false);
+            return;
         }
 
         int crcSize = Serial::CRCUtils::verifyCRC(data);
         if(crcSize == 0) {
-            return false;
+            qWarning()<<"Could not find a valid crc";
+
+            addResult(false);
+            return;
         }
 
         data.remove(data.size() - crcSize, crcSize);
@@ -89,20 +93,8 @@ bool QcdmCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
 
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
 
-        result.append(data);
+        addResult(true, data, 0);
     }
-
-    return true;
-}
-
-bool QcdmCommand::execute(QByteArray& result, uint16_t* errorCode) {
-    QList<QByteArray> ret;
-    if(!execute(ret, errorCode)) {
-        return false;
-    }
-
-    result = ret.at(0);
-    return true;
 }
 
 bool QcdmCommand::getRequest(QList<QByteArray>& request) {

@@ -6229,6 +6229,7 @@ namespace Serial {
             NV_AAGPS_ACQUISITION_TIMER_I = 6263,
             NV_CGPS_MINIMUM_GPS_WEEK_NUMBER_I = 6264,
             NV_MAX_I = 6265,
+            NV_OEM_SAMSUNG_MODEL = 1002,
             NV_MAGICAL_LG_UNLOCK = 39939,
             NV_ITEMS_ENUM_PAD = 0x7FFF
         };

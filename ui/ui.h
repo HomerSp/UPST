@@ -5,6 +5,7 @@
 #include <QQmlApplicationEngine>
 
 #include "connecteddevicesmodel.h"
+#include "serialdeviceworker.h"
 #include "serial/serialdevice.h"
 
 namespace UI {
@@ -25,12 +26,20 @@ namespace UI {
             return mDevices;
         }
 
+        SerialDeviceWorker* worker() {
+            return mWorker;
+        }
+
     signals:
         void deviceChanged(Serial::SerialDevice* device, bool added);
 
     public slots:
+        void devicesChanged();
+
         void deviceAdd(Serial::SerialDevice* device);
         void deviceRemove(const QString& port);
+
+        void setStatus(const QString& status);
 
     protected slots:
         void viewChanged();
@@ -47,6 +56,7 @@ namespace UI {
 
         ConnectedDevicesModel* mDevicesModel;
 
+        SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;
     };
 
@@ -64,6 +74,10 @@ namespace UI {
 
         void startUpdate();
         void endUpdate();
+
+        MainUI* ui() {
+            return mUI;
+        }
 
         QObject* rootObject() {
             return mUI->engine()->rootObjects().first();

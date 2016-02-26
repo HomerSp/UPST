@@ -18,51 +18,49 @@ void UI::Section::Manual::update() {
 
     Serial::SerialDevice* currentDevice = UISection::currentDevice();
     if(currentDevice != nullptr) {
-        QString data = "VID = " + currentDevice->vidStr() + "\nPID = " + currentDevice->pidStr();
-        {
-            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_FIRM_REV_I);
+        SerialCommandItem* cmdItem = new SerialCommandItem(currentDevice);
+        connect(cmdItem, &SerialCommandItem::finished, this, &UI::Section::Manual::manualCommandFinished);
 
-            uint16_t output = 0;
-            if(!swRevCmd.execute(output)) {
-                qDebug()<<"Could not get data";
-            }
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, true, Serial::QCDM::NV_MOB_FIRM_REV_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand32Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I));
 
-            data += QString("\n") + "NV_MOB_FIRM_REV_I = 0x" + QString::number(output, 16);
-        }
-        {
-            Serial::QCDM::Commands::Nv::NvCommand16Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I);
-
-            uint16_t output = 0;
-            if(!swRevCmd.execute(output)) {
-                qDebug()<<"Could not get data";
-            }
-
-            data += QString("\n") + "NV_MOB_MODEL_I = 0x" + QString::number(output, 16);
-        }
-        {
-            Serial::QCDM::Commands::Nv::NvCommand32Bit swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I);
-
-            uint32_t output = 0;
-            if(!swRevCmd.execute(output)) {
-                qDebug()<<"Could not get data";
-            }
-
-            data += QString("\n") + "NV_MOB_CAI_REV_I = 0x" + QString::number(output, 16);
-        }
-        {
-            Serial::QCDM::Commands::Nv::NvCommandString swRevCmd(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I);
-
-            QString output = 0;
-            if(!swRevCmd.execute(output)) {
-                qDebug()<<"Could not get data";
-            }
-
-            data += QString("\n") + "NV_SW_VERSION_INFO_I = " + output;
-        }
-
-        QObject* manualModeOutput = rootObject()->findChild<QObject*>("manualModeOutput");
-        manualModeOutput->setProperty("text", data);
+        ui()->worker()->addCommand(cmdItem);
     }
 
     UISection::endUpdate();
+}
+
+void UI::Section::Manual::manualCommandFinished() {
+    SerialCommandItem* item = static_cast<SerialCommandItem*>(sender());
+    QString data = "VID = " + item->device()->vidStr() + "\nPID = " + item->device()->pidStr();
+    {
+        Serial::QCDM::Commands::Nv::NvCommand16Bit *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommand16Bit*>(item->cmds().at(0));
+        if(cmd->resultSuccess()) {
+            data += QString("\n") + "NV_MOB_FIRM_REV_I = 0x" + QString::number(cmd->resultData(), 16);
+        }
+    }
+    {
+        Serial::QCDM::Commands::Nv::NvCommand16Bit *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommand16Bit*>(item->cmds().at(1));
+        if(cmd->resultSuccess()) {
+            data += QString("\n") + "NV_MOB_MODEL_I = 0x" + QString::number(cmd->resultData(), 16);
+        }
+    }
+    {
+        Serial::QCDM::Commands::Nv::NvCommand32Bit *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommand32Bit*>(item->cmds().at(2));
+        if(cmd->resultSuccess()) {
+            data += QString("\n") + "NV_MOB_CAI_REV_I = 0x" + QString::number(cmd->resultData(), 16);
+        }
+    }
+    {
+        Serial::QCDM::Commands::Nv::NvCommandString *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommandString*>(item->cmds().at(3));
+        if(cmd->resultSuccess()) {
+            data += QString("\n") + "NV_SW_VERSION_INFO_I = " + cmd->resultData();
+        }
+    }
+
+    QObject* manualModeOutput = rootObject()->findChild<QObject*>("manualModeOutput");
+    manualModeOutput->setProperty("text", data);
+
 }

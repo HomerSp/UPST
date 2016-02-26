@@ -19,52 +19,46 @@ NvCommand::NvCommand(SerialDevice* device, const QList<NvCommandItem*>& cmds)
     }
 }
 
-bool NvCommand::execute(QList<QByteArray>& result, uint16_t* errorCode) {
-    if(!QcdmCommand::execute(result, errorCode)) {
-        return false;
-    }
+void NvCommand::execute() {
+    QcdmCommand::execute();
 
-    for(int i = 0; i < result.size(); i++) {
-        QByteArray &resultData = result[i];
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
+        }
+
+        QByteArray resultData = result->data().toByteArray();
         if(resultData.size() < 2) {
-            return false;
+            result->setSuccess(false);
+            continue;
         }
 
         uint16_t item = ((uint16_t)resultData.at(1) << 8) | (uint8_t)resultData.at(0);
         QCDM::NvItem nvItem = this->nvItem(i);
         if(item != nvItem) {
             qDebug()<<"NvCommand item"<<item<<"!="<<nvItem;
-            return false;
+            result->setSuccess(false);
+            continue;
         }
 
         resultData.remove(0, 2);
 
         if(resultData.size() < 2) {
-            return false;
+            result->setSuccess(false);
+            continue;
         }
 
         uint16_t error = ((uint16_t)resultData.at(resultData.size() - 3) << 8) | (uint8_t)resultData.at(resultData.size() - 2);
-        if(errorCode != nullptr) {
-            *errorCode = error;
-        }
-
         if(error != 0) {
-            return false;
+            result->setErrorCode(error);
+            result->setSuccess(false);
+            continue;
         }
+
+        result->setData(resultData);
     }
-
-    return true;
-}
-
-bool NvCommand::execute(QByteArray& result, uint16_t* errorCode) {
-    QList<QByteArray> results;
-    if(!execute(results, errorCode)) {
-        return false;
-    }
-
-    result = results[0];
-
-    return true;
 }
 
 bool NvCommand::getRequest(QList<QByteArray> &request) {
@@ -115,18 +109,26 @@ NvCommand8Bit::NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item,
     }
 }
 
-bool NvCommand8Bit::execute(uint8_t& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
-    }
+void NvCommand8Bit::execute() {
+    NvCommand::execute();
 
-    if(ret.size() < 1) {
-        return false;
-    }
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
+        }
 
-    result = (uint8_t)byteArrayToInt64(ret, 1);
-    return true;
+        QByteArray resultData = result->data().toByteArray();
+        if(resultData.size() < 1) {
+            result->setSuccess(false);
+            continue;
+        }
+
+        uint8_t data = (uint8_t)byteArrayToInt64(resultData, 1);
+        result->setData(data);
+        result->setSuccess(true);
+    }
 }
 
 NvCommand16Bit::NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint16_t data)
@@ -143,18 +145,26 @@ NvCommand16Bit::NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem ite
     }
 }
 
-bool NvCommand16Bit::execute(uint16_t& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
-    }
+void NvCommand16Bit::execute() {
+    NvCommand::execute();
 
-    if(ret.size() < 2) {
-        return false;
-    }
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
+        }
 
-    result = (uint16_t)byteArrayToInt64(ret, 2);
-    return true;
+        QByteArray resultData = result->data().toByteArray();
+        if(resultData.size() < 2) {
+            result->setSuccess(false);
+            continue;
+        }
+
+        uint16_t data = (uint16_t)byteArrayToInt64(resultData, 2);
+        result->setData(data);
+        result->setSuccess(true);
+    }
 }
 
 NvCommand32Bit::NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint32_t data)
@@ -173,18 +183,26 @@ NvCommand32Bit::NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem ite
     }
 }
 
-bool NvCommand32Bit::execute(uint32_t& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
-    }
+void NvCommand32Bit::execute() {
+    NvCommand::execute();
 
-    if(ret.size() < 4) {
-        return false;
-    }
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
+        }
 
-    result = (uint32_t)byteArrayToInt64(ret, 4);
-    return true;
+        QByteArray resultData = result->data().toByteArray();
+        if(resultData.size() < 4) {
+            result->setSuccess(false);
+            continue;
+        }
+
+        uint32_t data = (uint32_t)byteArrayToInt64(resultData, 4);
+        result->setData(data);
+        result->setSuccess(true);
+    }
 }
 
 NvCommand64Bit::NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint64_t data)
@@ -207,36 +225,50 @@ NvCommand64Bit::NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem ite
     }
 }
 
-bool NvCommand64Bit::execute(uint64_t& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
+void NvCommand64Bit::execute() {
+    NvCommand::execute();
+
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
+        }
+
+        QByteArray resultData = result->data().toByteArray();
+        if(resultData.size() < 8) {
+            result->setSuccess(false);
+            continue;
+        }
+
+        uint64_t data = (uint64_t)byteArrayToInt64(resultData, 8);
+        result->setData(data);
+        result->setSuccess(true);
     }
-
-    if(ret.size() < 8) {
-        return false;
-    }
-
-    result = (uint64_t)byteArrayToInt64(ret, 8);
-
-    return true;
 }
 
 
-bool NvCommandString::execute(QString& result, uint16_t* errorCode) {
-    QByteArray ret;
-    if(!NvCommand::execute(ret, errorCode)) {
-        return false;
-    }
+void NvCommandString::execute() {
+    NvCommand::execute();
 
-    result = "";
-    for(int i = 1; i < ret.size(); i++) {
-        if(ret[i] == '\0') {
-            break;
+    const QList<SerialCommandResult*> &results = SerialCommand::results();
+    for(int i = 0; i < results.size(); i++) {
+        SerialCommandResult* result = results.at(i);
+        if(!result->success()) {
+            continue;
         }
 
-        result += ret[i];
-    }
+        QByteArray resultData = result->data().toByteArray();
+        QString data = "";
+        for(uint32_t x = 1; x < resultData.size(); x++) {
+            if(resultData[x] == '\0') {
+                break;
+            }
 
-    return true;
+            data += resultData[x];
+        }
+
+        result->setData(data);
+        result->setSuccess(true);
+    }
 }

@@ -12,6 +12,9 @@ namespace UI {
             ~Manual();
 
             virtual void update();
+
+        private slots:
+            void manualCommandFinished();
         };
     }
 }

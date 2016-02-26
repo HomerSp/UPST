@@ -2,6 +2,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QSerialPortInfo>
+#include <QThread>
 
 #include "devicefilterevent.h"
 
@@ -17,24 +18,7 @@ bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* mes
 #endif
 
 void DeviceFilterEvent::handleDeviceAdded() {
-    qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
-    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        QString port, vid, pid;
-        port = info.portName();
-        vid.sprintf("%04X", info.vendorIdentifier());
-        pid.sprintf("%04X", info.productIdentifier());
-
-        qDebug()<<"Device"<<port<<vid<<pid<<"added";
-
-        Serial::SerialDevice* device = new Serial::SerialDevice(info, true);
-        if(device->isValid()) {
-            qDebug()<<"Device is valid"<<device->port();
-            emit deviceAdd(device);
-        } else {
-            qWarning()<<"Device is not valid"<<device->port();
-            delete device;
-        }
-    }
+    emit devicesChanged();
 }
 
 void DeviceFilterEvent::handleDeviceRemoved(const QString& port) {

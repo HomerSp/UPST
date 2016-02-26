@@ -583,6 +583,31 @@ ApplicationWindow {
                 }
             }
         }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            Layout.columnSpan: 2
+
+            height: statusBarText.height + unit.dp(16)
+
+            z: 10
+
+            color: '#5f92eb'
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: unit.dp(8)
+
+                id: statusBarText
+                objectName: "statusBarText"
+                color: "#ffffff"
+                font.family: openSansRegularFont.name
+                font.pixelSize: unit.em(1.3)
+                text: "STATUS"
+            }
+        }
     }
 }
 

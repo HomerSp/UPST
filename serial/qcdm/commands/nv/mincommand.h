@@ -12,7 +12,7 @@ namespace Serial {
                 public:
                     MINCommand(SerialDevice* device, bool read = true, uint64_t data = 0);
 
-                    virtual bool execute(uint64_t &result, uint16_t* errorCode = nullptr);
+                    virtual void execute();
 
                 private:
                     bool fromNv(const QList<QByteArray>& data, uint64_t& result);

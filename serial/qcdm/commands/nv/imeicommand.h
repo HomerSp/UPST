@@ -12,7 +12,7 @@ namespace Serial {
                 public:
                     IMEICommand(SerialDevice* device);
 
-                    bool execute(uint64_t& result, uint16_t* errorCode = nullptr);
+                    void execute();
                 };
             }
         }
