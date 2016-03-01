@@ -7,5 +7,6 @@
         <file>res/images/icons/phone.svg</file>
         <file>res/images/icons/tablet.svg</file>
         <file>res/images/icons/computer.svg</file>
+        <file>res/data/devices.list</file>
     </qresource>
 </RCC>

@@ -7,6 +7,7 @@
 #include <QSerialPortInfo>
 
 #include "../serial/serialdevice.h"
+#include "../serial/serialdeviceconfig.h"
 #include "../serial/serialcommand.h"
 
 namespace UI {
@@ -63,6 +64,8 @@ namespace UI {
         void processDeviceRemovals();
         void processNewDevice();
         void processCommand();
+
+        Serial::SerialDeviceConfig* mDeviceConfig;
 
         QMutex mWakeMutex;
         QWaitCondition mWaitCondition;

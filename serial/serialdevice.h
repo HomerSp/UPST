@@ -1,6 +1,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <QJsonObject>
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
@@ -11,7 +12,7 @@ namespace Serial {
     {
         Q_OBJECT
     public:
-        SerialDevice(const QString& port, uint16_t vid, uint16_t pid, const QString& manufacturer, const QString& description);
+        SerialDevice(const QString& port, uint16_t vid, uint16_t pid);
         SerialDevice(const QSerialPortInfo& info);
         ~SerialDevice();
 
@@ -20,6 +21,8 @@ namespace Serial {
         bool isValid();
 
         bool update();
+
+        bool updateJson(const QJsonObject& obj);
 
         void setBaudRate(QSerialPort::BaudRate baudRate) {
             mBaudRate = baudRate;
@@ -41,10 +44,6 @@ namespace Serial {
             return mPort;
         }
 
-        const QString& description() const {
-            return mDescription;
-        }
-
         QSerialPort::BaudRate baudRate() const {
             return mBaudRate;
         }
@@ -56,6 +55,22 @@ namespace Serial {
         }
         QSerialPort::StopBits stopBits() const {
             return mStopBits;
+        }
+
+        QString name() const {
+            QString ret = "";
+            if(mMake.length() != 0) {
+                ret += mMake;
+            }
+            if(mModel.length() != 0) {
+                if(ret.length() > 0) {
+                    ret += " ";
+                }
+
+                ret += mModel;
+            }
+
+            return ret;
         }
 
         uint16_t vid() const {
@@ -146,8 +161,6 @@ namespace Serial {
         QString mPort;
         uint16_t mVid;
         uint16_t mPid;
-        QString mManufacturer;
-        QString mDescription;
 
         QSerialPort::BaudRate mBaudRate;
         QSerialPort::DataBits mDataBits;

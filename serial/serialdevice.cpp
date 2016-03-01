@@ -11,11 +11,9 @@
 
 using namespace Serial;
 
-SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid, const QString& manufacturer, const QString& description)
+SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
     : mCommunicator(nullptr),
       mPort(port), mVid(vid), mPid(pid),
-      mManufacturer(manufacturer),
-      mDescription(description),
       mBaudRate(QSerialPort::Baud115200),
       mDataBits(QSerialPort::Data8),
       mParity(QSerialPort::NoParity),
@@ -35,7 +33,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid, cons
 }
 
 SerialDevice::SerialDevice(const QSerialPortInfo& info)
-    : SerialDevice(info.portName(), info.vendorIdentifier(), info.productIdentifier(), info.manufacturer(), info.description()) {
+    : SerialDevice(info.portName(), info.vendorIdentifier(), info.productIdentifier()) {
 
 }
 
@@ -97,6 +95,18 @@ bool SerialDevice::update() {
     }
 
     qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin;
+
+    return true;
+}
+
+bool SerialDevice::updateJson(const QJsonObject& obj) {
+    if(obj.contains("make")) {
+        mMake = obj["make"].toString();
+    }
+
+    if(obj.contains("model")) {
+        mModel = obj["model"].toString();
+    }
 
     return true;
 }

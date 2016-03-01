@@ -9,7 +9,7 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
     Serial::SerialDevice* device = mDevices.at(index.row());
     switch(role) {
     case NameRole:
-        return device->description();
+        return device->name();
     case PortRole:
         return device->port();
     }

@@ -180,7 +180,7 @@ void UI::UISection::startUpdate() {
     if(devices().size() == 0) {
         QMetaObject::invokeMethod(currentDeviceLabel, "reset");
     } else {
-        currentDeviceLabel->setProperty("text", currentDevice()->description());
+        currentDeviceLabel->setProperty("text", currentDevice()->name());
     }
 
     if(devices().size() == 0) {

@@ -29,7 +29,7 @@ void UI::SerialCommandItem::process() {
 UI::SerialDeviceWorker::SerialDeviceWorker()
     : mRunning(true)
 {
-
+    mDeviceConfig = new Serial::SerialDeviceConfig();
 }
 
 void UI::SerialDeviceWorker::addNewDevice(const QSerialPortInfo &info) {
@@ -189,6 +189,7 @@ void UI::SerialDeviceWorker::processNewDevice() {
         } else {
             qDebug()<<"Device is valid";
             device->update();
+            mDeviceConfig->updateDevice(device);
             emit deviceAdd(device);
         }
 

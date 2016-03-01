@@ -7,9 +7,12 @@
 #include <QQmlContext>
 #include <QScreen>
 #include <QFile>
+#include <QDir>
+#include <QStandardPaths>
 
 #include "ui/ui.h"
 #include "devicefilterevent.h"
+#include "serial/serialdeviceconfig.h"
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -37,7 +40,7 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 #endif
     data += " " + msg + "\n";
 
-    QFile file("log.txt");
+    QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/log.txt");
     file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     QTextStream stream(&file);
     stream << data;
@@ -47,11 +50,22 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     QTextStream(stdout) << data;
 }
 
+void updateConfigs() {
+    Serial::SerialDeviceConfig::updateConfig();
+}
+
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(&logMessageHandler);
 
+    QGuiApplication::setApplicationName("UPST");
+    QGuiApplication::setOrganizationName("Ultimobile");
+
+    QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+
     QGuiApplication app(argc, argv);
+
+    updateConfigs();
 
     UI::MainUI mainUI(app);
 

@@ -1,0 +1,20 @@
+{
+	"devices":
+	[
+		{
+			"make": "Motorola",
+			"model": "RAZR M",
+			"codename": "XT905",
+			"vid": "0x22b8",
+			"pid": "0x2e29",
+			"nv":
+			[
+				{
+					"id": 8,
+					"type": "16bit",
+					"value": "0xc5"
+				}
+			]
+		}
+	]
+}
