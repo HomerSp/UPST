@@ -1,14 +1,9 @@
+#include <QtGlobal>
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QDebug>
-#include <QSerialPort>
-#include <QSerialPortInfo>
-#include <QAbstractNativeEventFilter>
-#include <QQmlContext>
-#include <QScreen>
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QStandardPaths>
+#include <QTextStream>
 
 #include "ui/ui.h"
 #include "devicefilterevent.h"
@@ -16,6 +11,7 @@
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+    Q_UNUSED(context);
     // Skip debug messages when not in testing mode
 #ifndef TESTING_MODE
     if(type == QtDebugMsg) {

@@ -3,13 +3,15 @@
 
 #include <QByteArray>
 #include <QVariant>
+#include <QList>
+
+#include <cstdint>
 
 #include "serialdevice.h"
 
 namespace Serial {
     class SerialCommand;
     class SerialCommunicator;
-    class SerialDevice;
 
     class SerialCommandResult {
     public:

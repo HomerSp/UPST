@@ -37,7 +37,7 @@ void IMEICommand::execute() {
             }
         }
 
-        result->setData(res);
+        result->setData((quint64)res);
     }
 }
 

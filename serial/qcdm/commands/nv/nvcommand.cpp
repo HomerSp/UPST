@@ -85,11 +85,11 @@ bool NvCommand::getRequest(QList<QByteArray> &request) {
     return true;
 }
 
-uint64_t byteArrayToInt64(const QByteArray &arr, unsigned int length) {
-    uint64_t ret = 0;
+quint64 byteArrayToInt64(const QByteArray &arr, unsigned int length) {
+    quint64 ret = 0;
 
     for(unsigned int i = 0; i < length; i++) {
-        uint64_t a = arr.at(i);
+        quint64 a = arr.at(i);
         ret |= ((a & 0xFF) << (i * 8));
     }
 
@@ -200,7 +200,7 @@ void NvCommand32Bit::execute() {
         }
 
         uint32_t data = (uint32_t)byteArrayToInt64(resultData, 4);
-        result->setData(data);
+        result->setData((quint64)data);
         result->setSuccess(true);
     }
 }
@@ -241,7 +241,7 @@ void NvCommand64Bit::execute() {
             continue;
         }
 
-        uint64_t data = (uint64_t)byteArrayToInt64(resultData, 8);
+        quint64 data = (quint64)byteArrayToInt64(resultData, 8);
         result->setData(data);
         result->setSuccess(true);
     }
@@ -260,7 +260,7 @@ void NvCommandString::execute() {
 
         QByteArray resultData = result->data().toByteArray();
         QString data = "";
-        for(uint32_t x = 1; x < resultData.size(); x++) {
+        for(int x = 1; x < resultData.size(); x++) {
             if(resultData[x] == '\0') {
                 break;
             }

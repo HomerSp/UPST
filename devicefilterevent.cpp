@@ -1,8 +1,6 @@
-#include <QDebug>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
-#include <QSerialPortInfo>
-#include <QThread>
+#include <QByteArray>
+#include <QObject>
+#include <QString>
 
 #include "devicefilterevent.h"
 
@@ -12,7 +10,7 @@ DeviceFilterEvent::DeviceFilterEvent()
 }
 
 #ifdef NATIVEFILTER_MISSING
-bool DeviceFilterEvent::nativeEventFilter(const QByteArray &eventType, void* message, long*) {
+bool DeviceFilterEvent::nativeEventFilter(const QByteArray &, void*, long*) {
     return false;
 }
 #endif

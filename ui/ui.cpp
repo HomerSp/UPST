@@ -121,6 +121,8 @@ void UI::MainUI::deviceRemove(const QString& port) {
 }
 
 void UI::MainUI::currentDeviceChanged(int index) {
+    Q_UNUSED(index);
+
     viewUpdate();
 }
 

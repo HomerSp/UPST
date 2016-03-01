@@ -1,7 +1,8 @@
 #ifndef CRCUTILS_H
 #define CRCUTILS_H
 
-#include <QList>
+#include <QByteArray>
+#include <cstdint>
 
 namespace Serial {
     class CRCUtils

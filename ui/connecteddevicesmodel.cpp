@@ -17,6 +17,8 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
     return "";
 }
 int UI::ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent);
+
     return mDevices.size();
 }
 
