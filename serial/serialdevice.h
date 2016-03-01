@@ -58,6 +58,14 @@ namespace Serial {
             return mStopBits;
         }
 
+        uint16_t vid() const {
+            return mVid;
+        }
+
+        uint16_t pid() const {
+            return mPid;
+        }
+
         const QString &mdn() const {
             return mMdn;
         }

@@ -25,6 +25,9 @@ void UI::Section::Manual::update() {
         cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I));
         cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand32Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I));
         cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I));
+        if(currentDevice->vid() == 0x04e8) {
+            cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_OEM_SAMSUNG_MODEL));
+        }
 
         ui()->worker()->addCommand(cmdItem);
     }
@@ -57,6 +60,12 @@ void UI::Section::Manual::manualCommandFinished() {
         Serial::QCDM::Commands::Nv::NvCommandString *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommandString*>(item->cmds().at(3));
         if(cmd->resultSuccess()) {
             data += QString("\n") + "NV_SW_VERSION_INFO_I = " + cmd->resultData();
+        }
+    }
+    if(item->device()->vid() == 0x04e8) {
+        Serial::QCDM::Commands::Nv::NvCommandString *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommandString*>(item->cmds().at(4));
+        if(cmd->resultSuccess()) {
+            data += QString("\n") + "NV_OEM_SAMSUNG_MODEL = " + cmd->resultData();
         }
     }
 
