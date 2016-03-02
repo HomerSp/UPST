@@ -69,8 +69,13 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
                 uint32_t id = nvObj["id"].toInt();
                 NvType type = NvTypeNone;
                 QVariant checkData = getValue(nvObj["type"].toString(), nvObj["value"].toString(), type);
+                if(type == NvTypeNone) {
+                    isCorrect = false;
+                    break;
+                }
+
                 if(nvItems.contains(id)) {
-                    isCorrect = (nvItems[id] == checkData);
+                    isCorrect = nvDataEquals(checkData, nvItems[id]);
                     break;
                 }
 
@@ -136,9 +141,28 @@ bool SerialDeviceConfig::checkNvItem(SerialDevice* device, uint16_t id, NvType t
 
     delete cmd;
 
-    qDebug()<<"checkNvItem"<<id<<outData << "vs" << checkData;
-    return (outData == checkData);
+    qDebug() << "checkNvItem" << id << checkData << "vs" << outData;
+    return nvDataEquals(checkData, outData);
 }
+
+ bool SerialDeviceConfig::nvDataEquals(const QVariant& checkData, const QVariant& nvData) {
+     if(checkData.type() == QVariant::String && nvData.type() == checkData.type()) {
+        QString checkString = checkData.toString().toLower();
+        QString nvString = nvData.toString().toLower();
+
+        if(checkString.contains('*')) {
+            if(checkString.indexOf('*') == 0) {
+                return nvString.endsWith(checkString.mid(1));
+            }
+
+            return nvString.startsWith(checkString.mid(0, checkString.length() - 1));
+        }
+
+        return nvString == checkString;
+     }
+
+     return checkData == nvData;
+ }
 
 QVariant SerialDeviceConfig::getValue(const QString& type, const QString& data, NvType& outType) {
     if(type == "8bit") {

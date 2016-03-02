@@ -27,6 +27,7 @@ namespace Serial {
         };
 
         bool checkNvItem(SerialDevice* device, uint16_t id, NvType type, const QVariant& checkData, QVariant& outData);
+        bool nvDataEquals(const QVariant& checkData, const QVariant& nvData);
 
         QVariant getValue(const QString& type, const QString& checkData, NvType& outType);
 

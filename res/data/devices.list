@@ -15,6 +15,41 @@
 					"value": "0xc5"
 				}
 			]
+		},
+		{
+			"make": "SAMSUNG",
+			"model": "Galaxy Discover",
+			"codename": "SCH-R740C",
+			"vid": "0x04e8",
+			"pid": "0x6860",
+			"nv":
+			[
+				{
+					"id": 8,
+					"type": "8bit",
+					"value": "0xf1"
+				}
+			]
+		},
+		{
+			"make": "SAMSUNG",
+			"model": "Galaxy S5 Mini",
+			"codename": "G800R4",
+			"vid": "0x04e8",
+			"pid": "0x685d",
+			"nv":
+			[
+				{
+					"id": 8,
+					"type": "8bit",
+					"value": "0xf3"
+				},
+				{
+					"id": 10002,
+					"type": "string",
+					"value": "800r4*"
+				}
+			]
 		}
 	]
 }
