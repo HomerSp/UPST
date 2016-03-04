@@ -2,6 +2,21 @@
 	"devices":
 	[
 		{
+			"make": "HTC",
+			"model": "Rezound",
+			"codename": "XT905",
+			"vid": "0x0bb4",
+			"pid": "0x0fdd",
+			"nv":
+			[
+				{
+					"id": 8,
+					"type": "8bit",
+					"value": "0xcf"
+				}
+			]
+		},
+		{
 			"make": "Motorola",
 			"model": "RAZR M",
 			"codename": "XT905",
