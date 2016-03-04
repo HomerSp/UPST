@@ -151,11 +151,13 @@ bool SerialDeviceConfig::checkNvItem(SerialDevice* device, uint16_t id, NvType t
         QString nvString = nvData.toString().toLower();
 
         if(checkString.contains('*')) {
-            if(checkString.indexOf('*') == 0) {
+            if(checkString.startsWith('*') && checkString.endsWith('*')) {
+                return nvString.contains(checkString.mid(1, checkString.length() - 2));
+             } else if(checkString.startsWith('*')) {
                 return nvString.endsWith(checkString.mid(1));
+            } else if(checkString.endsWith('*')) {
+                return nvString.startsWith(checkString.mid(0, checkString.length() - 1));
             }
-
-            return nvString.startsWith(checkString.mid(0, checkString.length() - 1));
         }
 
         return nvString == checkString;
