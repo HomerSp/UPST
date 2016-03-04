@@ -14,6 +14,8 @@ namespace Serial {
 
                     virtual void execute();
 
+                    bool toNv(uint64_t data, QList<QByteArray>& result);
+
                 private:
                     bool fromNv(const QList<QByteArray>& data, uint64_t& result);
                 };
