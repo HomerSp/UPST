@@ -113,16 +113,19 @@ bool MINCommand::toNv(uint64_t data, QList<QByteArray>& result) {
 
     {
         QByteArray minArr;
-        QDataStream minStream(&minArr, QIODevice::WriteOnly);
-        minStream << min1;
+        minArr.fill('\0', 8);
+        minArr[8] = (min1 >> 24) & 0xFF;
+        minArr[7] = (min1 >> 16) & 0xFF;
+        minArr[6] = (min1 >> 8) & 0xFF;
+        minArr[5] = (min1) & 0xFF;
 
         result.append(minArr);
     }
     {
         QByteArray minArr;
-        QDataStream minStream(&minArr, QIODevice::WriteOnly);
-        minStream << ((ushort)min2);
-
+        minArr.fill('\0', 4);
+        minArr[4] = (min2 >> 8) & 0xFF;
+        minArr[3] = (min2) & 0xFF;
         result.append(minArr);
     }
 

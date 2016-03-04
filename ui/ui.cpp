@@ -81,7 +81,7 @@ void UI::MainUI::devicesChanged() {
         }
 
         if(shouldAdd) {
-            mWorker->addNewDevice(info);
+            mWorker->addDeviceCheck(info);
         }
     }
 }
@@ -131,7 +131,7 @@ void UI::MainUI::deviceRemove(const QString& port) {
             emit deviceChanged(device, false);
             mDevices.removeAt(i);
 
-            mWorker->removeDevice(device);
+            mWorker->addDeviceRemove(device);
 
             break;
         }

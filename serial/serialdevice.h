@@ -27,6 +27,8 @@ namespace Serial {
 
         bool updateJson(const QJsonObject& obj);
 
+        bool provision();
+
         void setBaudRate(QSerialPort::BaudRate baudRate) {
             mBaudRate = baudRate;
         }
@@ -38,6 +40,11 @@ namespace Serial {
         }
         void setStopBits(QSerialPort::StopBits stopBits) {
             mStopBits = stopBits;
+        }
+
+        void setProvisionData(const QString& mdn, uint64_t min) {
+            mMdn = mdn;
+            mMin = min;
         }
 
         bool operator==(const SerialDevice& other);

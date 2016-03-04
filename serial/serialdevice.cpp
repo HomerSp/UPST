@@ -70,6 +70,42 @@ bool SerialDevice::isValid() {
     return cmd.result()->success();
 }
 
+bool SerialDevice::provision() {
+    bool ret = true;
+
+    qDebug()<<"===== Writing SPC =====";
+    Serial::QCDM::Commands::QcdmCommand spcCommand(this, Serial::QCDM::DiagCommands::DIAG_SPC_F, QString("000000").toLatin1());
+    spcCommand.execute();
+    if(spcCommand.result()->success()) {
+        qDebug()<<"Result="<<spcCommand.result()->data().toString();
+    } else {
+        qDebug()<<"Could not unlock SPC";
+        ret = false;
+    }
+
+    qDebug()<<"===== WRITING MDN =====";
+    Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(this, false, mMdn);
+    mdnCmd.execute();
+    if(mdnCmd.result()->success()) {
+        qDebug()<<"Result="<<mdnCmd.result()->data().toString();
+    } else {
+        qDebug()<<"Could not write MDN";
+        ret = false;
+    }
+
+    qDebug()<<"===== WRITING MIN =====";
+    Serial::QCDM::Commands::Nv::MINCommand minCmd(this, false, mMin);
+    minCmd.execute();
+    if(minCmd.result()->success()) {
+        qDebug()<<"Result="<<minCmd.result()->data().toString();
+    } else {
+        qDebug()<<"Could not write MIN";
+        ret = false;
+    }
+
+    return ret;
+}
+
 bool SerialDevice::update() {
     qDebug()<<"===== GETTING ESN =====";
     Serial::QCDM::Commands::Nv::ESNCommand esnCmd(this);

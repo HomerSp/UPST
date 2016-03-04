@@ -45,20 +45,20 @@ void UI::Section::Provision::update() {
 void UI::Section::Provision::provision() {
     QObject* rootObject = UISection::rootObject();
     QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();
-    QString min = rootObject->findChild<QObject*>("textMIN")->property("text").toString();
-
-    qDebug()<<"provision"<<mdn;
-
-    /*if(mDevices.size() > 0) {
-        mModel->addDevice(mDevices.at(0));
-    }*/
+    uint64_t min = (uint64_t)rootObject->findChild<QObject*>("textMIN")->property("text").toString().toULongLong();
 
     Serial::SerialDevice* device = currentDevice();
     if(device == nullptr) {
         return;
     }
 
-    qDebug()<<"===== Resetting connection =====";
+    qDebug()<<"Provision"<<device->name()<<mdn<<min;
+
+    device->setProvisionData(mdn, min);
+
+    ui()->worker()->addDeviceProvision(device);
+
+    /*qDebug()<<"===== Resetting connection =====";
 
     QByteArray resetArray;
     resetArray.append((char)Serial::QCDM::Mode::MODE_RADIO_RESET);
@@ -69,7 +69,7 @@ void UI::Section::Provision::provision() {
         qDebug()<<"Could not reset device";
     }
 
-    return;
+    return;*/
 
 /*    Serial::SerialDevice* device = mDevices.at(0);
 

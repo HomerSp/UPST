@@ -5,6 +5,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QSerialPortInfo>
+#include <QPair>
 
 #include "../serial/serialdevice.h"
 #include "../serial/serialdeviceconfig.h"
@@ -43,10 +44,12 @@ namespace UI {
     public:
         SerialDeviceWorker();
 
-        void addNewDevice(const QSerialPortInfo &info);
-        void addCommand(SerialCommandItem* cmd);
+        void addDeviceCheck(const QSerialPortInfo &info);
+        void addDeviceRemove(Serial::SerialDevice* device);
 
-        void removeDevice(Serial::SerialDevice* device);
+        void addDeviceProvision(Serial::SerialDevice* device);
+
+        void addCommand(SerialCommandItem* cmd);
 
         void stop();
 
@@ -61,9 +64,17 @@ namespace UI {
         void statusChange(const QString& status);
 
     private:
-        void processDeviceRemovals();
-        void processNewDevice();
-        void processCommand();
+        enum WorkType {
+            WorkTypeDeviceCheck,
+            WorkTypeDeviceRemove,
+            WorkTypeCommand,
+            WorkTypeDeviceProvision,
+        };
+
+        void processDeviceRemove(Serial::SerialDevice* device);
+        void processDeviceCheck(QSerialPortInfo* portInfo);
+        void processDeviceProvision(Serial::SerialDevice* device);
+        void processCommand(SerialCommandItem* command);
 
         Serial::SerialDeviceConfig* mDeviceConfig;
 
@@ -73,14 +84,8 @@ namespace UI {
         QMutex mRunningMutex;
         QAtomicInteger<bool> mRunning;
 
-        QMutex mPortsMutex;
-        QList<QSerialPortInfo*> mPorts;
-
-        QMutex mDeviceRemoveMutex;
-        QList<Serial::SerialDevice*> mDeviceRemove;
-
-        QMutex mCommandsMutex;
-        QList<SerialCommandItem*> mCommands;
+        QMutex mWorkMutex;
+        QMap<WorkType, void*> mWorkItems;
     };
 }
 

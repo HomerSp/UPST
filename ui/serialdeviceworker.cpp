@@ -32,22 +32,40 @@ UI::SerialDeviceWorker::SerialDeviceWorker()
     mDeviceConfig = new Serial::SerialDeviceConfig();
 }
 
-void UI::SerialDeviceWorker::addNewDevice(const QSerialPortInfo &info) {
-    QMutexLocker lock(&mPortsMutex);
-    foreach(const QSerialPortInfo *i, mPorts) {
-        if(i->portName() == info.portName()) {
+void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
+    QMutexLocker lock(&mWorkMutex);
+    for(QMap<WorkType, void*>::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
+        if(i.key() != WorkTypeDeviceCheck) {
+            continue;
+        }
+
+        if(static_cast<QSerialPortInfo*>(i.value())->portName() == info.portName()) {
             return;
         }
     }
 
-    mPorts.append(new QSerialPortInfo(info));
+    mWorkItems.insert(WorkTypeDeviceCheck, new QSerialPortInfo(info));
+    mWaitCondition.wakeAll();
+}
+
+void UI::SerialDeviceWorker::addDeviceRemove(Serial::SerialDevice* device) {
+    QMutexLocker locker(&mWorkMutex);
+
+    mWorkItems.insert(WorkTypeDeviceRemove, device);
+    mWaitCondition.wakeAll();
+}
+
+void UI::SerialDeviceWorker::addDeviceProvision(Serial::SerialDevice* device) {
+    QMutexLocker locker(&mWorkMutex);
+
+    mWorkItems.insert(WorkTypeDeviceProvision, device);
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addCommand(SerialCommandItem *cmd) {
-    QMutexLocker lock(&mCommandsMutex);
+    QMutexLocker lock(&mWorkMutex);
 
-    mCommands.append(cmd);
+    mWorkItems.insert(WorkTypeCommand, cmd);
     mWaitCondition.wakeAll();
 }
 
@@ -57,76 +75,95 @@ void UI::SerialDeviceWorker::stop() {
     // Wait for the worker to finish.
     QMutexLocker runningLock(&mRunningMutex);
 
-    QMutexLocker lock(&mPortsMutex);
-    foreach(const QSerialPortInfo *i, mPorts) {
-        delete i;
+    QMutexLocker lock(&mWorkMutex);
+    for(QMap<WorkType, void*>::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
+        if(i.key() == WorkTypeDeviceCheck) {
+            delete static_cast<QSerialPortInfo*>(i.value());
+        } else if(i.key() == WorkTypeCommand) {
+            delete static_cast<SerialCommandItem*>(i.value());
+        }
     }
 
-    mPorts.clear();
-
-    QMutexLocker lock2(&mCommandsMutex);
-    foreach(SerialCommandItem* item, mCommands) {
-        delete item;
-    }
-
-    mCommands.clear();
-
-    mWaitCondition.wakeAll();
-}
-
-void UI::SerialDeviceWorker::removeDevice(Serial::SerialDevice* device) {
-    QMutexLocker locker(&mDeviceRemoveMutex);
-    mDeviceRemove.append(device);
+    mWorkItems.clear();
 
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::process() {
     while(mRunning.load()) {
-        bool hasNewDevices = false, hasDeviceRemove = false, hasCommands = false;
+        bool waitForNextCommand = true;
         {
             QMutexLocker runningLock(&mRunningMutex);
 
             qDebug()<<"SerialDeviceWorker::process";
 
             // We want to process all of the removals first as removing a device may also affect commands.
-            {
-                QMutexLocker locker(&mDeviceRemoveMutex);
-                if(mDeviceRemove.size() > 0) {
-                    hasDeviceRemove = true;
-                }
-            }
+            int i = 0, size = 0;
+            do {
+                Serial::SerialDevice* device = nullptr;
+                {
+                    QMutexLocker locker(&mWorkMutex);
+                    size = mWorkItems.size();
+                    if(size == 0) {
+                        break;
+                    }
 
-            if(hasDeviceRemove) {
-                qDebug()<<"processDeviceRemovals";
-                processDeviceRemovals();
-            }
+                    if(mWorkItems.keys()[i++] != WorkTypeDeviceRemove) {
+                        continue;
+                    }
 
-            {
-                QMutexLocker locker(&mPortsMutex);
-                if(mPorts.size() > 0) {
-                    hasNewDevices = true;
-                }
-            }
-            {
-                QMutexLocker locker(&mCommandsMutex);
-                if(mCommands.size() > 0) {
-                    hasCommands = true;
-                }
-            }
+                    device = static_cast<Serial::SerialDevice*>(mWorkItems.values()[i]);
+                    mWorkItems.erase(mWorkItems.begin() + i);
 
-            if(hasNewDevices) {
-                qDebug()<<"processNewDevice";
-                processNewDevice();
-            }
-            if(hasCommands) {
-                qDebug()<<"processCommand";
-                processCommand();
-            }
+                    i--;
+                    size--;
+                }
+
+                processDeviceRemove(device);
+
+                waitForNextCommand = false;
+            } while(i < size);
+
+            size = 0;
+            do {
+                WorkType type;
+                void* data = nullptr;
+
+                {
+                    QMutexLocker locker(&mWorkMutex);
+                    size = mWorkItems.size();
+                    if(size == 0) {
+                        break;
+                    }
+
+                    type = mWorkItems.begin().key();
+                    data = mWorkItems.begin().value();
+                    mWorkItems.erase(mWorkItems.begin());
+                }
+
+                switch(type) {
+                case WorkTypeDeviceCheck: {
+                    processDeviceCheck(static_cast<QSerialPortInfo*>(data));
+                    break;
+                }
+                case WorkTypeDeviceProvision: {
+                    processDeviceProvision(static_cast<Serial::SerialDevice*>(data));
+                    break;
+                }
+                case WorkTypeCommand: {
+                    processCommand(static_cast<SerialCommandItem*>(data));
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                waitForNextCommand = false;
+            } while(size > 0);
         }
 
         // Wait until we have a new process item
-        if(!hasNewDevices && !hasDeviceRemove && !hasCommands) {
+        if(waitForNextCommand) {
             emit statusChange("");
 
             qDebug()<<"Sleeping until next command";
@@ -138,83 +175,52 @@ void UI::SerialDeviceWorker::process() {
     emit finished();
 }
 
-void UI::SerialDeviceWorker::processDeviceRemovals() {
-    Serial::SerialDevice* device = nullptr;
+void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
+    int i = 0, size = 0;
     do {
-        {
-            QMutexLocker locker(&mDeviceRemoveMutex);
-
-            if(mDeviceRemove.size() > 0) {
-                device = *(mDeviceRemove.begin());
-                mDeviceRemove.erase(mDeviceRemove.begin());
-            } else {
-                device = nullptr;
-            }
+        QMutexLocker locker(&mWorkMutex);
+        size = mWorkItems.size();
+        if(mWorkItems.keys()[i++] != WorkTypeCommand) {
+            continue;
         }
 
-        if(device != nullptr) {
-            QMutexLocker locker(&mCommandsMutex);
-            for(int i = 0; i < mCommands.size(); i++) {
-                SerialCommandItem* item = mCommands.at(i);
-                if(item->device() == device) {
-                    item->deleteLater();
-
-                    mCommands.removeAt(i);
-                    i--;
-                }
-            }
-
-            delete device;
+        SerialCommandItem* item = static_cast<SerialCommandItem*>(mWorkItems.values()[i]);
+        if(item->device() == device) {
+            item->deleteLater();
+            mWorkItems.erase(mWorkItems.begin() + i);
+            i--;
+            size--;
         }
-    } while(device != nullptr);
+    } while(i < size);
+
+    delete device;
 }
 
-void UI::SerialDeviceWorker::processNewDevice() {
-    QSerialPortInfo *portInfo = nullptr;
-    {
-        QMutexLocker locker(&mPortsMutex);
-        if(mPorts.size() > 0) {
-            portInfo = *(mPorts.begin());
-            mPorts.erase(mPorts.begin());
-        } else {
-            portInfo = nullptr;
-        }
+void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
+    emit statusChange("Getting device information for " + portInfo->portName());
+
+    Serial::SerialDevice* device = new Serial::SerialDevice(*portInfo);
+    if(!device->isValid()) {
+        qWarning()<<"Device is not valid";
+        delete device;
+    } else {
+        qDebug()<<"Device is valid";
+        device->update();
+        mDeviceConfig->updateDevice(device);
+        emit deviceAdd(device);
     }
 
-    if(portInfo != nullptr) {
-        emit statusChange("Getting device information for " + portInfo->portName());
+    emit statusChange("");
 
-        Serial::SerialDevice* device = new Serial::SerialDevice(*portInfo);
-        if(!device->isValid()) {
-            qWarning()<<"Device is not valid";
-            delete device;
-        } else {
-            qDebug()<<"Device is valid";
-            device->update();
-            mDeviceConfig->updateDevice(device);
-            emit deviceAdd(device);
-        }
-
-        emit statusChange("");
-
-        delete portInfo;
-    }
+    delete portInfo;
 }
 
-void UI::SerialDeviceWorker::processCommand() {
-    SerialCommandItem* item = nullptr;
-    {
-        QMutexLocker locker(&mCommandsMutex);
-        if(mCommands.size() > 0) {
-            item = *(mCommands.begin());
-            mCommands.erase(mCommands.begin());
-        } else {
-            item = nullptr;
-        }
-    }
+void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device) {
+    emit statusChange("Provisioning " + device->name());
+    device->provision();
+}
 
-    if(item != nullptr) {
-        item->process();
-        item->deleteLater();
-    }
+void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
+    item->process();
+    item->deleteLater();
 }
