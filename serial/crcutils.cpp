@@ -141,6 +141,7 @@ int CRCUtils::verifyCRC(const QByteArray &data) {
         if(data[i - 1] == ESC_ASYNC) {
             dataSize -= 2;
             b = (uint8_t)data.at(i) ^ ESC_COMPL;
+            i--;
         } else {
             dataSize--;
             b = (uint8_t)data.at(i);
