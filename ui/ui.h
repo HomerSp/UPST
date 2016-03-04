@@ -32,6 +32,7 @@ namespace UI {
 
     signals:
         void deviceChanged(Serial::SerialDevice* device, bool added);
+        void deviceUpdate(Serial::SerialDevice* device);
 
     public slots:
         void devicesChanged();

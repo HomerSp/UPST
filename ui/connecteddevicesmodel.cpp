@@ -11,7 +11,7 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
     case NameRole:
         return device->name();
     case PortRole:
-        return device->port();
+        return device->portStr();
     }
 
     return "";
@@ -42,6 +42,16 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
                 QAbstractListModel::endRemoveRows();
                 break;
             }
+        }
+    }
+}
+
+void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
+    for(int i = 0; i < mDevices.size(); i++) {
+        if(mDevices[i] == device) {
+            mDevices.replace(i, device);
+            emit dataChanged(index(i), index(i));
+            break;
         }
     }
 }

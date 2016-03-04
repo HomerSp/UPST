@@ -127,6 +127,8 @@ void UI::SerialDeviceWorker::process() {
 
         // Wait until we have a new process item
         if(!hasNewDevices && !hasDeviceRemove && !hasCommands) {
+            emit statusChange("");
+
             qDebug()<<"Sleeping until next command";
             QMutexLocker locker(&mWakeMutex);
             mWaitCondition.wait(&mWakeMutex);

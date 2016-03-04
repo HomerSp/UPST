@@ -13,6 +13,7 @@ UI::MainUI::MainUI(const QGuiApplication& app)
 {
     mDevicesModel = new UI::ConnectedDevicesModel();
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
+    QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
     mEngine = new QQmlApplicationEngine();
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
@@ -67,8 +68,6 @@ UI::MainUI::~MainUI() {
 }
 
 void UI::MainUI::devicesChanged() {
-    setStatus("Refreshing devices");
-
     qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
         QString port = info.portName();
@@ -90,9 +89,30 @@ void UI::MainUI::devicesChanged() {
 void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
     qDebug()<<"deviceAdd"<<device->port();
 
+    // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
         if(*d == *device) {
             delete device;
+            return;
+        }
+    }
+
+    // Check if this device is a child to another device.
+    for(int i = 0; i < mDevices.size(); i++) {
+        Serial::SerialDevice* d = mDevices.at(i);
+        qDebug()<<"deviceAdd"<<d->vidStr()<<device->vidStr()<<d->pidStr()<<device->pidStr()<<d->meidStr()<<device->meidStr();
+
+        if(device->isSameDevice(d)) {
+            if((device->mdn().size() > 0 && d->mdn().size() == 0) || (device->min() != 0 && d->min() == 0)) {
+                device->addChild(d);
+                mDevices.replace(i, device);
+                d = device;
+            } else {
+                d->addChild(device);
+            }
+
+            emit deviceUpdate(d);
+            viewUpdate();
             return;
         }
     }

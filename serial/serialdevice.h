@@ -18,6 +18,9 @@ namespace Serial {
 
         SerialCommunicator* communicator();
 
+        void addChild(SerialDevice* device);
+
+        bool isSameDevice(SerialDevice* device);
         bool isValid();
 
         bool update();
@@ -57,28 +60,22 @@ namespace Serial {
             return mStopBits;
         }
 
-        QString name() const {
-            QString ret = "";
-            if(mMake.length() != 0) {
-                ret += mMake;
-            }
-            if(mModel.length() != 0) {
-                if(ret.length() > 0) {
-                    ret += " ";
-                }
-
-                ret += mModel;
-            }
-
-            return ret;
-        }
-
         uint16_t vid() const {
             return mVid;
         }
 
         uint16_t pid() const {
             return mPid;
+        }
+
+        const QString& make() const {
+            return mMake;
+        }
+        const QString& model() const {
+            return mModel;
+        }
+        const QString& codename() const {
+            return mCodename;
         }
 
         const QString &mdn() const {
@@ -98,11 +95,40 @@ namespace Serial {
             return mMEID;
         }
 
+        QString portStr() const {
+            if(mChildren.size() == 0) {
+                return mPort;
+            }
+
+            QString ret = mPort;
+            foreach(SerialDevice* d, mChildren) {
+                ret += ", " + d->port();
+            }
+
+            return ret;
+        }
+
         QString vidStr() const {
             return QString("%1").arg(mVid, 4, 16, QChar('0'));
         }
         QString pidStr() const {
             return QString("%1").arg(mPid, 4, 16, QChar('0'));
+        }
+
+        QString name() const {
+            QString ret = "";
+            if(mMake.length() != 0) {
+                ret += mMake;
+            }
+            if(mModel.length() != 0) {
+                if(ret.length() > 0) {
+                    ret += " ";
+                }
+
+                ret += mModel;
+            }
+
+            return ret;
         }
 
         QString makeStr() const {
@@ -158,6 +184,8 @@ namespace Serial {
     private:
         SerialCommunicator* mCommunicator;
 
+        QList<SerialDevice*> mChildren;
+
         QString mPort;
         uint16_t mVid;
         uint16_t mPid;
@@ -169,6 +197,8 @@ namespace Serial {
 
         QString mMake;
         QString mModel;
+        QString mCodename;
+
         QString mMdn;
         uint64_t mMin;
         uint32_t mESN;

@@ -25,6 +25,7 @@ namespace UI {
 
     public slots:
         void deviceChanged(Serial::SerialDevice* device, bool added);
+        void deviceUpdate(Serial::SerialDevice* device);
 
     private:
         QList<Serial::SerialDevice*> mDevices;

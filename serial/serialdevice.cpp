@@ -38,6 +38,10 @@ SerialDevice::SerialDevice(const QSerialPortInfo& info)
 }
 
 SerialDevice::~SerialDevice() {
+    foreach(SerialDevice* c, mChildren) {
+        delete c;
+    }
+
     if(mCommunicator != nullptr) {
         delete mCommunicator;
     }
@@ -47,6 +51,14 @@ SerialDevice::~SerialDevice() {
 
 SerialCommunicator* SerialDevice::communicator() {
     return mCommunicator;
+}
+
+void SerialDevice::addChild(SerialDevice *device) {
+    mChildren.append(device);
+}
+
+bool SerialDevice::isSameDevice(SerialDevice *device) {
+    return mVid == device->mVid && mPid == device->mPid && mMEID == device->mMEID;
 }
 
 bool SerialDevice::isValid() {
@@ -103,18 +115,40 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
     if(obj.contains("make")) {
         mMake = obj["make"].toString();
     }
-
     if(obj.contains("model")) {
         mModel = obj["model"].toString();
+    }
+    if(obj.contains("codename")) {
+        mCodename = obj["codename"].toString();
     }
 
     return true;
 }
 
 bool SerialDevice::operator==(const SerialDevice& other) {
-    return other.mPort == mPort;
+    if(*this == other.mPort) {
+        return true;
+    }
+
+    foreach(Serial::SerialDevice* c, other.mChildren) {
+        if(*this == c->mPort) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool SerialDevice::operator==(const QString& port) {
-    return port == mPort;
+    if(port == mPort) {
+        return true;
+    }
+
+    foreach(Serial::SerialDevice* c, mChildren) {
+        if(c->mPort == port) {
+            return true;
+        }
+    }
+
+    return false;
 }
