@@ -14,7 +14,7 @@ namespace UI {
             virtual void update();
 
         private slots:
-            void manualCommandFinished();
+            void rawCommandFinished();
         };
     }
 }

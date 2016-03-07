@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Layouts 1.1
 import "components"
 
 Item {
@@ -9,15 +10,19 @@ Item {
         id: unit
     }
 
-    Rectangle {
+    ColumnLayout {
         anchors.fill: parent
-        color: "#FFFFFF"
+        anchors.margins: unit.dp(8)
 
-        TextEdit {
-            objectName: "manualModeOutput"
+        TextInput {
+            objectName: "manualRawInput"
             anchors.fill: parent
-            anchors.margins: unit.dp(8)
-            selectByMouse: true
+        }
+
+        TextInput {
+            objectName: "manualRawOutput"
+            anchors.fill: parent
+            readOnly: true
         }
     }
 }

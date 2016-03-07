@@ -48,7 +48,7 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
 
 void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     for(int i = 0; i < mDevices.size(); i++) {
-        if(mDevices[i] == device) {
+        if(*(mDevices[i]) == *(device)) {
             mDevices.replace(i, device);
             emit dataChanged(index(i), index(i));
             break;

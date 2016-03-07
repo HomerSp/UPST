@@ -19,6 +19,8 @@ ApplicationWindow {
     function updateTitle() {
         if(mainPageLoader.currentView == "manual") {
             this.title = qsTr("UPST - Manual mode")
+        } else if(mainPageLoader.currentView == "deviceinfo") {
+            this.title = qsTr("UPST - Device info");
         } else {
             this.title = qsTr("UPST")
         }
@@ -50,16 +52,24 @@ ApplicationWindow {
             objectName: "advancedMenu"
             title: qsTr("Advanced")
             MenuItem {
+                id: advancedMenuDeviceInfo
+                text: qsTr("Device info")
+                onTriggered: {
+                    mainPageLoader.currentView = "deviceinfo"
+                }
+            }
+            MenuItem {
+                id: advancedMenuProvision
+                text: qsTr("Provision mode")
+                onTriggered: {
+                    mainPageLoader.currentView = "provision"
+                }
+            }
+            MenuItem {
                 id: advancedMenuManual
                 text: qsTr("Manual mode")
                 onTriggered: {
-                    if(mainPageLoader.currentView === "provision") {
-                        this.text = qsTr("Provision mode")
-                        mainPageLoader.currentView = "manual"
-                    } else if(mainPageLoader.currentView === "manual") {
-                        this.text = qsTr("Manual mode")
-                        mainPageLoader.currentView = "provision"
-                    }
+                    mainPageLoader.currentView = "manual"
                 }
             }
         }
@@ -368,6 +378,8 @@ ApplicationWindow {
                         this.source = "main_manualmode.qml"
                     } else if(this.currentView === "provision") {
                         this.source = "main_provisionmode.qml"
+                    } else if(this.currentView === "deviceinfo") {
+                        this.source = "main_deviceinfo.qml"
                     }
 
                     updateTitle()

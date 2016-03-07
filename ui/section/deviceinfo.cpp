@@ -1,25 +1,41 @@
 #include <QDebug>
 #include "../../serial/qcdm/commands/nv/nvcommand.h"
 
-#include "manual.h"
+#include "deviceinfo.h"
 
-UI::Section::Manual::Manual(UI::MainUI* ui)
+UI::Section::DeviceInfo::DeviceInfo(UI::MainUI* ui)
     : UISection(ui)
 {
 
 }
 
-UI::Section::Manual::~Manual() {
+UI::Section::DeviceInfo::~DeviceInfo() {
 
 }
 
-void UI::Section::Manual::update() {
+void UI::Section::DeviceInfo::update() {
     UISection::startUpdate();
+
+    Serial::SerialDevice* currentDevice = UISection::currentDevice();
+    if(currentDevice != nullptr) {
+        SerialCommandItem* cmdItem = new SerialCommandItem(currentDevice);
+        connect(cmdItem, &SerialCommandItem::finished, this, &UI::Section::DeviceInfo::infoCommandFinished);
+
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, true, Serial::QCDM::NV_MOB_FIRM_REV_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand32Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_CAI_REV_I));
+        cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_SW_VERSION_INFO_I));
+        if(currentDevice->vid() == 0x04e8) {
+            cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_OEM_SAMSUNG_MODEL));
+        }
+
+        ui()->worker()->addCommand(cmdItem);
+    }
 
     UISection::endUpdate();
 }
 
-void UI::Section::Manual::rawCommandFinished() {
+void UI::Section::DeviceInfo::infoCommandFinished() {
     SerialCommandItem* item = static_cast<SerialCommandItem*>(sender());
     QString data = "VID = " + item->device()->vidStr() + "\nPID = " + item->device()->pidStr();
     {
@@ -53,7 +69,7 @@ void UI::Section::Manual::rawCommandFinished() {
         }
     }
 
-    QObject* manualModeOutput = rootObject()->findChild<QObject*>("manualModeOutput");
-    manualModeOutput->setProperty("text", data);
+    QObject* text = rootObject()->findChild<QObject*>("deviceInfoText");
+    text->setProperty("text", data);
 
 }

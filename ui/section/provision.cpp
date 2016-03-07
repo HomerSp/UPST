@@ -18,27 +18,6 @@ UI::Section::Provision::~Provision() {
 void UI::Section::Provision::update() {
     UISection::startUpdate();
 
-    QObject* rootObject = UISection::rootObject();
-
-    Serial::SerialDevice* currentDevice = UISection::currentDevice();
-    if(currentDevice != nullptr) {
-        rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", currentDevice->makeStr());
-        rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", currentDevice->modelStr());
-        rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", currentDevice->mdnStr());
-        rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", currentDevice->minStr());
-        rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", currentDevice->esnStr());
-        rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", currentDevice->meidStr());
-        rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", currentDevice->imeiStr());
-    } else {
-        rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", "");
-        rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", "");
-    }
-
     UISection::endUpdate();
 }
 

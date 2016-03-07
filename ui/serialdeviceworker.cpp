@@ -33,6 +33,8 @@ UI::SerialDeviceWorker::SerialDeviceWorker()
 }
 
 void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
+    qDebug()<<"addDeviceCheck"<<info.portName();
+
     QMutexLocker lock(&mWorkMutex);
     for(QMap<WorkType, void*>::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
         if(i.key() != WorkTypeDeviceCheck) {
@@ -104,18 +106,18 @@ void UI::SerialDeviceWorker::process() {
                 {
                     QMutexLocker locker(&mWorkMutex);
                     size = mWorkItems.size();
-                    if(size == 0) {
+                    if(size <= 0 || i >= size) {
                         break;
                     }
 
-                    if(mWorkItems.keys()[i++] != WorkTypeDeviceRemove) {
+                    if(mWorkItems.keys()[i] != WorkTypeDeviceRemove) {
+                        i++;
                         continue;
                     }
 
                     device = static_cast<Serial::SerialDevice*>(mWorkItems.values()[i]);
                     mWorkItems.erase(mWorkItems.begin() + i);
 
-                    i--;
                     size--;
                 }
 
@@ -176,11 +178,17 @@ void UI::SerialDeviceWorker::process() {
 }
 
 void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
+    // We need to remove any pending commands that might be attached to a specific device.
     int i = 0, size = 0;
     do {
         QMutexLocker locker(&mWorkMutex);
         size = mWorkItems.size();
-        if(mWorkItems.keys()[i++] != WorkTypeCommand) {
+        if(size == 0 || i >= size) {
+            break;
+        }
+
+        if(mWorkItems.keys()[i] != WorkTypeCommand) {
+            i++;
             continue;
         }
 
@@ -188,7 +196,6 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
         if(item->device() == device) {
             item->deleteLater();
             mWorkItems.erase(mWorkItems.begin() + i);
-            i--;
             size--;
         }
     } while(i < size);
@@ -201,10 +208,10 @@ void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
 
     Serial::SerialDevice* device = new Serial::SerialDevice(*portInfo);
     if(!device->isValid()) {
-        qWarning()<<"Device is not valid";
+        qWarning()<<"Device"<<portInfo->portName()<<"is not valid";
         delete device;
     } else {
-        qDebug()<<"Device is valid";
+        qDebug()<<"Device"<<portInfo->portName()<<"is valid";
         device->update();
         mDeviceConfig->updateDevice(device);
         emit deviceAdd(device);

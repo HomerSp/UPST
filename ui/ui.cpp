@@ -3,6 +3,7 @@
 #include <QThread>
 
 #include "ui.h"
+#include "section/deviceinfo.h"
 #include "section/manual.h"
 #include "section/provision.h"
 
@@ -168,6 +169,8 @@ void UI::MainUI::viewChanged() {
         mSection = new UI::Section::Manual(this);
     } else if(view == "provision") {
         mSection = new UI::Section::Provision(this);
+    } else if(view == "deviceinfo") {
+        mSection = new UI::Section::DeviceInfo(this);
     }
 
     if(mSection == nullptr) {
@@ -211,18 +214,36 @@ void UI::UISection::startUpdate() {
         bottomTab->setProperty("enabled", false);
 
         rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 1.0f);
+    } else {
+        Serial::SerialDevice* currentDevice = UISection::currentDevice();
+        if(currentDevice != nullptr) {
+            rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", currentDevice->makeStr());
+            rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", currentDevice->modelStr());
+            rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", currentDevice->mdnStr());
+            rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", currentDevice->minStr());
+            rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", currentDevice->esnStr());
+            rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", currentDevice->meidStr());
+            rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", currentDevice->imeiStr());
+        }
     }
 }
 
 void UI::UISection::endUpdate() {
+    QObject* rootObject = this->rootObject();
     if(devices().size() > 0) {
-        QObject* rootObject = this->rootObject();
-
         QObject* bottomTab = rootObject->findChild<QObject*>("mainPageBottomTabArrow");
         bottomTab->setProperty("enabled", true);
         bottomTab->setProperty("hidden", false);
 
         rootObject->findChild<QObject*>("noDeviceOverlay")->setProperty("opacity", 0.0f);
+    } else {
+        rootObject->findChild<QObject*>("currentDeviceMake")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceModel")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceMDN")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceMIN")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", "");
     }
 }
 
