@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import "components"
 
@@ -14,15 +15,36 @@ Item {
         anchors.fill: parent
         anchors.margins: unit.dp(8)
 
-        TextInput {
-            objectName: "manualRawInput"
-            anchors.fill: parent
+        Text {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            text: qsTr("Input")
         }
 
-        TextInput {
+        TextField {
+            objectName: "manualRawInput"
+            anchors.left: parent.left
+            anchors.right: parent.right
+        }
+
+        Text {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            text: qsTr("Output")
+        }
+
+        TextField {
             objectName: "manualRawOutput"
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.right: parent.right
             readOnly: true
+        }
+
+        Button {
+            objectName: "manualRawSend"
+            text: qsTr("Send")
         }
     }
 }

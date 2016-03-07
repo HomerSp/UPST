@@ -7,13 +7,15 @@ namespace UI {
     namespace Section {
         class Manual : public UISection
         {
+            Q_OBJECT
         public:
             Manual(MainUI* ui);
             ~Manual();
 
             virtual void update();
 
-        private slots:
+        protected slots:
+            void rawSend();
             void rawCommandFinished();
         };
     }
