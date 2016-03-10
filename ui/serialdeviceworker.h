@@ -43,6 +43,7 @@ namespace UI {
         Q_OBJECT
     public:
         SerialDeviceWorker();
+        ~SerialDeviceWorker();
 
         void addDeviceCheck(const QSerialPortInfo &info);
         void addDeviceRemove(Serial::SerialDevice* device);
@@ -82,6 +83,7 @@ namespace UI {
         QWaitCondition mWaitCondition;
 
         QMutex mRunningMutex;
+        QMutex mStoppedMutex;
         QAtomicInteger<bool> mRunning;
 
         QMutex mWorkMutex;

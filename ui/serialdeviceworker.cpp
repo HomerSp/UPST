@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QThread>
 
 #include "serialdeviceworker.h"
 
@@ -30,6 +31,10 @@ UI::SerialDeviceWorker::SerialDeviceWorker()
     : mRunning(true)
 {
     mDeviceConfig = new Serial::SerialDeviceConfig();
+}
+
+UI::SerialDeviceWorker::~SerialDeviceWorker() {
+    delete mDeviceConfig;
 }
 
 void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
@@ -72,7 +77,12 @@ void UI::SerialDeviceWorker::addCommand(SerialCommandItem *cmd) {
 }
 
 void UI::SerialDeviceWorker::stop() {
+    QMutexLocker stopLock(&mStoppedMutex);
+
     mRunning = false;
+
+    // TODO: Make this wait until we are actually in the wait condition.
+    mWaitCondition.wakeAll();
 
     // Wait for the worker to finish.
     QMutexLocker runningLock(&mRunningMutex);
@@ -87,8 +97,6 @@ void UI::SerialDeviceWorker::stop() {
     }
 
     mWorkItems.clear();
-
-    mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::process() {
@@ -106,7 +114,7 @@ void UI::SerialDeviceWorker::process() {
                 {
                     QMutexLocker locker(&mWorkMutex);
                     size = mWorkItems.size();
-                    if(size <= 0 || i >= size) {
+                    if(size <= 0 || i >= size || !mRunning.load()) {
                         break;
                     }
 
@@ -134,7 +142,7 @@ void UI::SerialDeviceWorker::process() {
                 {
                     QMutexLocker locker(&mWorkMutex);
                     size = mWorkItems.size();
-                    if(size == 0) {
+                    if(size == 0 || !mRunning.load()) {
                         break;
                     }
 
@@ -165,7 +173,7 @@ void UI::SerialDeviceWorker::process() {
         }
 
         // Wait until we have a new process item
-        if(waitForNextCommand) {
+        if(waitForNextCommand && mRunning.load()) {
             emit statusChange("");
 
             qDebug()<<"Sleeping until next command";
@@ -173,6 +181,10 @@ void UI::SerialDeviceWorker::process() {
             mWaitCondition.wait(&mWakeMutex);
         }
     }
+
+    // Wait for the stop handler to finish before returning
+    QMutexLocker stopLock(&mStoppedMutex);
+    qDebug()<<"SerialDeviceWorker finished";
 
     emit finished();
 }
