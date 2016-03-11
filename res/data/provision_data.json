@@ -1,0 +1,158 @@
+{
+    "userType": "0",
+    "user": "@mychoicewireless.net",
+    "password": "123choiceabc",
+    "carrierPRL": "http://umpst.ultimobile.com/umpst/PRLS/MC/2021.prl",
+    "carrierPRLmd5": "7096b74f861e801be2548194ee10379a",
+    "carrierSPC": "000000",
+    "sequentialOffline": "0",
+    "sixteendigitpassword": "null",
+    "nvItems": null,
+    "genUserProf": {
+        "index": "0",
+        "homeAddress": "0.0.0.0",
+        "primaryAddress": "0.0.0.0",
+        "secondaryAddress": "0.0.0.0",
+        "mnAAASpiSet": "1",
+        "mnAAASpi": "2",
+        "mnHASpiSet": "1",
+        "mnHASpi": "258",
+        "retTunPref": "1"
+    },
+    "genUserSS": {
+        "index": "0",
+        "mnHASharedSecret": "123choiceabc",
+        "mnAAASharedSecret": "123choiceabc"
+    },
+    "mobileIP": {
+        "mipPref": "2",
+        "numOfProf": "1",
+        "currentActiveProf": "0",
+        "mipProfEnable": "1",
+        "mipRegistrationRetries": "2",
+        "mipRetryInterval": "3",
+        "mipPreReRRQTime": "30",
+        "mipRRQ": "0",
+        "dormantHandOffOptEnable": "1",
+        "mnHARFC2002bis": "1",
+        "MIPNaiUser": "MDN@sp.mychoicewireless.net",
+        "MIPDMUPkoid": "0"
+    },
+    "data": {
+        "tetheredNAI": "MDN@sp.mychoicewireless.net",
+        "tetheredMIPNAI": "MDN@sp.mychoicewireless.net",
+        "PPPUser": "MDN@mychoicewireless.net",
+        "PAPUser": "MDN@mychoicewireless.net",
+        "HDRANUser": "MDN@mychoicewireless.net",
+        "HDRPPPUser": "MDN@mychoicewireless.net",
+        "SIPNaiUser": "MDN@sp.mychoicewireless.net",
+        "hdrScpATConfig": "1",
+        "evdoRXControl": "0"
+    },
+    "nam": {
+        "name": "NAM1",
+        "homeSID": "5517",
+        "evrc": {
+            "_enabled": "1",
+            "homePageSo": "3",
+            "homeOrigSo": "3",
+            "roamOrigSo": "3"
+        },
+        "voicePriv": "1",
+        "prefMode": "4",
+        "systemPref": "-1",
+        "cdmaPrefServ": "-1",
+        "banner": "-1",
+        "namLock": "0",
+        "otapaEnable": "1",
+        "useIMSI": "255",
+        "useIMSIT": "255",
+        "hybridMode": "1",
+        "sid_nid_list": [
+            {
+                "sid": "5517",
+                "nid": "65535"
+            },
+            {
+                "sid": "3002",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            },
+            {
+                "sid": "0000",
+                "nid": "65535"
+            }
+        ],
+        "primaryDNS": "0.0.0.0",
+        "secondaryDNS": "0.0.0.0",
+        "mccIMSI": "310",
+        "mncIMSI": "00"
+    }
+}

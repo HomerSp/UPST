@@ -8,5 +8,6 @@
         <file>res/images/icons/tablet.svg</file>
         <file>res/images/icons/computer.svg</file>
         <file>res/data/devices.list</file>
+        <file>res/data/provision_data.json</file>
     </qresource>
 </RCC>
