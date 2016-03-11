@@ -71,6 +71,7 @@ namespace Serial {
 
             private:
                 QList<QcdmCommandItem *> mCmds;
+
             };
         }
     }

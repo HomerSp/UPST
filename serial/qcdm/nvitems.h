@@ -6231,7 +6231,21 @@ namespace Serial {
             NV_MAX_I = 6265,
             NV_OEM_SAMSUNG_MODEL = 10002,
             NV_MAGICAL_LG_UNLOCK = 39939,
-            NV_ITEMS_ENUM_PAD = 0x7FFF
+            NV_ITEMS_ENUM_PAD = 0x7FFF,
+        };
+
+        enum NvItemType
+        {
+            NV_GENERIC_BYTE_ARRAY = 0,
+            NV_GENERIC_FLAG_ARRAY,
+            NV_GENERIC_NAM_BYTE_ARRAY,
+            NV_GENERIC_NAM_FLAG_ARRAY,
+            NV_GENERIC_MIP_BYTE_ARRAY,
+            NV_GENERIC_MIP_NAI_BYTE_ARRAY,
+            NV_GENERIC_IP_BYTE_ARRAY,
+            NV_GENERIC_NAI_BYTE_ARRAY,
+            NV_GENERIC_NAM_UINT16_ARRAY,
+            NV_GENERIC_NAM_ANSI_ARRAY,
         };
     }
 }

@@ -9,8 +9,6 @@ using namespace Serial::QCDM::Commands::Nv;
 MINCommand::MINCommand(SerialDevice* device, bool read, uint64_t data)
     : NvCommand(device)
 {
-    Q_UNUSED(data);
-
     if(read) {
         addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, QCDM::NvItem::NV_MIN1_I));
         addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, QCDM::NvItem::NV_MIN2_I));

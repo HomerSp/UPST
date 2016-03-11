@@ -10,7 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include "qcdm/commands/nv/nvcommand.h"
+#include "qcdm/commands/nvcommands/nvcommand.h"
 #include "serialdeviceconfig.h"
 
 using namespace Serial;

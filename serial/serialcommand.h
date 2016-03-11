@@ -78,6 +78,16 @@ namespace Serial {
             mTimeout = timeout;
         }
 
+#ifdef TESTING_MODE
+                const QString& debuggingName() {
+                    return mDebuggingName;
+                }
+
+                void setDebuggingName(const QString& name) {
+                    mDebuggingName = name;
+                }
+#endif
+
     protected:
         SerialCommand(SerialDevice *device);
 
@@ -95,6 +105,10 @@ namespace Serial {
         int mTimeout;
 
         QList<SerialCommandResult*> mResults;
+
+#ifdef TESTING_MODE
+        QString mDebuggingName;
+#endif
     };
 }
 #endif // SERIALCOMMAND_H

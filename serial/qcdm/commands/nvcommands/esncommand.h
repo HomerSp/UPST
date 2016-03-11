@@ -1,8 +1,6 @@
 #ifndef ESNCOMMAND_H
 #define ESNCOMMAND_H
 
-
-
 #include "nvcommand.h"
 
 namespace Serial {

@@ -1,13 +1,16 @@
 #include <QObject>
 #include <QDebug>
+#include <QFile>
 
 #include "serialcommunicator.h"
 #include "serialdevice.h"
-#include "qcdm/commands/nv/esncommand.h"
-#include "qcdm/commands/nv/imeicommand.h"
-#include "qcdm/commands/nv/meidcommand.h"
-#include "qcdm/commands/nv/mdncommand.h"
-#include "qcdm/commands/nv/mincommand.h"
+#include "serialprovisiondata.h"
+#include "qcdm/nv/nvprovisiondata.h"
+#include "qcdm/commands/nvcommands/esncommand.h"
+#include "qcdm/commands/nvcommands/imeicommand.h"
+#include "qcdm/commands/nvcommands/meidcommand.h"
+#include "qcdm/commands/nvcommands/mdncommand.h"
+#include "qcdm/commands/nvcommands/mincommand.h"
 
 using namespace Serial;
 
@@ -73,8 +76,13 @@ bool SerialDevice::isValid() {
 bool SerialDevice::provision() {
     bool ret = true;
 
+    QFile sourceFile(":/res/data/provision_data.json");
+    sourceFile.open(QFile::ReadOnly | QFile::Text);
+
+    SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
+
     qDebug()<<"===== Writing SPC =====";
-    Serial::QCDM::Commands::QcdmCommand spcCommand(this, Serial::QCDM::DiagCommands::DIAG_SPC_F, QString("000000").toLatin1());
+    Serial::QCDM::Commands::QcdmCommand spcCommand(this, Serial::QCDM::DiagCommands::DIAG_SPC_F, provisionData->carrierSPC().toLatin1());
     spcCommand.execute();
     if(spcCommand.result()->success()) {
         qDebug()<<"Result="<<spcCommand.result()->data().toString();
@@ -102,6 +110,24 @@ bool SerialDevice::provision() {
         qDebug()<<"Could not write MIN";
         ret = false;
     }
+
+    foreach(Serial::SerialCommand* cmd, provisionData->constCommands()) {
+#ifdef TESTING_MODE
+        qDebug()<<"Provisioning"<<cmd->debuggingName();
+#endif
+        // Increase the timeout period
+        cmd->setTimeout(10000);
+        cmd->execute();
+        foreach(Serial::SerialCommandResult* result, cmd->results()) {
+           if(!result->success()) {
+               qDebug()<<"Failed to provision";
+           } else {
+               qDebug()<<"Provision success";
+           }
+        }
+    }
+
+    delete provisionData;
 
     return ret;
 }

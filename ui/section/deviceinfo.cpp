@@ -1,5 +1,5 @@
 #include <QDebug>
-#include "../../serial/qcdm/commands/nv/nvcommand.h"
+#include "../../serial/qcdm/commands/nvcommands/nvcommand.h"
 
 #include "deviceinfo.h"
 
