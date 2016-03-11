@@ -41,38 +41,38 @@ void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
     qDebug()<<"addDeviceCheck"<<info.portName();
 
     QMutexLocker lock(&mWorkMutex);
-    for(QMap<WorkType, void*>::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
-        if(i.key() != WorkTypeDeviceCheck) {
+    for(QList<QPair<WorkType, void*> >::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
+        if((*i).first != WorkTypeDeviceCheck) {
             continue;
         }
 
-        if(static_cast<QSerialPortInfo*>(i.value())->portName() == info.portName()) {
+        if(static_cast<QSerialPortInfo*>((*i).second)->portName() == info.portName()) {
             return;
         }
     }
 
-    mWorkItems.insert(WorkTypeDeviceCheck, new QSerialPortInfo(info));
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceCheck, new QSerialPortInfo(info)));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addDeviceRemove(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
 
-    mWorkItems.insert(WorkTypeDeviceRemove, device);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceRemove, device));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addDeviceProvision(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
 
-    mWorkItems.insert(WorkTypeDeviceProvision, device);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceProvision, device));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addCommand(SerialCommandItem *cmd) {
     QMutexLocker lock(&mWorkMutex);
 
-    mWorkItems.insert(WorkTypeCommand, cmd);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeCommand, cmd));
     mWaitCondition.wakeAll();
 }
 
@@ -88,11 +88,11 @@ void UI::SerialDeviceWorker::stop() {
     QMutexLocker runningLock(&mRunningMutex);
 
     QMutexLocker lock(&mWorkMutex);
-    for(QMap<WorkType, void*>::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
-        if(i.key() == WorkTypeDeviceCheck) {
-            delete static_cast<QSerialPortInfo*>(i.value());
-        } else if(i.key() == WorkTypeCommand) {
-            delete static_cast<SerialCommandItem*>(i.value());
+    for(QList<QPair<WorkType, void*> >::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
+        if((*i).first == WorkTypeDeviceCheck) {
+            delete static_cast<QSerialPortInfo*>((*i).second);
+        } else if((*i).first == WorkTypeCommand) {
+            delete static_cast<SerialCommandItem*>((*i).second);
         }
     }
 
@@ -118,12 +118,12 @@ void UI::SerialDeviceWorker::process() {
                         break;
                     }
 
-                    if(mWorkItems.keys()[i] != WorkTypeDeviceRemove) {
+                    if(mWorkItems[i].first != WorkTypeDeviceRemove) {
                         i++;
                         continue;
                     }
 
-                    device = static_cast<Serial::SerialDevice*>(mWorkItems.values()[i]);
+                    device = static_cast<Serial::SerialDevice*>(mWorkItems[i].second);
                     mWorkItems.erase(mWorkItems.begin() + i);
 
                     size--;
@@ -146,8 +146,8 @@ void UI::SerialDeviceWorker::process() {
                         break;
                     }
 
-                    type = mWorkItems.begin().key();
-                    data = mWorkItems.begin().value();
+                    type = (*mWorkItems.begin()).first;
+                    data = (*mWorkItems.begin()).second;
                     mWorkItems.erase(mWorkItems.begin());
                 }
 
@@ -199,12 +199,12 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
             break;
         }
 
-        if(mWorkItems.keys()[i] != WorkTypeCommand) {
+        if(mWorkItems[i].first != WorkTypeCommand) {
             i++;
             continue;
         }
 
-        SerialCommandItem* item = static_cast<SerialCommandItem*>(mWorkItems.values()[i]);
+        SerialCommandItem* item = static_cast<SerialCommandItem*>(mWorkItems[i].second);
         if(item->device() == device) {
             item->deleteLater();
             mWorkItems.erase(mWorkItems.begin() + i);

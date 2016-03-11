@@ -87,7 +87,7 @@ namespace UI {
         QAtomicInteger<bool> mRunning;
 
         QMutex mWorkMutex;
-        QMap<WorkType, void*> mWorkItems;
+        QList<QPair<WorkType, void*> > mWorkItems;
     };
 }
 
