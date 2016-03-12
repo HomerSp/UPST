@@ -7,7 +7,7 @@
 			"codename": "XT905",
 			"vid": "0x0bb4",
 			"pid": "0x0fdd",
-			"nv":
+			"match_nv":
 			[
 				{
 					"id": 8,
@@ -22,7 +22,7 @@
 			"codename": "XT905",
 			"vid": "0x22b8",
 			"pid": "0x2e29",
-			"nv":
+			"match_nv":
 			[
 				{
 					"id": 8,
@@ -37,7 +37,7 @@
 			"codename": "SCH-R740C",
 			"vid": "0x04e8",
 			"pid": "0x6860",
-			"nv":
+			"match_nv":
 			[
 				{
 					"id": 8,
@@ -46,13 +46,13 @@
 				}
 			]
 		},
-		{
+                {
 			"make": "SAMSUNG",
 			"model": "Galaxy S5 Mini",
 			"codename": "G800R4",
 			"vid": "0x04e8",
 			"pid": "0x685d",
-			"nv":
+			"match_nv":
 			[
 				{
 					"id": 8,
@@ -72,7 +72,7 @@
                         "codename": "0PCV1",
                         "vid": "0x0bb4",
                         "pid": "0x0f99",
-                        "nv":
+                        "match_nv":
                         [
                                 {
                                         "id": 7,
@@ -86,5 +86,6 @@
                                 }
                         ]
                 }
+
 	]
 }

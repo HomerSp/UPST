@@ -57,8 +57,8 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
 
         bool isCorrect = true;
 
-        if(obj.contains("nv")) {
-            QJsonArray nvArr = obj["nv"].toArray();
+        if(obj.contains("match_nv")) {
+            QJsonArray nvArr = obj["match_nv"].toArray();
             foreach(QJsonValue nvVal, nvArr) {
                 QJsonObject nvObj = nvVal.toObject();
                 if(!nvObj.contains("id") || !nvObj.contains("type") || !nvObj.contains("value")) {
