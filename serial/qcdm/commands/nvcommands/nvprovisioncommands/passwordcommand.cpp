@@ -1,3 +1,4 @@
+#include "../../../../serialprovisiondata.h"
 #include "passwordcommand.h"
 
 using namespace Serial::QCDM::Commands::Nv::Provision;
@@ -7,7 +8,7 @@ PasswordCommand::PasswordCommand(SerialDevice* device, bool read, const QJsonVal
 {
     if(!read) {
         if(jsonValue != nullptr) {
-            QString password = jsonValue->toString();
+            QString password = SerialProvisionData::getPassword(device, jsonValue->toString());
 
             QByteArray strData;
             strData.fill(0x0, 72);

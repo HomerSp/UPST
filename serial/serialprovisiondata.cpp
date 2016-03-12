@@ -10,7 +10,8 @@ using namespace Serial;
 SerialProvisionData::SerialProvisionData(SerialDevice* device)
     : mDevice(device)
 {
-
+    mSequentialOffline = false;
+    mPassword16 = "";
 }
 
 SerialProvisionData::~SerialProvisionData() {
@@ -24,6 +25,12 @@ void SerialProvisionData::update(const QString &data) {
 
     QJsonObject rootObject = jsonDoc.object();
     mCarrierSPC = rootObject["carrierSPC"].toString();
+    if(rootObject.contains("sequentialOffline")) {
+        mSequentialOffline = rootObject["sequentialOffline"].toString().toUInt() != 0;
+    }
+    if(rootObject.contains("sixteendigitpassword") && rootObject["sixteendigitpassword"].toString() != "null") {
+        mPassword16 = rootObject["sixteendigitpassword"].toString();
+    }
     mUserType = static_cast<UserType>(rootObject["userType"].toString().toUInt());
     mUser = getUser(mDevice, mUserType, rootObject["user"].toString());
     mUserProfIndex = 0;
@@ -61,4 +68,19 @@ QString SerialProvisionData::getUser(SerialDevice* device, UserType type, const 
     default:
         return device->mdnStr() + userNai;
     }
+}
+
+QString SerialProvisionData::getPassword(SerialDevice* device, const QString& str) {
+    QString strLow = str.toLower();
+    if (strLow == "meid") {
+        return device->meidStr();
+    } else if (strLow == "decesn") {
+        return QString("%1").arg(device->esn(), 10, 10, QChar('0'));
+    } else if (strLow == "min") {
+        return device->minStr();
+    } else if (strLow == "esn") {
+        return device->esnStr();
+    }
+
+    return str;
 }

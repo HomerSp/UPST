@@ -1,3 +1,4 @@
+#include "../../../../serialprovisiondata.h"
 #include "genusersscommand.h"
 
 using namespace Serial::QCDM::Commands::Nv::Provision;
@@ -12,8 +13,8 @@ GenUserSSCommand::GenUserSSCommand(SerialDevice* device, bool read, const QJsonV
             QJsonObject jsonObj = jsonValue->toObject();
 
             uint8_t index = static_cast<uint8_t>(jsonObj["index"].toString().toUInt());
-            QString mnHASharedSecret = jsonObj["mnHASharedSecret"].toString();
-            QString mnAAASharedSecret = jsonObj["mnAAASharedSecret"].toString();
+            QString mnHASharedSecret = SerialProvisionData::getPassword(device, jsonObj["mnHASharedSecret"].toString());
+            QString mnAAASharedSecret = SerialProvisionData::getPassword(device, jsonObj["mnAAASharedSecret"].toString());
 
             QByteArray data;
             data.append(index);

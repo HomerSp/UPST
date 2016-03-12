@@ -21,9 +21,18 @@ namespace Serial {
         };
 
         static QString getUser(SerialDevice* device, UserType type, const QString& userNai);
+        static QString getPassword(SerialDevice* device, const QString& str);
 
         const QString& carrierSPC() const {
             return mCarrierSPC;
+        }
+
+        bool sequentialOffline() const {
+            return mSequentialOffline;
+        }
+
+        const QString& password16() const {
+            return mPassword16;
         }
 
         const QList<SerialCommand*> constCommands() const {
@@ -61,6 +70,8 @@ namespace Serial {
         SerialDevice* mDevice;
 
         QString mCarrierSPC;
+        bool mSequentialOffline;
+        QString mPassword16;
         UserType mUserType;
         QString mUser;
         uint8_t mUserProfIndex;
