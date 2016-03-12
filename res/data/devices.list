@@ -65,6 +65,26 @@
 					"value": "800r4*"
 				}
 			]
-		}
+                },
+                {
+                        "make": "HTC",
+                        "model": "Desire 510",
+                        "codename": "0PCV1",
+                        "vid": "0x0bb4",
+                        "pid": "0x0f99",
+                        "nv":
+                        [
+                                {
+                                        "id": 7,
+                                        "type": "8bit",
+                                        "value": "0x64"
+                                },
+                                {
+                                        "id": 8,
+                                        "type": "8bit",
+                                        "value": "0x0"
+                                }
+                        ]
+                }
 	]
 }
