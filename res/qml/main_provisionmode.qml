@@ -53,6 +53,7 @@ Item {
                     height: labelMDN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
                     font.pixelSize: labelMDN.font.pointSize
+                    maximumLength: 10
                 }
             }
         }
@@ -90,6 +91,7 @@ Item {
                     height: labelMIN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
                     font.pixelSize: labelMIN.font.pointSize
+                    maximumLength: 10
                 }
             }
 
