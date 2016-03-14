@@ -6,13 +6,13 @@
 using namespace Serial::QCDM::Commands;
 
 QcdmCommand::QcdmCommand(SerialDevice* device, QCDM::DiagCommands cmd, QByteArray data)
-    : SerialCommand(device)
+    : QcdmCommand(device)
 {
     mCmds.append(new QcdmCommandItem(cmd, data));
 }
 
 QcdmCommand::QcdmCommand(SerialDevice* device, QcdmCommandItem *cmd)
-    : SerialCommand(device)
+    : QcdmCommand(device)
 {
     mCmds.append(cmd);
 }
