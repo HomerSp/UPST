@@ -129,9 +129,11 @@ void UI::SerialDeviceWorker::process() {
                     size--;
                 }
 
-                processDeviceRemove(device);
+                if(device != nullptr) {
+                    processDeviceRemove(device);
 
-                waitForNextCommand = false;
+                    waitForNextCommand = false;
+                }
             } while(i < size);
 
             size = 0;
@@ -190,29 +192,32 @@ void UI::SerialDeviceWorker::process() {
 }
 
 void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
-    // We need to remove any pending commands that might be attached to a specific device.
+    // We need to remove any pending commands/provisions that might be attached to a specific device.
     int i = 0, size = 0;
     do {
         QMutexLocker locker(&mWorkMutex);
-        size = mWorkItems.size();
-        if(size == 0 || i >= size) {
+        if(mWorkItems.size() == 0 || i >= mWorkItems.size()) {
             break;
         }
 
-        if(mWorkItems[i].first != WorkTypeCommand) {
+        if(mWorkItems[i].first == WorkTypeCommand) {
+            SerialCommandItem* item = static_cast<SerialCommandItem*>(mWorkItems[i].second);
+            if(item->device() == device) {
+                item->deleteLater();
+                mWorkItems.erase(mWorkItems.begin() + i);
+            }
+        } else if(mWorkItems[i].first == WorkTypeDeviceProvision) {
+            Serial::SerialDevice* d = static_cast<Serial::SerialDevice*>(mWorkItems[i].second);
+            if(d == device) {
+                mWorkItems.erase(mWorkItems.begin() + i);
+            }
+        } else {
             i++;
-            continue;
-        }
-
-        SerialCommandItem* item = static_cast<SerialCommandItem*>(mWorkItems[i].second);
-        if(item->device() == device) {
-            item->deleteLater();
-            mWorkItems.erase(mWorkItems.begin() + i);
-            size--;
         }
     } while(i < size);
 
     delete device;
+    device = nullptr;
 }
 
 void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
