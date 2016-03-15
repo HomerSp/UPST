@@ -28,12 +28,12 @@ void IMEICommand::execute() {
         uint64_t res = 0;
         for(int i = 0; i < 8; i++) {
             uint64_t c = ret.at(8 - i);
-            if(i < 1) {
-                res |= (c & 0x0F) << (i * 8);
-            }
 
-            if(i > 0) {
-                res |= ((c >> 4) & 0x0F) << ((i * 8) - 4);
+            if(i < 7) {
+                uint64_t d = ((c >> 4) & 0x0F) | ((c & 0x0F) << 4);
+                res |= (d & 0xFF) << (i * 8);
+            } else {
+                res |= (((c >> 4) & 0x0F) << ((i * 8) + 4)) >> 4;
             }
         }
 
