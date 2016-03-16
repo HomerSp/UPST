@@ -58,6 +58,14 @@ namespace Serial {
             return mTimeout;
         }
 
+        void clearResults() {
+            foreach(SerialCommandResult* res, mResults) {
+                delete res;
+            }
+
+            mResults.clear();
+        }
+
         SerialCommandResult* result(int i = 0) {
             return mResults.at(i);
         }
@@ -79,13 +87,13 @@ namespace Serial {
         }
 
 #ifdef TESTING_MODE
-                const QString& debuggingName() {
-                    return mDebuggingName;
-                }
+        const QString& debuggingName() {
+            return mDebuggingName;
+        }
 
-                void setDebuggingName(const QString& name) {
-                    mDebuggingName = name;
-                }
+        void setDebuggingName(const QString& name) {
+            mDebuggingName = name;
+        }
 #endif
 
     protected:

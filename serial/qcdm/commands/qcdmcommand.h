@@ -14,7 +14,7 @@ namespace Serial {
         namespace Commands {
             class QcdmCommandItem {
             public:
-                QcdmCommandItem(QCDM::DiagCommands cmd, QByteArray data) {
+                QcdmCommandItem(QCDM::DiagCommands cmd, QByteArray data = 0) {
                     this->cmd = cmd;
                     this->data = data;
                 }
@@ -49,6 +49,14 @@ namespace Serial {
 
                 void addItem(QcdmCommandItem* item) {
                     mCmds.append(item);
+                }
+
+                void clearItems() {
+                    foreach(QcdmCommandItem* cmd, mCmds) {
+                        delete cmd;
+                    }
+
+                    mCmds.clear();
                 }
 
                 QcdmCommandItem* item(int i = 0) {

@@ -32,6 +32,7 @@ include(serial/qcdm/commands/nvcommands/nvprovisioncommands/nvprovisioncommands.
 include(serial/qcdm/nv/nv.pri)
 include(ui/ui.pri)
 include(ui/section/section.pri)
+include(web/web.pri)
 
 # Default rules for deployment.
 include(deployment.pri)

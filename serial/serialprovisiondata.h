@@ -1,6 +1,7 @@
 #ifndef SERIALPROVISIONDATA_H
 #define SERIALPROVISIONDATA_H
 
+#include <QJsonObject>
 #include <QJsonValue>
 
 #include "serialcommand.h"
@@ -56,13 +57,14 @@ namespace Serial {
             return mUserProfIndex;
         }
 
-        QList<SerialCommand*> commands() {
+        QList<SerialCommand*> &commands() {
             return mCommands;
         }
 
         virtual SerialCommand* getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue) = 0;
+        virtual void update(const QString& data) = 0;
 
-        void update(const QString& data);
+        void update(const QJsonObject& rootObject);
 
     private:
         void updateObj(const QString& parent, const QJsonObject& obj);

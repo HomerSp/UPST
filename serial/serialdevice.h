@@ -7,6 +7,8 @@
 
 namespace Serial {
     class SerialCommunicator;
+    class SerialCommand;
+    class SerialProvisionData;
 
     class SerialDevice : public QObject
     {
@@ -189,6 +191,9 @@ namespace Serial {
         }
 
     private:
+        bool provision(SerialProvisionData* data);
+        bool provision(SerialProvisionData* data, SerialCommand* cmd);
+
         SerialCommunicator* mCommunicator;
 
         QList<SerialDevice*> mChildren;

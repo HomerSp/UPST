@@ -1,6 +1,11 @@
+#include <QJsonDocument>
+
 #include "../../serialcommand.h"
 #include "nvprovisiondata.h"
 
+#include "../../../web/webutils.h"
+
+#include "../commands/prlcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/aoccommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genuserprofcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genusersscommand.h"
@@ -22,10 +27,23 @@ NvProvisionData::~NvProvisionData() {
 
 }
 
-void NvProvisionData::update(const QString &data) {
-    SerialProvisionData::update(data);
-
+void NvProvisionData::updateStart(const QJsonObject &rootObject) {
     commands().append(new Serial::QCDM::Commands::Nv::Provision::AOCCommand(device(), false));
+
+    QByteArray prlData;
+    if(Web::WebUtils::download(QUrl(rootObject["carrierPRL"].toString()), prlData)) {
+        qDebug()<<"prlData size"<<prlData.size();
+        commands().append(new Serial::QCDM::Commands::PRLCommand(device(), false, prlData));
+    }
+}
+
+void NvProvisionData::update(const QString &data) {
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data.toLatin1());
+
+    QJsonObject rootObject = jsonDoc.object();
+
+    updateStart(rootObject);
+    SerialProvisionData::update(rootObject);
 }
 
 Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue) {

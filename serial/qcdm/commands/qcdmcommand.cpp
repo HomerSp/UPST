@@ -26,9 +26,7 @@ QcdmCommand::QcdmCommand(SerialDevice* device, const QList<QcdmCommandItem*>& cm
 }
 
 QcdmCommand::~QcdmCommand() {
-    foreach(QcdmCommandItem* cmd, mCmds) {
-        delete cmd;
-    }
+    clearItems();
 }
 
 void QcdmCommand::execute() {
@@ -70,6 +68,8 @@ void QcdmCommand::execute() {
 
         uint8_t cmd = data[0];
         if(cmd == Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F) {
+            qWarning()<<"Bad SPC Mode";
+
             addResult(false, 0, Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F);
             return;
         }

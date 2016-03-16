@@ -20,10 +20,7 @@ SerialProvisionData::~SerialProvisionData() {
     }
 }
 
-void SerialProvisionData::update(const QString &data) {
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data.toLatin1());
-
-    QJsonObject rootObject = jsonDoc.object();
+void SerialProvisionData::update(const QJsonObject& rootObject) {
     mCarrierSPC = rootObject["carrierSPC"].toString();
     if(rootObject.contains("sequentialOffline")) {
         mSequentialOffline = rootObject["sequentialOffline"].toString().toUInt() != 0;

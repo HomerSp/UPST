@@ -13,14 +13,13 @@ SerialCommandResult::SerialCommandResult(bool success, QVariant data, uint16_t e
 SerialCommand::SerialCommand(SerialDevice* device)
     : mDevice(device),
       mTimeout(1000)
+#ifdef TESTING_MODE
+    ,mDebuggingName("")
+#endif
 {
 
 }
 
 SerialCommand::~SerialCommand() {
-    foreach(SerialCommandResult* res, mResults) {
-        delete res;
-    }
-
-    mResults.clear();
+    clearResults();
 }

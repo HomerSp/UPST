@@ -10,6 +10,8 @@ namespace Serial {
             {
             public:
                 PRLCommand(SerialDevice* device, bool read = true, QByteArray data = 0);
+
+                virtual void execute();
             };
         }
     }
