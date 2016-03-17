@@ -4,6 +4,7 @@
     "password": "123choiceabc",
     "carrierPRL": "http://umpst.ultimobile.com/umpst/PRLS/MC/2021.prl",
     "carrierPRLmd5": "7096b74f861e801be2548194ee10379a",
+    "calibrationFile": "http://umpst.ultimobile.com/umpst/CALIBRATIONS/Choice/XT1031/choice-motog-xt1031-raw-items.txt",
     "carrierSPC": "000000",
     "sequentialOffline": "0",
     "sixteendigitpassword": "null",

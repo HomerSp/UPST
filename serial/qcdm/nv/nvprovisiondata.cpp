@@ -1,4 +1,6 @@
 #include <QJsonDocument>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 #include "../../serialcommand.h"
 #include "nvprovisiondata.h"
@@ -44,6 +46,66 @@ void NvProvisionData::update(const QString &data) {
 
     updateStart(rootObject);
     SerialProvisionData::update(rootObject);
+}
+
+void NvProvisionData::updateCalibration(const QUrl& url) {
+    QByteArray calibrationData;
+    if(Web::WebUtils::download(url, calibrationData)) {
+        qDebug()<<"calibrationData"<<calibrationData.size();
+
+        QString data = QString(calibrationData);
+
+        int start = data.indexOf("[NV items]");
+        if(start < 0) {
+            return;
+        }
+
+        start = data.indexOf("[Complete items", start);
+
+        QRegularExpressionMatch completeMatch = QRegularExpression("\\[Complete items - (\\d{1,}), Items size - (\\d{1,})\\]").match(data, start);
+        if(!completeMatch.hasMatch()) {
+            return;
+        }
+
+        int itemCount = completeMatch.captured(1).toUInt();
+        int itemSize = completeMatch.captured(2).toUInt();
+        int numRows = ceil(itemSize / 16.0f);
+
+        qDebug()<<"itemCount"<<itemCount<<"itemSize"<<itemSize;
+        start = data.indexOf('\n', start) + 1;
+
+        for(int i = 0; i < itemCount; i++) {
+            start = data.indexOf('\n', start) + 1;
+
+            QRegularExpressionMatch nvItemMatch = QRegularExpression("(\\d{1,})").match(data, start);
+            if(!nvItemMatch.hasMatch()) {
+                return;
+            }
+
+            int nvItem = nvItemMatch.captured(1).toUInt();
+            qDebug()<<"nvItem"<<nvItem;
+
+            start = data.indexOf('\n', start) + 1;
+
+            QByteArray nvItemData;
+            for(int y = 0; y < numRows; y++) {
+                for(int x = 0; x < 16; x++) {
+                    if(x + (y * 16) >= itemSize) {
+                        break;
+                    }
+
+                    QString str = data.mid(start + (x * 3), 2);
+                    nvItemData.append(static_cast<char>(str.toUInt(0, 16)));
+                }
+
+                start = data.indexOf('\n', start) + 1;
+            }
+
+            qDebug()<<QString(nvItemData.toHex());
+
+            commands().append(new Serial::QCDM::Commands::Nv::NvCommand(device(), false, static_cast<Serial::QCDM::NvItem>(nvItem), nvItemData));
+        }
+    }
 }
 
 Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue) {

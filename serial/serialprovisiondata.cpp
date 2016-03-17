@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
+#include <QUrl>
 
 #include "qcdm/commands/qcdmcommand.h"
 #include "serialprovisiondata.h"
@@ -36,6 +37,10 @@ void SerialProvisionData::update(const QJsonObject& rootObject) {
     }
 
     updateObj("", rootObject);
+
+    if(rootObject.contains("calibrationFile") && rootObject["calibrationFile"].toString() != "null") {
+        updateCalibration(QUrl(rootObject["calibrationFile"].toString()));
+    }
 }
 
 void SerialProvisionData::updateObj(const QString& parent, const QJsonObject& obj) {
