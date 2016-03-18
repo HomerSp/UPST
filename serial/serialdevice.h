@@ -192,7 +192,7 @@ namespace Serial {
 
     private:
         bool provision(SerialProvisionData* data);
-        bool provision(SerialProvisionData* data, SerialCommand* cmd);
+        bool provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd);
 
         SerialCommunicator* mCommunicator;
 

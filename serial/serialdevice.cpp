@@ -1,6 +1,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QFile>
+#include <QList>
 
 #include "../web/webutils.h"
 #include "serialcommunicator.h"
@@ -175,69 +176,75 @@ bool SerialDevice::operator==(const QString& port) {
 bool SerialDevice::provision(SerialProvisionData* data) {
     bool ret = true;
 
-    if(data->password16().size() == 16) {
-        qDebug()<<"===== Sending password =====";
-        Serial::QCDM::Commands::QcdmCommand passwordCmd(this, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
-        passwordCmd.execute();
-        if(passwordCmd.result()->success()) {
-            qDebug()<<"Result="<<passwordCmd.result()->data().toString();
+    QList<SerialDevice*> devices;
+    devices.append(this);
+    devices.append(mChildren);
+
+    foreach(SerialDevice* device, devices) {
+        if(data->password16().size() == 16) {
+            qDebug()<<"===== Sending password =====";
+            Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
+            passwordCmd.execute();
+            if(passwordCmd.result()->success()) {
+                qDebug()<<"Result="<<passwordCmd.result()->data().toString();
+            } else {
+                qDebug()<<"Could not send password";
+                ret = false;
+            }
+        }
+
+        qDebug()<<"===== Writing SPC =====";
+        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+        spcCommand.execute();
+        if(spcCommand.result()->success()) {
+            qDebug()<<"Result="<<spcCommand.result()->data().toString();
         } else {
-            qDebug()<<"Could not send password";
+            qDebug()<<"Could not unlock SPC";
             ret = false;
         }
-    }
 
-    qDebug()<<"===== Writing SPC =====";
-    Serial::QCDM::Commands::QcdmCommand spcCommand(this, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
-    spcCommand.execute();
-    if(spcCommand.result()->success()) {
-        qDebug()<<"Result="<<spcCommand.result()->data().toString();
-    } else {
-        qDebug()<<"Could not unlock SPC";
-        ret = false;
-    }
+        qDebug()<<"===== WRITING MDN =====";
+        Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mMdn);
+        mdnCmd.execute();
+        if(mdnCmd.result()->success()) {
+            qDebug()<<"Result="<<mdnCmd.result()->data().toString();
+        } else {
+            qDebug()<<"Could not write MDN";
+            ret = false;
+        }
 
-    qDebug()<<"===== WRITING MDN =====";
-    Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(this, false, mMdn);
-    mdnCmd.execute();
-    if(mdnCmd.result()->success()) {
-        qDebug()<<"Result="<<mdnCmd.result()->data().toString();
-    } else {
-        qDebug()<<"Could not write MDN";
-        ret = false;
-    }
+        qDebug()<<"===== WRITING MIN =====";
+        Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mMin);
+        minCmd.execute();
+        if(minCmd.result()->success()) {
+            qDebug()<<"Result="<<minCmd.result()->data().toString();
+        } else {
+            qDebug()<<"Could not write MIN";
+            ret = false;
+        }
 
-    qDebug()<<"===== WRITING MIN =====";
-    Serial::QCDM::Commands::Nv::MINCommand minCmd(this, false, mMin);
-    minCmd.execute();
-    if(minCmd.result()->success()) {
-        qDebug()<<"Result="<<minCmd.result()->data().toString();
-    } else {
-        qDebug()<<"Could not write MIN";
-        ret = false;
-    }
+        qDebug()<<"Provision items"<<data->constCommands().size();
 
-    qDebug()<<"Provision items"<<data->constCommands().size();
-
-    foreach(Serial::SerialCommand* cmd, data->constCommands()) {
-        provision(data, cmd);
+        foreach(Serial::SerialCommand* cmd, data->constCommands()) {
+            provision(device, data, cmd);
+        }
     }
 
     return ret;
 }
 
-bool SerialDevice::provision(SerialProvisionData* data, SerialCommand* cmd) {
+bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd) {
 #ifdef TESTING_MODE
     qDebug()<<"Provisioning"<<cmd->debuggingName();
 #endif
 
     if(data->sequentialOffline()) {
         if(data->password16().size() == 16) {
-            Serial::QCDM::Commands::QcdmCommand passwordCmd(this, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
+            Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
             passwordCmd.execute();
         }
 
-        Serial::QCDM::Commands::QcdmCommand spcCommand(this, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
         spcCommand.execute();
     }
 
@@ -245,15 +252,15 @@ bool SerialDevice::provision(SerialProvisionData* data, SerialCommand* cmd) {
     cmd->setTimeout(10000);
     cmd->execute();
     foreach(Serial::SerialCommandResult* result, cmd->results()) {
-       if(!result->success()) {
-           qDebug()<<"Failed to provision";
-       } else {
-           qDebug()<<"Provision success";
-       }
+        if(!result->success()) {
+            qDebug()<<"Failed to provision";
+        } else {
+            qDebug()<<"Provision success";
+        }
     }
 
     if(data->sequentialOffline()) {
-        Serial::QCDM::Commands::RadioModeCommand radioCmd(this, Serial::QCDM::MODE_RADIO_OFFLINE);
+        Serial::QCDM::Commands::RadioModeCommand radioCmd(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmd.execute();
     }
 
