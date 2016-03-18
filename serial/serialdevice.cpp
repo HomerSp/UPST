@@ -185,7 +185,6 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             qDebug()<<"Could not send password";
             ret = false;
         }
-
     }
 
     qDebug()<<"===== Writing SPC =====";

@@ -17,20 +17,6 @@ namespace Serial {
         static void updateConfig();
 
     private:
-        enum NvType {
-            NvTypeNone,
-            NvType8Bit,
-            NvType16Bit,
-            NvType32Bit,
-            NvType64Bit,
-            NvTypeString,
-        };
-
-        bool checkNvItem(SerialDevice* device, uint16_t id, NvType type, const QVariant& checkData, QVariant& outData);
-        bool nvDataEquals(const QVariant& checkData, const QVariant& nvData);
-
-        QVariant getValue(const QString& type, const QString& checkData, NvType& outType);
-
         QJsonDocument mDevices;
     };
 }
