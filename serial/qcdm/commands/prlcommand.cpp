@@ -57,8 +57,9 @@ void PRLCommand::execute() {
             addItem(new QcdmCommandItem(QCDM::DIAG_PR_LIST_RD_F, writeData));
             QcdmCommand::execute();
 
+            // TOAST approved code below.
             res = SerialCommand::results().last();
-            if(res->success() && res->data().toByteArray().size() > 0 && res->data().toByteArray()[0] != '\0') {
+            if(res->success() && res->data().toByteArray().size() > 0) {
                 QByteArray data = res->data().toByteArray();
                 if(data.at(0) != 0x1) {
                     uint16_t size = ((static_cast<uint16_t>(data.at(6)) << 8) | (static_cast<uint8_t>(data.at(5)))) / 8;
