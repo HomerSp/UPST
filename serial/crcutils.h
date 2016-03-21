@@ -11,7 +11,7 @@ namespace Serial {
         CRCUtils();
 
         static bool addCRC(QByteArray &data);
-        static int verifyCRC(const QByteArray &data);
+        static bool checkAndRemoveCRC(QByteArray &data);
 
     private:
         static bool checkByte(uint8_t &result, uint8_t chkByte);

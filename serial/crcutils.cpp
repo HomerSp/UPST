@@ -126,39 +126,24 @@ bool CRCUtils::addCRC(QByteArray &data)
     return true;
 }
 
-int CRCUtils::verifyCRC(const QByteArray &data) {
-    // Find out where the crc is located, and what it is
-    uint16_t crc = 0;
-    int dataSize = data.size(), crcFound = 0;
-
-    int i = data.size() - 1;
-    if(data[i] == FLAG_ASYNC) {
-        i--;
-        dataSize--;
-    }
-    for(; i > 0 && crcFound < 2; i--) {
-        uint8_t b;
-        if(data[i - 1] == ESC_ASYNC) {
-            dataSize -= 2;
-            b = (uint8_t)data.at(i) ^ ESC_COMPL;
-            i--;
-        } else {
-            dataSize--;
-            b = (uint8_t)data.at(i);
+bool CRCUtils::checkAndRemoveCRC(QByteArray &data) {
+    // Unescape data first
+    for(int i = 0; i < data.size() - 1; i++) {
+        if(data.at(i) == ESC_ASYNC) {
+            data[i] = data.at(i + 1) ^ ESC_COMPL;
+            data.remove(i + 1, 1);
         }
-
-        if(crcFound == 0) {
-            crc |= ((uint16_t)b << 8);
-        } else {
-            crc |= b;
-        }
-
-        crcFound++;
     }
+
+    if(data.at(data.size() - 1) != FLAG_ASYNC) {
+        return false;
+    }
+
+    uint16_t crc = (static_cast<uint16_t>(data[data.size() - 2]) << 8) | static_cast<uint8_t>(data.at(data.size() - 3));
 
     // Compute the crc.
     uint16_t computedCrc = CRC_SEED;
-    for (int i = 0; i < dataSize; i++)
+    for (int i = 0; i < data.size() - 3; i++)
     {
         computeCRC(computedCrc, data[i]);
     }
@@ -167,12 +152,10 @@ int CRCUtils::verifyCRC(const QByteArray &data) {
 
     qDebug()<<"crc"<<QString::number(crc, 16)<<"vs"<<QString::number(computedCrc, 16);
 
-    // Do they match?
-    if(crc == computedCrc) {
-        return data.size() - dataSize;
-    }
+    data.remove(data.size() - 3, 3);
 
-    return 0;
+    // Do they match?
+    return (crc == computedCrc);
 }
 
 bool CRCUtils::checkByte(uint8_t &result, uint8_t chkByte)

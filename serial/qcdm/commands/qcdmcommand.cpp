@@ -80,15 +80,13 @@ void QcdmCommand::execute() {
             return;
         }
 
-        int crcSize = Serial::CRCUtils::verifyCRC(data);
-        if(crcSize == 0) {
+        if(!Serial::CRCUtils::checkAndRemoveCRC(data)) {
             qWarning()<<"Could not find a valid crc";
 
             addResult(false);
             return;
         }
 
-        data.remove(data.size() - crcSize, crcSize);
         data.remove(0, 1);
 
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
