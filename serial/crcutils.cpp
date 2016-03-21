@@ -89,15 +89,6 @@ bool CRCUtils::addCRC(QByteArray &data)
     uint16_t crc = 0;
     uint8_t result = 0;
 
-    for (int i = 0; i < data.size(); i++)
-    {
-        if (checkByte(result, data[i]))
-        {
-            data.insert(i, ESC_ASYNC);
-            i++;
-        }
-    }
-
     crc = CRC_SEED;
 
     for (int i = 0; i < data.size(); i++)
@@ -110,6 +101,15 @@ bool CRCUtils::addCRC(QByteArray &data)
     if (checkByte(result, (uint8_t)(crc & 0xff)))
     {
         data.append(ESC_ASYNC);
+    }
+
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (checkByte(result, data[i]))
+        {
+            data.insert(i, ESC_ASYNC);
+            i++;
+        }
     }
 
     data.append(result);
@@ -130,7 +130,7 @@ bool CRCUtils::checkAndRemoveCRC(QByteArray &data) {
     // Unescape data first
     for(int i = 0; i < data.size() - 1; i++) {
         if(data.at(i) == ESC_ASYNC) {
-            data[i] = data.at(i + 1) ^ ESC_COMPL;
+            data[i] = static_cast<uint8_t>(data.at(i + 1) ^ ESC_COMPL);
             data.remove(i + 1, 1);
         }
     }
@@ -139,7 +139,7 @@ bool CRCUtils::checkAndRemoveCRC(QByteArray &data) {
         return false;
     }
 
-    uint16_t crc = (static_cast<uint16_t>(data[data.size() - 2]) << 8) | static_cast<uint8_t>(data.at(data.size() - 3));
+    uint16_t crc = (static_cast<uint16_t>(data.at(data.size() - 2)) << 8) | static_cast<uint8_t>(data.at(data.size() - 3));
 
     // Compute the crc.
     uint16_t computedCrc = CRC_SEED;
