@@ -24,6 +24,7 @@ PRLCommand::PRLCommand(Serial::SerialDevice* device, bool read, QByteArray data)
                 frameSize = data.size() - (prlPacketSize * (frameCount - 1));
             }
 
+            // Number of bits
             frameData.append(static_cast<uint8_t>((frameSize << 3) & 0xFF));
             frameData.append(static_cast<uint8_t>((frameSize >> 5) & 0xFF));
             frameData.append(data.mid(i * prlPacketSize, frameSize));
@@ -44,7 +45,7 @@ void PRLCommand::execute() {
 
         QByteArray writeData;
         writeData.append(static_cast<char>(0));
-        writeData.append(static_cast<char>(1));
+        writeData.append(static_cast<char>(0)); // NAM
 
         uint8_t i = 0;
         SerialCommandResult* res = nullptr;
@@ -58,7 +59,18 @@ void PRLCommand::execute() {
 
             res = SerialCommand::results().last();
             if(res->success() && res->data().toByteArray().size() > 0 && res->data().toByteArray()[0] != '\0') {
-                result.append(res->data().toByteArray());
+                QByteArray data = res->data().toByteArray();
+                if(data.at(0) != 0x1) {
+                    uint16_t size = ((static_cast<uint16_t>(data.at(6)) << 8) | (static_cast<uint8_t>(data.at(5)))) / 8;
+                    result.append(data.mid(7, size));
+
+                    // 0 means there is no more data.
+                    if(data.at(4) == 0x00) {
+                        res = nullptr;
+                    }
+                } else {
+                    res = nullptr;
+                }
             } else {
                 res = nullptr;
             }
