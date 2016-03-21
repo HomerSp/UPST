@@ -50,9 +50,22 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
             continue;
         }
 
-        uint16_t vid = obj["vid"].toString().toUShort(0, 16);
-        uint16_t pid = obj["pid"].toString().toUShort(0, 16);
-        if(device->vid() != vid || device->pid() != pid) {
+        uint16_t vid = obj["vid"].toString().toUShort(0, 0);
+        if(device->vid() != vid) {
+            continue;
+        }
+
+        bool pidFound = false;
+
+        QStringList pidList = obj["pid"].toString().split(',');
+        foreach(QString pid, pidList) {
+            if(pid.toUShort(0, 0) == device->pid()) {
+                pidFound = true;
+                break;
+            }
+        }
+
+        if(!pidFound) {
             continue;
         }
 

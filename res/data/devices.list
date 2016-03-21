@@ -6,7 +6,7 @@
                         "model": "Rezound",
                         "codename": "",
                         "vid": "0x0bb4",
-			"pid": "0x0fdd",
+                        "pid": "0x0fdc,0x0fdd",
                         "match_items":
 			[
 				{
