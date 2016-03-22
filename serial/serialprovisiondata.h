@@ -40,6 +40,8 @@ namespace Serial {
             return mCommands;
         }
 
+        void resetCommands();
+
     protected:
         SerialDevice* device() {
             return mDevice;

@@ -21,6 +21,12 @@ SerialProvisionData::~SerialProvisionData() {
     }
 }
 
+void SerialProvisionData::resetCommands() {
+    foreach(SerialCommand* cmd, mCommands) {
+        cmd->clearResults();
+    }
+}
+
 void SerialProvisionData::update(const QJsonObject& rootObject) {
     mCarrierSPC = rootObject["carrierSPC"].toString();
     if(rootObject.contains("sequentialOffline")) {

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QList>
+#include <QDataStream>
 
 #include "../web/webutils.h"
 #include "serialcommunicator.h"
@@ -228,6 +229,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         foreach(Serial::SerialCommand* cmd, data->constCommands()) {
             provision(device, data, cmd);
         }
+
+        // We need to reset the command results for the next device.
+        data->resetCommands();
     }
 
     return ret;
