@@ -98,11 +98,6 @@ bool CRCUtils::addCRC(QByteArray &data)
 
     crc = (crc ^ 0xffff);
 
-    if (checkByte(result, (uint8_t)(crc & 0xff)))
-    {
-        data.append(ESC_ASYNC);
-    }
-
     for (int i = 0; i < data.size(); i++)
     {
         if (checkByte(result, data[i]))
@@ -110,6 +105,11 @@ bool CRCUtils::addCRC(QByteArray &data)
             data.insert(i, ESC_ASYNC);
             i++;
         }
+    }
+
+    if (checkByte(result, (uint8_t)(crc & 0xff)))
+    {
+        data.append(ESC_ASYNC);
     }
 
     data.append(result);
