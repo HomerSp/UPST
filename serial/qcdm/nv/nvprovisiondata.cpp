@@ -1,6 +1,7 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QCryptographicHash>
 
 #include "../../serialcommand.h"
 #include "nvprovisiondata.h"
@@ -34,8 +35,23 @@ void NvProvisionData::updateStart(const QJsonObject &rootObject) {
 
     QByteArray prlData;
     if(Web::WebUtils::download(QUrl(rootObject["carrierPRL"].toString()), prlData)) {
-        qDebug()<<"prlData size"<<prlData.size();
-        commands().append(new Serial::QCDM::Commands::PRLCommand(device(), false, prlData));
+        bool shouldAdd = true;
+        if(rootObject.contains("carrierPRLmd5")) {
+            QString carrierMd5 = rootObject["carrierPRLmd5"].toString().toLower();
+            QString checkMd5 = QString(QCryptographicHash::hash(prlData, QCryptographicHash::Md5).toHex()).toLower();
+            if(carrierMd5 != checkMd5) {
+                qCritical()<<"PRL file md5 mismatch, found"<<carrierMd5<<"vs real"<<checkMd5;
+                // Since UMPST doesn't use the md5, the md5 in the provisioning data doesn't match,
+                // therefore we need to ignore that error here.
+                // Update the provisioning data with the correct md5 pl0x.
+                //shouldAdd = false;
+            }
+        }
+
+        if(shouldAdd) {
+            qDebug()<<"prlData size"<<prlData.size();
+            commands().append(new Serial::QCDM::Commands::PRLCommand(device(), false, prlData));
+        }
     }
 }
 
@@ -48,9 +64,20 @@ void NvProvisionData::update(const QString &data) {
     SerialProvisionData::update(rootObject);
 }
 
-void NvProvisionData::updateCalibration(const QUrl& url) {
+void NvProvisionData::updateCalibration(const QUrl& url, const QString& md5) {
     QByteArray calibrationData;
     if(Web::WebUtils::download(url, calibrationData)) {
+        if(md5.size() > 0) {
+            QString checkMd5 = QString(QCryptographicHash::hash(calibrationData, QCryptographicHash::Md5).toHex()).toLower();
+            if(checkMd5 != md5) {
+                qCritical()<<"Calibration file md5 mismatch, found"<<md5<<"vs real"<<checkMd5;
+                // Since UMPST doesn't use the md5, the md5 in the provisioning data doesn't match,
+                // therefore we need to ignore that error here.
+                // Update the provisioning data with the correct md5 pl0x.
+                //return;
+            }
+        }
+
         qDebug()<<"calibrationData"<<calibrationData.size();
 
         QString data = QString(calibrationData);

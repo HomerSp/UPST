@@ -39,7 +39,11 @@ void SerialProvisionData::update(const QJsonObject& rootObject) {
     updateObj("", rootObject);
 
     if(rootObject.contains("calibrationFile") && rootObject["calibrationFile"].toString() != "null") {
-        updateCalibration(QUrl(rootObject["calibrationFile"].toString()));
+        QString md5 = "";
+        if(rootObject.contains("calibrationFilemd5")) {
+            md5 = rootObject["calibrationFilemd5"].toString();
+        }
+        updateCalibration(QUrl(rootObject["calibrationFile"].toString()), md5);
     }
 }
 

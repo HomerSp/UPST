@@ -16,7 +16,7 @@ namespace Serial {
                 virtual Serial::SerialCommand* getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue);
 
                 virtual void update(const QString& data);
-                virtual void updateCalibration(const QUrl& url);
+                virtual void updateCalibration(const QUrl& url, const QString& md5);
 
             private:
                 void updateStart(const QJsonObject &rootObject);
