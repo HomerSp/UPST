@@ -13,9 +13,9 @@ EvrcCommand::EvrcCommand(SerialDevice* device, bool read, const QJsonValue* json
 
             uint8_t nam = 0x0;
             uint8_t enabled = static_cast<uint8_t>(jsonObj["_enabled"].toString().toUInt());
-            uint16_t homePageSo = static_cast<uint16_t>(jsonObj["home_page_so"].toString().toUInt());
-            uint16_t homeOrigSo = static_cast<uint16_t>(jsonObj["home_orig_so"].toString().toUInt());
-            uint16_t roamOrigSo = static_cast<uint16_t>(jsonObj["roam_orig_so"].toString().toUInt());
+            uint16_t homePageSo = static_cast<uint16_t>(jsonObj["homePageSo"].toString().toUInt());
+            uint16_t homeOrigSo = static_cast<uint16_t>(jsonObj["homeOrigSo"].toString().toUInt());
+            uint16_t roamOrigSo = static_cast<uint16_t>(jsonObj["roamOrigSo"].toString().toUInt());
 
             QByteArray data;
             data.append(nam);
