@@ -85,10 +85,22 @@ bool NvCommand::getRequest(QList<QByteArray> &request) {
     return true;
 }
 
+uint64_t NvCommand::getDecodedValue(uint64_t val, uint8_t width) {
+    uint64_t valModified = 0;
+    for(int i = 0; i < width; i++) {
+        uint8_t c = ((val / static_cast<uint64_t>(pow(10, i))) % 10);
+        c = (c + 1) % 10;
+        printf("%d", c);
+        valModified += c * pow(10.0f, i);
+    }
+
+    return valModified;
+}
+
 uint64_t NvCommand::getEncodedValue(uint64_t val, uint8_t width) {
     uint64_t valModified = 0;
     for(int i = 0; i < width; i++) {
-        uint8_t c = ((static_cast<uint16_t>(val / pow(10.0f, i)) % 10) + 9) % 10;
+        uint8_t c = (((val / static_cast<uint64_t>(pow(10, i))) % 10) + 9) % 10;
         valModified += c * pow(10.0f, i);
     }
 

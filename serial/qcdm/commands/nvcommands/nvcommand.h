@@ -47,6 +47,7 @@ namespace Serial {
 
                     virtual bool getRequest(QList<QByteArray>& request);
 
+                    uint64_t getDecodedValue(uint64_t val, uint8_t width);
                     uint64_t getEncodedValue(uint64_t val, uint8_t width);
                 };
 
