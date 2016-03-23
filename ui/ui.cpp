@@ -106,8 +106,8 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         qDebug()<<"deviceAdd"<<d->vidStr()<<device->vidStr()<<d->pidStr()<<device->pidStr()<<d->meidStr()<<device->meidStr();
 
         if(device->isSameDevice(d)) {
-            // If the new device has a mdn or a min, use it as the parent. Otherwise we add this one as a child.
-            if((device->mdn().size() > 0 && d->mdn().size() == 0) || (device->min() != 0 && d->min() == 0)) {
+            // If the new device has a make, mdn or a min, use it as the parent. Otherwise we add this one as a child.
+            if(device->make().length() > d->make().length() || (device->mdn().size() > 0 && d->mdn().size() == 0) || (device->min() != 0 && d->min() == 0)) {
                 device->addChild(d);
                 mDevices.replace(i, device);
                 d = device;
