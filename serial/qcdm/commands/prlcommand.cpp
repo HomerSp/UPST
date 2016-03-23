@@ -17,7 +17,7 @@ PRLCommand::PRLCommand(Serial::SerialDevice* device, bool read, QByteArray data)
             QByteArray frameData;
             frameData.append(static_cast<uint8_t>(i));
             frameData.append(static_cast<uint8_t>((i == frameCount - 1)?0:1));
-            frameData.append(static_cast<char>(0x0));
+            frameData.append(static_cast<char>(0x0));   // NAM
 
             uint32_t frameSize = prlPacketSize;
             if(i == frameCount - 1) {
@@ -25,9 +25,13 @@ PRLCommand::PRLCommand(Serial::SerialDevice* device, bool read, QByteArray data)
             }
 
             // Number of bits
-            frameData.append(static_cast<uint8_t>((frameSize << 3) & 0xFF));
-            frameData.append(static_cast<uint8_t>((frameSize >> 5) & 0xFF));
+            uint16_t bitFrameSize = frameSize * 8;
+            frameData.append(static_cast<uint8_t>((bitFrameSize) & 0xFF));
+            frameData.append(static_cast<uint8_t>((bitFrameSize >> 8) & 0xFF));
             frameData.append(data.mid(i * prlPacketSize, frameSize));
+            for(int x = 0; x < 120 - frameSize; x++) {
+                frameData.append(static_cast<char>(0x0));
+            }
 
             qDebug()<<"addItem"<<frameSize;
             addItem(new QcdmCommandItem(QCDM::DIAG_PR_LIST_WR_F, frameData));
