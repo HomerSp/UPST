@@ -91,6 +91,10 @@ bool MINCommand::toNv(uint64_t data, QList<QByteArray>& result) {
         minArr[7] = (min1 >> 16) & 0xFF;
         minArr[6] = (min1 >> 8) & 0xFF;
         minArr[5] = (min1) & 0xFF;
+        minArr[4] = (min1 >> 24) & 0xFF;
+        minArr[3] = (min1 >> 16) & 0xFF;
+        minArr[2] = (min1 >> 8) & 0xFF;
+        minArr[1] = (min1) & 0xFF;
 
         result.append(minArr);
     }
@@ -99,6 +103,8 @@ bool MINCommand::toNv(uint64_t data, QList<QByteArray>& result) {
         minArr.fill('\0', 4);
         minArr[4] = (min2 >> 8) & 0xFF;
         minArr[3] = (min2) & 0xFF;
+        minArr[2] = (min2 >> 8) & 0xFF;
+        minArr[1] = (min2) & 0xFF;
         result.append(minArr);
     }
 
