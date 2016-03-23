@@ -17,6 +17,8 @@ MINCommand::MINCommand(SerialDevice* device, bool read, uint64_t data)
         if(toNv(data, dataArr)) {
             addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, QCDM::NvItem::NV_MIN1_I, dataArr[0]));
             addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, QCDM::NvItem::NV_MIN2_I, dataArr[1]));
+            addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, QCDM::NvItem::NV_IMSI_T_S1_I, dataArr[0]));
+            addItem(new NvCommandItem(QCDM::DIAG_NV_WRITE_F, QCDM::NvItem::NV_IMSI_T_S2_I, dataArr[1]));
         }
     }
 }
