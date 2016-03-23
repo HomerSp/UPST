@@ -182,6 +182,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     devices.append(mChildren);
 
     foreach(SerialDevice* device, devices) {
+        Serial::QCDM::Commands::RadioModeCommand radioCmd(device, Serial::QCDM::MODE_RADIO_OFFLINE);
+        radioCmd.execute();
+
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
             Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
@@ -232,6 +235,11 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         // We need to reset the command results for the next device.
         data->resetCommands();
+    }
+
+    foreach(SerialDevice* device, devices) {
+        Serial::QCDM::Commands::RadioModeCommand radioCmd(device, Serial::QCDM::MODE_RADIO_OFFLINE);
+        radioCmd.execute();
     }
 
     return ret;
