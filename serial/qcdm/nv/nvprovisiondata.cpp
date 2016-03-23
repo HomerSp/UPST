@@ -138,6 +138,7 @@ void NvProvisionData::updateCalibration(const QUrl& url, const QString& md5) {
 }
 
 Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue) {
+    QString parentLower = parent.toLower();
     QString nameLower = name.toLower();
 #define PROVISION_CMD(n, className, args...) \
         if(nameLower == n && (!jsonValue.isString() || (jsonValue.isString() && jsonValue.toString().toInt() != -1))) {\
@@ -151,7 +152,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("genuserprof", GenUserProfCommand, user());
             PROVISION_CMD("genuserss", GenUserSSCommand);
             PROVISION_CMD("password", PasswordCommand);
-        } else if(parent == "mobileip") {
+        } else if(parentLower == "mobileip") {
             PROVISION_CMD("mippref", ProvisionCommand, NvItem::NV_DS_QCMIP_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("numofprof", ProvisionCommand, NvItem::NV_DS_MIP_NUM_PROF_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("currentactiveprof", ProvisionCommand, NvItem::NV_DS_MIP_ACTIVE_PROF_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
@@ -164,7 +165,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("miprrq", ProvisionCommand, NvItem::NV_DS_MIP_RRQ_IF_TFRK_I, NvItemType::NV_GENERIC_FLAG_ARRAY);
             PROVISION_CMD("dormanthandoffoptenable", ProvisionCommand, NvItem::NV_DS_MIP_QC_HANDDOWN_TO_1X_OPT_I, NvItemType::NV_GENERIC_FLAG_ARRAY);
             PROVISION_CMD("mnharfc2002bis", ProvisionCommand, NvItem::NV_DS_MIP_2002BIS_MN_HA_AUTH_I, NvItemType::NV_GENERIC_FLAG_ARRAY);
-        } else if(parent == "data") {
+        } else if(parentLower == "data") {
             PROVISION_CMD("pppuser", GenericNaiCommand, NvItem::NV_PPP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("papuser", GenericNaiCommand, NvItem::NV_PAP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("hdranuser", GenericNaiCommand, NvItem::NV_HDR_AN_AUTH_NAI_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
@@ -174,9 +175,9 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("pppdetection", ProvisionCommand, NvItem::NV_DATA_AUTO_PACKET_DETECTION_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("evdorxcontrol", ProvisionCommand, NvItem::NV_HDR_RX_DIVERSITY_CTRL_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("scpsession", ProvisionCommand, NvItem::NV_HDRSCP_SESSION_STATUS_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
-            PROVISION_CMD("scphdratconfig", ProvisionCommand, NvItem::NV_HDRSCP_FORCE_AT_CONFIG_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
+            PROVISION_CMD("hdrscpatconfig", ProvisionCommand, NvItem::NV_HDRSCP_FORCE_AT_CONFIG_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("scphdrrel0config", ProvisionCommand, NvItem::NV_HDRSCP_FORCE_REL0_CONFIG_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
-        } else if(parent == "nam") {
+        } else if(parentLower == "nam") {
             PROVISION_CMD("evrc", EvrcCommand);
             PROVISION_CMD("sid_nid_list", SidNidListCommand);
 
@@ -187,13 +188,18 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("primarydns", ProvisionCommand, NvItem::NV_PRIMARY_DNS_I, NvItemType::NV_GENERIC_IP_BYTE_ARRAY);
             PROVISION_CMD("secondarydns", ProvisionCommand, NvItem::NV_SECONDARY_DNS_I, NvItemType::NV_GENERIC_IP_BYTE_ARRAY);
             PROVISION_CMD("namlock", ProvisionCommand, NvItem::NV_NAM_LOCK_I, NvItemType::NV_GENERIC_NAM_FLAG_ARRAY);
-            PROVISION_CMD("otapaenabled", ProvisionCommand, NvItem::NV_OTAPA_ENABLED_I, NvItemType::NV_GENERIC_NAM_FLAG_ARRAY);
+            PROVISION_CMD("otapaenable", ProvisionCommand, NvItem::NV_OTAPA_ENABLED_I, NvItemType::NV_GENERIC_NAM_FLAG_ARRAY);
+            PROVISION_CMD("hybridmode", ProvisionCommand, NvItem::NV_HYBRID_PREF_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("useimsi", ProvisionCommand, NvItem::NV_IMSI_ADDR_NUM_I, NvItemType::NV_GENERIC_NAM_BYTE_ARRAY);
             PROVISION_CMD("useimsit", ProvisionCommand, NvItem::NV_IMSI_T_ADDR_NUM_I, NvItemType::NV_GENERIC_NAM_BYTE_ARRAY);
             PROVISION_CMD("mccimsi", MccImsiCommand);
             PROVISION_CMD("mncimsi", MncImsiCommand);
         }
     } while(false);
+
+    if(cmd == nullptr) {
+        qWarning()<<"Could not find a handler for"<<parent<<"/"<<name;
+    }
 
 #ifdef TESTING_MODE
     if(cmd != nullptr) {
