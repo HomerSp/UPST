@@ -102,6 +102,7 @@ bool CRCUtils::addCRC(QByteArray &data)
     {
         if (checkByte(result, data[i]))
         {
+            data[i] = result;
             data.insert(i, ESC_ASYNC);
             i++;
         }
@@ -162,13 +163,13 @@ bool CRCUtils::checkByte(uint8_t &result, uint8_t chkByte)
 {
     switch (chkByte)
     {
-        case FLAG_ASYNC:
-        case ESC_ASYNC:
-            result = chkByte ^ ESC_COMPL;
-            return true;
-        default:
-            result = chkByte;
-            return false;
+    case FLAG_ASYNC:
+    case ESC_ASYNC:
+        result = chkByte ^ ESC_COMPL;
+        return true;
+    default:
+        result = chkByte;
+        return false;
     }
 }
 
