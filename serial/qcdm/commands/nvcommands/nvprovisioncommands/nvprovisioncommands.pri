@@ -6,7 +6,9 @@ HEADERS += \
     $$PWD/evrccommand.h \
     $$PWD/sidnidlistcommand.h \
     $$PWD/passwordcommand.h \
-    $$PWD/genericnaicommand.h
+    $$PWD/genericnaicommand.h \
+    $$PWD/mccimsicommand.h \
+    $$PWD/mncimsicommand.h
 SOURCES += \ 
     $$PWD/genuserprofcommand.cpp \
     $$PWD/genusersscommand.cpp \
@@ -15,4 +17,6 @@ SOURCES += \
     $$PWD/evrccommand.cpp \
     $$PWD/sidnidlistcommand.cpp \
     $$PWD/passwordcommand.cpp \
-    $$PWD/genericnaicommand.cpp
+    $$PWD/genericnaicommand.cpp \
+    $$PWD/mccimsicommand.cpp \
+    $$PWD/mncimsicommand.cpp

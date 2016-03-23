@@ -13,6 +13,8 @@
 #include "../commands/nvcommands/nvprovisioncommands/genuserprofcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genusersscommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/evrccommand.h"
+#include "../commands/nvcommands/nvprovisioncommands/mccimsicommand.h"
+#include "../commands/nvcommands/nvprovisioncommands/mncimsicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/sidnidlistcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/passwordcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genericnaicommand.h"
@@ -188,10 +190,8 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("otapaenabled", ProvisionCommand, NvItem::NV_OTAPA_ENABLED_I, NvItemType::NV_GENERIC_NAM_FLAG_ARRAY);
             PROVISION_CMD("useimsi", ProvisionCommand, NvItem::NV_IMSI_ADDR_NUM_I, NvItemType::NV_GENERIC_NAM_BYTE_ARRAY);
             PROVISION_CMD("useimsit", ProvisionCommand, NvItem::NV_IMSI_T_ADDR_NUM_I, NvItemType::NV_GENERIC_NAM_BYTE_ARRAY);
-            PROVISION_CMD("mccimsi", ProvisionCommand, NvItem::NV_IMSI_MCC_I, NvItemType::NV_GENERIC_NAM_UINT16_ARRAY);
-            PROVISION_CMD("mncimsi", ProvisionCommand, NvItem::NV_IMSI_11_12_I, NvItemType::NV_GENERIC_NAM_UINT16_ARRAY);
-            PROVISION_CMD("mccimsit", ProvisionCommand, NvItem::NV_IMSI_T_MCC_I, NvItemType::NV_GENERIC_NAM_UINT16_ARRAY);
-            PROVISION_CMD("mncimsit", ProvisionCommand, NvItem::NV_IMSI_T_11_12_I, NvItemType::NV_GENERIC_NAM_UINT16_ARRAY);
+            PROVISION_CMD("mccimsi", MccImsiCommand);
+            PROVISION_CMD("mncimsi", MncImsiCommand);
         }
     } while(false);
 

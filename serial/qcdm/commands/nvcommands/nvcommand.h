@@ -46,6 +46,8 @@ namespace Serial {
                     }
 
                     virtual bool getRequest(QList<QByteArray>& request);
+
+                    uint64_t getEncodedValue(uint64_t val, uint8_t width);
                 };
 
                 class NvCommand8Bit : public NvCommand
