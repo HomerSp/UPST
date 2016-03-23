@@ -56,56 +56,29 @@ bool MINCommand::fromNv(const QList<QByteArray>& data, uint64_t& result) {
     min2Data.append(data[1][4]);
     min2Data.append(data[1][3]);
 
-    uint min1 = min1Data.toHex().toULong(0, 16);
-    uint min2 = min2Data.toHex().toULong(0, 16);
+    uint64_t min1 = min1Data.toHex().toULong(0, 16);
+    uint64_t min2 = getDecodedValue(min2Data.toHex().toULong(0, 16), 3);
 
-    qDebug()<<"min1Data"<<QString(min1Data.toHex())<<"min2Data"<<QString(min2Data.toHex());
-
-    min2 = (min2 + 1) % 10
-            + (((((min2 % 100) / 10) + 1) % 10) * 10)
-            + ((((min2 / 100) + 1) % 10) * 100);
-
-    uint min1a = (uint) (min1 & 0xffc000) >> 14;
-    min1a = (min1a + 1) % 10
-            + (((((min1a % 100) / 10) + 1) % 10) * 10)
-            + ((((min1a / 100) + 1) % 10) * 100);
-
-    uint min1b = (uint) ((min1 & 0x3c00) >> 10) % 10;
-
-    uint min1c = (uint) (min1 & 0x3ff);
-    min1c = ((min1c + 1) % 10)
-            + (((((min1c % 100) / 10) + 1) % 10) * 10)
-            + ((((min1c / 100) + 1) % 10) * 100);
+    uint min1a = getDecodedValue((min1 & 0xffc000) >> 14, 3);
+    uint min1b = ((min1 & 0x3c00) >> 10) % 10;
+    uint min1c = getDecodedValue(min1 & 0x3ff, 3);
 
     qDebug()<<"min1a"<<min1a<<"min1b"<<min1b<<"min1c"<<min1c<<"min2"<<min2;
 
-    QString min = QString("%1%2%3%4").arg(min2, 3, 10, QChar('0')).arg(min1a, 3, 10, QChar('0')).arg(min1b, 1, 10, QChar('0')).arg(min1c, 3, 10, QChar('0'));
+    result = min1c + (min1b * 1000ULL) + (min1a * 10000ULL) + (min2 * 10000000ULL);
 
-    bool ok = false;
-    result = min.toULongLong(&ok);
-
-    return ok;
+    return true;
 }
 
 bool MINCommand::toNv(uint64_t data, QList<QByteArray>& result) {
-    QString minStr = QString("%1").arg(data, 10, 10, QChar('0'));
+    uint64_t min2 = NvCommand::getEncodedValue((data / 10000000ULL) % 1000, 3);
+    uint64_t min1a = NvCommand::getEncodedValue((data / 10000ULL) % 1000, 3);
+    uint64_t min1b = (data / 1000ULL) % 10;
+    uint64_t min1c = NvCommand::getEncodedValue((data) % 1000, 3);
 
-    uint min2 = ((minStr.mid(0, 1).toUInt() + 9) % 10 * 100)
-        + ((minStr.mid(1, 1).toUInt() + 9) % 10 * 10)
-        + ((minStr.mid(2, 1).toUInt() + 9) % 10);
-
-    uint min1a = ((minStr.mid(3, 1).toUInt() + 9) % 10 * 100)
-            + ((minStr.mid(4, 1).toUInt() + 9) % 10 * 10)
-            + ((minStr.mid(5, 1).toUInt() + 9) % 10);
-
-    uint min1b = (minStr.mid(6,1).toUInt());
     if(min1b == 0) {
         min1b = 10;
     }
-
-    uint min1c = ((minStr.mid(7, 1).toUInt() + 9) % 10 * 100)
-            + ((minStr.mid(8, 1).toUInt() + 9) % 10 * 10)
-            + ((minStr.mid(9, 1).toUInt() + 9) % 10);
 
     uint min1 = min1c + (min1b << 10) + (min1a << 14);
 
