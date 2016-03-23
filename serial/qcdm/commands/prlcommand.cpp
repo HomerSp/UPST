@@ -29,7 +29,7 @@ PRLCommand::PRLCommand(Serial::SerialDevice* device, bool read, QByteArray data)
             frameData.append(static_cast<uint8_t>((bitFrameSize) & 0xFF));
             frameData.append(static_cast<uint8_t>((bitFrameSize >> 8) & 0xFF));
             frameData.append(data.mid(i * prlPacketSize, frameSize));
-            for(int x = 0; x < 120 - frameSize; x++) {
+            for(uint16_t x = 0; x < 120 - frameSize; x++) {
                 frameData.append(static_cast<char>(0x0));
             }
 
