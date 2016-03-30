@@ -21,6 +21,10 @@ namespace Serial {
         bool read(QByteArray& data, int timeout = 1000);
         bool write(const QByteArray& data);
 
+        const QString port() const {
+            return mPort->portName();
+        }
+
         inline void setPort(const QString& port) {
             mPort->setPortName(port);
         }

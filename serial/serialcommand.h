@@ -82,6 +82,10 @@ namespace Serial {
             return mResults.at(i)->success();
         }
 
+        void setDevice(SerialDevice* device) {
+            mDevice = device;
+        }
+
         void setTimeout(int timeout) {
             mTimeout = timeout;
         }

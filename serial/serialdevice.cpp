@@ -182,6 +182,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     devices.append(mChildren);
 
     foreach(SerialDevice* device, devices) {
+        qDebug()<<"===== Provisioning port"<<device->communicator()->port()<<"=====";
+
+        qDebug()<<"===== RESETTING DEVICE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdBefore.execute();
 
@@ -236,6 +239,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         // We need to reset the command results for the next device.
         data->resetCommands();
 
+        qDebug()<<"===== RESETTING DEVICE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdAfter(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdAfter.execute();
     }
@@ -259,6 +263,7 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     }
 
     // Increase the timeout period
+    cmd->setDevice(device);
     cmd->setTimeout(10000);
     cmd->execute();
     foreach(Serial::SerialCommandResult* result, cmd->results()) {
