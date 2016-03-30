@@ -263,9 +263,8 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     }
 
     // Increase the timeout period
-    cmd->setDevice(device);
     cmd->setTimeout(10000);
-    cmd->execute();
+    cmd->execute(device);
     foreach(Serial::SerialCommandResult* result, cmd->results()) {
         if(!result->success()) {
             qDebug()<<"Failed to provision";

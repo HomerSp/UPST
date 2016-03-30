@@ -30,7 +30,15 @@ QcdmCommand::~QcdmCommand() {
 }
 
 void QcdmCommand::execute() {
-    if(!communicator()->open()) {
+    execute(SerialCommand::device());
+}
+
+void QcdmCommand::execute(SerialDevice* device) {
+    if(device == nullptr) {
+        return;
+    }
+
+    if(!device->communicator()->open()) {
         addResult(false);
         return;
     }
@@ -48,12 +56,12 @@ void QcdmCommand::execute() {
 
         QByteArray data;
         qDebug()<<"QcdmCommand writing"<<QString(request.toHex());
-        if(!communicator()->write(request)) {
+        if(!device->communicator()->write(request)) {
             addResult(false);
             return;
         }
         qDebug()<<"QcdmCommand reading...";
-        if(!communicator()->read(data, timeout())) {
+        if(!device->communicator()->read(data, timeout())) {
             addResult(false);
             return;
         }

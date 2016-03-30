@@ -40,6 +40,7 @@ namespace Serial {
                 }
 
                 virtual void execute();
+                virtual void execute(SerialDevice* device);
 
             protected:
                 QcdmCommand(SerialDevice* device) : SerialCommand(device) {

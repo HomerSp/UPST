@@ -53,6 +53,7 @@ namespace Serial {
         virtual ~SerialCommand();
 
         virtual void execute() = 0;
+        virtual void execute(SerialDevice* device) = 0;
 
         int timeout() const {
             return mTimeout;
@@ -82,10 +83,6 @@ namespace Serial {
             return mResults.at(i)->success();
         }
 
-        void setDevice(SerialDevice* device) {
-            mDevice = device;
-        }
-
         void setTimeout(int timeout) {
             mTimeout = timeout;
         }
@@ -103,8 +100,8 @@ namespace Serial {
     protected:
         SerialCommand(SerialDevice *device);
 
-        SerialCommunicator* communicator() {
-            return mDevice->communicator();
+        SerialDevice* device() {
+            return mDevice;
         }
 
         void addResult(bool success, QVariant data = 0, uint16_t errorCode = 0) {
