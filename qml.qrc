@@ -6,5 +6,6 @@
         <file>res/qml/main_deviceinfo.qml</file>
         <file>res/qml/components/DeviceInfoBox.qml</file>
         <file>res/qml/components/Units.qml</file>
+        <file>res/qml/dialog/dialog_about.qml</file>
     </qresource>
 </RCC>

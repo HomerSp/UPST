@@ -1,5 +1,6 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
@@ -48,6 +49,16 @@ ApplicationWindow {
         }
 
         Menu {
+            title: qsTr("Edit")
+            MenuItem {
+                text: qsTr("Refresh")
+                onTriggered: {
+                    connectedDevicesList.refresh();
+                }
+            }
+        }
+
+        Menu {
             id: advancedMenu
             objectName: "advancedMenu"
             title: qsTr("Advanced")
@@ -70,6 +81,25 @@ ApplicationWindow {
                 text: qsTr("Manual mode")
                 onTriggered: {
                     mainPageLoader.currentView = "manual"
+                }
+            }
+        }
+
+        Menu {
+            id: helpMenu
+            title: qsTr("Help")
+            MenuItem {
+                id: helpMenuAbout
+                text: qsTr("About")
+                onTriggered: {
+                    var component = Qt.createComponent("dialog/dialog_about.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainWindow);
+                        dialog.modality = Qt.ApplicationModal;
+                        dialog.open();
+                    } else {
+                        console.error("Could not load about dialog: " + component.errorString());
+                    }
                 }
             }
         }
@@ -194,6 +224,7 @@ ApplicationWindow {
             z: 4
 
             ListView {
+                signal refresh()
                 signal currentIndexChanged(int index)
 
                 id: connectedDevicesList

@@ -17,6 +17,8 @@ UI::MainUI::MainUI(const QGuiApplication& app)
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
     mEngine = new QQmlApplicationEngine();
+    mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
+    mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
@@ -37,6 +39,7 @@ UI::MainUI::MainUI(const QGuiApplication& app)
 
     QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
     QObject::connect(connectedDevicesList, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDeviceChanged(int)));
+    QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(devicesChanged()));
 
     viewChanged();
     currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
