@@ -40,13 +40,15 @@ namespace Serial {
                 }
 
                 virtual void execute();
-                virtual void execute(SerialDevice* device);
+                virtual void execute(SerialDevice* device, bool obeyOffset = true);
 
             protected:
                 QcdmCommand(SerialDevice* device) : SerialCommand(device) {
 
                 }
                 QcdmCommand(SerialDevice* device, QcdmCommandItem *cmd);
+
+                void execute(bool obeyOffset);
 
                 void addItem(QcdmCommandItem* item) {
                     mCmds.append(item);

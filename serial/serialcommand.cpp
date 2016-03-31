@@ -12,7 +12,8 @@ SerialCommandResult::SerialCommandResult(bool success, QVariant data, uint16_t e
 
 SerialCommand::SerialCommand(SerialDevice* device)
     : mDevice(device),
-      mTimeout(1000)
+      mTimeout(1000),
+      mOffset(0)
 #ifdef TESTING_MODE
     ,mDebuggingName("")
 #endif

@@ -30,10 +30,14 @@ QcdmCommand::~QcdmCommand() {
 }
 
 void QcdmCommand::execute() {
-    execute(SerialCommand::device());
+    execute(true);
 }
 
-void QcdmCommand::execute(SerialDevice* device) {
+void QcdmCommand::execute(bool obeyOffset) {
+    execute(SerialCommand::device(), obeyOffset);
+}
+
+void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
     if(device == nullptr) {
         return;
     }
@@ -96,6 +100,10 @@ void QcdmCommand::execute(SerialDevice* device) {
         }
 
         data.remove(0, 1);
+
+        if(obeyOffset) {
+            data.remove(0, offset());
+        }
 
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
 

@@ -14,7 +14,14 @@
 					"id": 8,
                                         "datatype": "8bit",
 					"value": "0xcf"
-				}
+                                },
+                                {
+                                        "type": "nv",
+                                        "id": 30015,
+                                        "datatype": "string",
+                                        "offset": 55,
+                                        "value": "ADR6425LVW"
+                                }
 			]
 		},
 		{

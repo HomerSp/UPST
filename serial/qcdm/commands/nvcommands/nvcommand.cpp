@@ -20,7 +20,7 @@ NvCommand::NvCommand(SerialDevice* device, const QList<NvCommandItem*>& cmds)
 }
 
 void NvCommand::execute() {
-    QcdmCommand::execute();
+    QcdmCommand::execute(false);
 
     const QList<SerialCommandResult*> &results = SerialCommand::results();
     for(int i = 0; i < results.size(); i++) {
@@ -56,6 +56,8 @@ void NvCommand::execute() {
             result->setSuccess(false);
             continue;
         }
+
+        resultData.remove(0, offset());
 
         result->setData(resultData);
     }

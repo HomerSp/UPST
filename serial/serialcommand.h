@@ -53,7 +53,7 @@ namespace Serial {
         virtual ~SerialCommand();
 
         virtual void execute() = 0;
-        virtual void execute(SerialDevice* device) = 0;
+        virtual void execute(SerialDevice* device, bool obeyOffset = true) = 0;
 
         int timeout() const {
             return mTimeout;
@@ -87,6 +87,10 @@ namespace Serial {
             mTimeout = timeout;
         }
 
+        void setOffset(int offset) {
+            mOffset = offset;
+        }
+
 #ifdef TESTING_MODE
         const QString& debuggingName() {
             return mDebuggingName;
@@ -108,10 +112,16 @@ namespace Serial {
             mResults.append(new SerialCommandResult(success, data, errorCode));
         }
 
+        int offset() const {
+            return mOffset;
+        }
+
     private:
         SerialDevice* mDevice;
 
         int mTimeout;
+
+        int mOffset;
 
         QList<SerialCommandResult*> mResults;
 
