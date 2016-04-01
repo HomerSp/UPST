@@ -13,6 +13,7 @@
 #include "../commands/nvcommands/nvprovisioncommands/genuserprofcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genusersscommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/evrccommand.h"
+#include "../commands/nvcommands/nvprovisioncommands/hdranusercommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/mccimsicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/mncimsicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/sidnidlistcommand.h"
@@ -168,8 +169,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
         } else if(parentLower == "data") {
             PROVISION_CMD("pppuser", GenericNaiCommand, NvItem::NV_PPP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("papuser", GenericNaiCommand, NvItem::NV_PAP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
-            PROVISION_CMD("hdranuser", GenericNaiCommand, NvItem::NV_HDR_AN_AUTH_NAI_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
-            PROVISION_CMD("hdranlonguser", GenericNaiCommand, NvItem::NV_HDR_AN_AUTH_USER_ID_LONG_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
+            PROVISION_CMD("hdranuser", HDRAnUserCommand, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("hdrpppuser", GenericNaiCommand, NvItem::NV_HDR_AN_PPP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("sipnaiuser", GenericNaiCommand, NvItem::NV_DS_SIP_RM_NAI_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("pppdetection", ProvisionCommand, NvItem::NV_DATA_AUTO_PACKET_DETECTION_I, NvItemType::NV_GENERIC_BYTE_ARRAY);

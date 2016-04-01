@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/passwordcommand.h \
     $$PWD/genericnaicommand.h \
     $$PWD/mccimsicommand.h \
-    $$PWD/mncimsicommand.h
+    $$PWD/mncimsicommand.h \
+    $$PWD/hdranusercommand.h
 SOURCES += \ 
     $$PWD/genuserprofcommand.cpp \
     $$PWD/genusersscommand.cpp \
@@ -19,4 +20,5 @@ SOURCES += \
     $$PWD/passwordcommand.cpp \
     $$PWD/genericnaicommand.cpp \
     $$PWD/mccimsicommand.cpp \
-    $$PWD/mncimsicommand.cpp
+    $$PWD/mncimsicommand.cpp \
+    $$PWD/hdranusercommand.cpp

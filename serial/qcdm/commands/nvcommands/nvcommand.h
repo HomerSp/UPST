@@ -23,6 +23,12 @@ namespace Serial {
                         this->nvItem = nvItem;
                     }
 
+                    NvCommandItem(NvCommandItem* item)
+                        : NvCommandItem(item->cmd, item->nvItem, item->data)
+                    {
+
+                    }
+
                     QCDM::NvItem nvItem;
                 };
 
