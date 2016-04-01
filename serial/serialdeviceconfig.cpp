@@ -76,6 +76,9 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
             foreach(QJsonValue matchVal, matchArr) {
                 QJsonObject nvObj = matchVal.toObject();
                 isCorrect = parser.checkItem(nvObj);
+                if(!isCorrect) {
+                    break;
+                }
             }
         }
 
