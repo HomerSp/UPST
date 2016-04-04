@@ -23,7 +23,8 @@ DEFINES += TESTING_MODE
 HEADERS += devicefilterevent.h
 
 RESOURCES += qml.qrc \
-    resources.qrc
+    resources.qrc \
+    icons.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

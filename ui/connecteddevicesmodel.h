@@ -12,7 +12,8 @@ namespace UI {
     public:
         enum DevicesRoles {
             NameRole = Qt::UserRole + 1,
-            PortRole
+            PortRole,
+            IconRole,
         };
 
         ConnectedDevicesModel(QObject* parent = 0);
@@ -28,6 +29,8 @@ namespace UI {
         void deviceUpdate(Serial::SerialDevice* device);
 
     private:
+        QString getDeviceIcon(Serial::SerialDevice* device) const;
+
         QList<Serial::SerialDevice*> mDevices;
     };
 }

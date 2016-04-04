@@ -288,7 +288,7 @@ ApplicationWindow {
                                 Layout.fillHeight: true
                                 Layout.rowSpan: 2
 
-                                source: "qrc:/res/images/icons/phone.svg"
+                                source: icon
                                 fillMode: Image.PreserveAspectFit
                                 mipmap: true
                                 sourceSize.height: deviceInfoText.height

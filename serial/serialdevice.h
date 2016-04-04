@@ -10,6 +10,14 @@ namespace Serial {
     class SerialCommand;
     class SerialProvisionData;
 
+    enum SerialDeviceType {
+        SerialDeviceTypeUnknown = 0,
+        SerialDeviceTypeSmartphone,
+        SerialDeviceTypeFeaturePhone,
+        SerialDeviceTypeTablet,
+        SerialDeviceTypeMifi,
+    };
+
     class SerialDevice : public QObject
     {
         Q_OBJECT
@@ -85,6 +93,10 @@ namespace Serial {
         }
         const QString& codename() const {
             return mCodename;
+        }
+
+        SerialDeviceType type() const {
+            return mType;
         }
 
         const QString &mdn() const {
@@ -210,6 +222,7 @@ namespace Serial {
         QString mMake;
         QString mModel;
         QString mCodename;
+        SerialDeviceType mType;
 
         QString mMdn;
         uint64_t mMin;

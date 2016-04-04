@@ -7,6 +7,7 @@
                         "codename": "",
                         "vid": "0x0bb4",
                         "pid": "0x0fdc,0x0fdd",
+                        "type": "smartphone",
                         "match_items":
 			[
 				{
@@ -30,6 +31,7 @@
 			"codename": "XT905",
 			"vid": "0x22b8",
 			"pid": "0x2e29",
+                        "type": "smartphone",
                         "match_items":
 			[
 				{
@@ -46,6 +48,7 @@
 			"codename": "SCH-R740C",
 			"vid": "0x04e8",
 			"pid": "0x6860",
+                        "type": "smartphone",
                         "match_items":
 			[
 				{
@@ -62,6 +65,7 @@
 			"codename": "G800R4",
 			"vid": "0x04e8",
 			"pid": "0x685d",
+                        "type": "smartphone",
                         "match_items":
 			[
 				{
@@ -84,6 +88,7 @@
                         "codename": "0PCV1",
                         "vid": "0x0bb4",
                         "pid": "0x0f99",
+                        "type": "smartphone",
                         "match_items":
                         [
                                 {

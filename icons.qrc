@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/images/icons/computer.svg</file>
+        <file>res/images/icons/download.svg</file>
+        <file>res/images/icons/feature_phone.svg</file>
+        <file>res/images/icons/smartphone.svg</file>
+        <file>res/images/icons/tablet.svg</file>
+        <file>res/images/icons/unknown.svg</file>
+        <file>res/images/icons/upload.svg</file>
+        <file>res/images/icons/mifi.svg</file>
+    </qresource>
+</RCC>

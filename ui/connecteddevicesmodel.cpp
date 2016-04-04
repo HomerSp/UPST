@@ -12,6 +12,8 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
         return device->name();
     case PortRole:
         return device->portStr();
+    case IconRole:
+        return getDeviceIcon(device);
     }
 
     return "";
@@ -26,7 +28,31 @@ QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
     roles[PortRole] = "port";
+    roles[IconRole] = "icon";
     return roles;
+}
+
+QString UI::ConnectedDevicesModel::getDeviceIcon(Serial::SerialDevice* device) const {
+    QString type = "unknown";
+
+    switch(device->type()) {
+    case Serial::SerialDeviceTypeSmartphone:
+        type = "smartphone";
+        break;
+    case Serial::SerialDeviceTypeFeaturePhone:
+        type = "feature_phone";
+        break;
+    case Serial::SerialDeviceTypeTablet:
+        type = "tablet";
+        break;
+    case Serial::SerialDeviceTypeMifi:
+        type = "mifi";
+        break;
+    default:
+        break;
+    }
+
+    return "qrc:/res/images/icons/" + type + ".svg";
 }
 
 void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool added) {

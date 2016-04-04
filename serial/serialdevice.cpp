@@ -28,6 +28,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mStopBits(QSerialPort::OneStop),
       mMake(""),
       mModel(""),
+      mType(SerialDeviceTypeUnknown),
       mMdn(""),
       mMin(0),
       mESN(0),
@@ -141,6 +142,18 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
     }
     if(obj.contains("codename")) {
         mCodename = obj["codename"].toString();
+    }
+    if(obj.contains("type")) {
+        QString type = obj["type"].toString();
+        if(type == "smartphone") {
+            mType = SerialDeviceTypeSmartphone;
+        } else if(type == "featurephone") {
+            mType = SerialDeviceTypeFeaturePhone;
+        } else if(type == "tablet") {
+            mType = SerialDeviceTypeTablet;
+        } else if(type == "mifi") {
+            mType = SerialDeviceTypeMifi;
+        }
     }
 
     return true;
