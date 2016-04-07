@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.2
@@ -41,7 +41,7 @@ Item {
                     id: labelMDN
                     text: qsTr("MDN")
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.3)
+                    font.pixelSize: unit.em(1.1)
                 }
 
                 TextField {
@@ -52,7 +52,7 @@ Item {
                     width: parent.width
                     height: labelMDN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
-                    font.pixelSize: labelMDN.font.pointSize
+                    font.pixelSize: labelMDN.font.pixelSize
                     maximumLength: 10
                 }
             }
@@ -79,7 +79,7 @@ Item {
                     id: labelMIN
                     text: qsTr("MIN")
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.3)
+                    font.pixelSize: unit.em(1.1)
                 }
 
                 TextField {
@@ -90,12 +90,12 @@ Item {
                     width: parent.width
                     height: labelMIN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
-                    font.pixelSize: labelMIN.font.pointSize
+                    font.pixelSize: labelMIN.font.pixelSize
                     maximumLength: 10
                 }
             }
 
-            Button {
+            UPButton {
                 id: provisionButton
                 objectName: "provisionButton"
                 text: qsTr("Provision")
@@ -105,33 +105,7 @@ Item {
                 anchors.right: minContainerRect.right
                 anchors.topMargin: unit.dp(20)
 
-                style: ButtonStyle {
-                    id: provisionButtonStyle
-                    background: Rectangle {
-                        implicitWidth: provisionButton.width
-                        implicitHeight: provisionButton.height
-                        border.width: control.activeFocus ? 2 : 0
-                        border.color: "#ccc"
-                        color: control.pressed ? "#4c75bc" : (control.hovered ? "#7fa8ef" : "#5f92eb")
-                        radius: unit.dp(4)
-
-                        Behavior on color {
-                            ColorAnimation { duration: 100 }
-                        }
-
-                        transitions: Transition {
-                            NumberAnimation { properties: "border.width"; duration: 100 }
-                        }
-                    }
-                    label: Text {
-                        color: "white"
-                        text: provisionButton.text
-                        font.family: openSansRegularFont.name
-                        font.pixelSize: unit.em(1.3)
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
+                scheme: "light"
             }
         }
     }

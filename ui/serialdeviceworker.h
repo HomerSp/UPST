@@ -12,6 +12,11 @@
 #include "../serial/serialcommand.h"
 
 namespace UI {
+    struct LoginItem {
+        QString username;
+        QString password;
+    };
+
     class SerialCommandItem : public QObject {
         Q_OBJECT
     public:
@@ -52,15 +57,23 @@ namespace UI {
 
         void addCommand(SerialCommandItem* cmd);
 
+        void addLogin(const QString& username, const QString& password);
+
         void stop();
 
     public slots:
         void process();
 
+        void deviceProvisionProgressChanged(int status, int progress);
+
     signals:
         void finished();
 
         void deviceAdd(Serial::SerialDevice* device);
+
+        void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress);
+
+        void loginStatus(bool success);
 
         void statusChange(const QString& status);
 
@@ -70,12 +83,14 @@ namespace UI {
             WorkTypeDeviceRemove,
             WorkTypeCommand,
             WorkTypeDeviceProvision,
+            WorkTypeLogin,
         };
 
         void processDeviceRemove(Serial::SerialDevice* device);
         void processDeviceCheck(QSerialPortInfo* portInfo);
         void processDeviceProvision(Serial::SerialDevice* device);
         void processCommand(SerialCommandItem* command);
+        void processLogin(LoginItem* item);
 
         Serial::SerialDeviceConfig* mDeviceConfig;
 

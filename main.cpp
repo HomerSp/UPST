@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);
     QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceRemove, &mainUI, &UI::MainUI::deviceRemove);
+    QObject::connect(&mainUI, &UI::MainUI::loggedIn, &deviceFilter, &DeviceFilterEvent::enable);
+    QObject::connect(&mainUI, &UI::MainUI::loggedOut, &deviceFilter, &DeviceFilterEvent::disable);
 
     app.installNativeEventFilter(&deviceFilter);
-
-    deviceFilter.refresh();
 
     return app.exec();
 }

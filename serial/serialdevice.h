@@ -202,6 +202,9 @@ namespace Serial {
             return QString("%1").arg(mIMEI, 14, 16, QChar('0'));
         }
 
+    signals:
+        void provisionProgressChanged(int status, int progress);
+
     private:
         bool provision(SerialProvisionData* data);
         bool provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd);

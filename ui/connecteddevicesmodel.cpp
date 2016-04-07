@@ -5,15 +5,32 @@ UI::ConnectedDevicesModel::ConnectedDevicesModel(QObject* parent)
 
 }
 
+UI::ConnectedDevicesModel::~ConnectedDevicesModel() {
+    while(!mDeviceProgress.empty()) {
+        delete mDeviceProgress.begin().value();
+        mDeviceProgress.erase(mDeviceProgress.begin());
+    }
+}
+
 QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) const {
     Serial::SerialDevice* device = mDevices.at(index.row());
+    DeviceModelProgress* progress = mDeviceProgress.find(device).value();
+
     switch(role) {
     case NameRole:
-        return device->name();
+        return (device->name().length() > 0)?device->name():"Unknown";
     case PortRole:
         return device->portStr();
     case IconRole:
         return getDeviceIcon(device);
+    case ProgressMaxRole:
+        return progress->max;
+    case ProgressMinRole:
+        return progress->min;
+    case ProgressCurrentRole:
+        return progress->current;
+    case ProgressStatusRole:
+        return progress->status;
     }
 
     return "";
@@ -29,6 +46,10 @@ QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     roles[NameRole] = "name";
     roles[PortRole] = "port";
     roles[IconRole] = "icon";
+    roles[ProgressMaxRole] = "progressMax";
+    roles[ProgressMinRole] = "progressMin";
+    roles[ProgressCurrentRole] = "progressCurrent";
+    roles[ProgressStatusRole] = "progressStatus";
     return roles;
 }
 
@@ -59,12 +80,25 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
     if(added) {
         QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
         mDevices.append(device);
+
+        DeviceModelProgress* progress = new DeviceModelProgress();
+        progress->current = 0;
+        progress->max = 100;
+        progress->min = 0;
+        progress->status = 0;
+        mDeviceProgress.insert(device, progress);
+
         QAbstractListModel::endInsertRows();
     } else {
         for(int i = 0; i< mDevices.size(); i++) {
             if(mDevices[i] == device) {
                 QAbstractListModel::beginRemoveRows(QModelIndex(), i, i);
                 mDevices.removeAt(i);
+
+                if(mDeviceProgress.contains(device)) {
+                    delete mDeviceProgress.find(device).value();
+                    mDeviceProgress.remove(device);
+                }
                 QAbstractListModel::endRemoveRows();
                 break;
             }
@@ -80,4 +114,12 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
             break;
         }
     }
+}
+
+void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int status, int current) {
+    DeviceModelProgress* progress = mDeviceProgress.find(device).value();
+    progress->status = status;
+    progress->current = current;
+
+    deviceUpdate(device);
 }

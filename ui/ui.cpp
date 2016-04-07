@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QQmlContext>
+#include <QQmlProperty>
 #include <QThread>
 
 #include "ui.h"
@@ -28,18 +29,15 @@ UI::MainUI::MainUI(const QGuiApplication& app)
     /* Set up signals */
     QObject* rootObject = mEngine->rootObjects().first();
 
-    // Hide advanced menu item if we are not using a testing build
-#ifndef TESTING_MODE
-    QObject* advancedMenuObject = rootObject->findChild<QObject*>("advancedMenu");
-    advancedMenuObject->setProperty("visible", false);
-#endif
-
     QObject* pageLoader = rootObject->findChild<QObject*>("mainPageLoader");
     QObject::connect(pageLoader, SIGNAL(viewChanged()), this, SLOT(viewChanged()));
 
     QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
     QObject::connect(connectedDevicesList, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDeviceChanged(int)));
     QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(devicesChanged()));
+
+    QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
+    QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
     viewChanged();
     currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
@@ -50,7 +48,9 @@ UI::MainUI::MainUI(const QGuiApplication& app)
     mWorker->moveToThread(thread);
 
     connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
+    connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
+    connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, mDevicesModel, &ConnectedDevicesModel::setProgress);
 
     connect(thread, SIGNAL(started()), mWorker, SLOT(process()));
     connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
@@ -195,6 +195,45 @@ void UI::MainUI::viewUpdate() {
     }
 
     mSection->update();
+}
+
+void UI::MainUI::login() {
+    mWorker->addLogin("", "");
+}
+
+void UI::MainUI::logout() {
+    updateLoginStatus(false);
+
+    emit loggedOut();
+
+    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        deviceRemove(info.portName());
+    }
+}
+
+void UI::MainUI::loginStatusChanged(bool success) {
+    if(!success) {
+        // TODO: Display an error.
+        return;
+    }
+
+    updateLoginStatus(true);
+
+    emit loggedIn();
+}
+
+void UI::MainUI::updateLoginStatus(bool loggedIn) {
+    QObject* rootObject = mEngine->rootObjects().first();
+
+    rootObject->findChild<QObject*>("fileMenuLogout")->setProperty("visible", loggedIn);
+    rootObject->findChild<QObject*>("editMenu")->setProperty("visible", loggedIn);
+    // Show advanced menu item if we are using a testing build
+#ifdef TESTING_MODE
+    rootObject->findChild<QObject*>("advancedMenu")->setProperty("visible", loggedIn);
+#endif
+
+
+    rootObject->findChild<QObject*>("loginOverlay")->setProperty("opacity", (loggedIn)?0:1);
 }
 
 UI::UISection::UISection(UI::MainUI* ui)

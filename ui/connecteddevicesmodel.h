@@ -7,6 +7,13 @@
 #include "serial/serialdevice.h"
 
 namespace UI {
+    struct DeviceModelProgress {
+        int status;
+        int min;
+        int max;
+        int current;
+    };
+
     class ConnectedDevicesModel : public QAbstractListModel {
         Q_OBJECT
     public:
@@ -14,9 +21,14 @@ namespace UI {
             NameRole = Qt::UserRole + 1,
             PortRole,
             IconRole,
+            ProgressMaxRole,
+            ProgressMinRole,
+            ProgressCurrentRole,
+            ProgressStatusRole,
         };
 
         ConnectedDevicesModel(QObject* parent = 0);
+        ~ConnectedDevicesModel();
 
         virtual QVariant data(const QModelIndex& parent, int role) const;
         virtual QHash<int, QByteArray> roleNames() const;
@@ -28,10 +40,13 @@ namespace UI {
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
 
+        void setProgress(Serial::SerialDevice* device, int status, int current);
+
     private:
         QString getDeviceIcon(Serial::SerialDevice* device) const;
 
         QList<Serial::SerialDevice*> mDevices;
+        QMap<Serial::SerialDevice*, DeviceModelProgress*> mDeviceProgress;
     };
 }
 

@@ -16,6 +16,10 @@ public:
 
     void refresh();
 
+public slots:
+    void enable();
+    void disable();
+
 signals:
     void devicesChanged();
     void deviceRemove(const QString& port);
@@ -28,6 +32,8 @@ protected:
 
 private:
     bool getVidPid(const QString& port, QString& vid, QString& pid);
+
+    bool mEnabled;
 
 };
 

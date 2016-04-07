@@ -30,9 +30,16 @@ namespace UI {
             return mWorker;
         }
 
+        ConnectedDevicesModel* devicesModel() {
+            return mDevicesModel;
+        }
+
     signals:
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
+
+        void loggedIn();
+        void loggedOut();
 
     public slots:
         void devicesChanged();
@@ -42,13 +49,20 @@ namespace UI {
 
         void setStatus(const QString& status);
 
+        void loginStatusChanged(bool success);
+
     protected slots:
         void viewChanged();
         void viewUpdate();
 
         void currentDeviceChanged(int);
 
+        void login();
+        void logout();
+
     private:
+        void updateLoginStatus(bool loggedIn);
+
         const QGuiApplication& mApp;
 
         UISection* mSection;

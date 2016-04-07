@@ -76,6 +76,15 @@ void UI::SerialDeviceWorker::addCommand(SerialCommandItem *cmd) {
     mWaitCondition.wakeAll();
 }
 
+void UI::SerialDeviceWorker::addLogin(const QString &username, const QString &password) {
+    LoginItem* item = new LoginItem();
+    item->username = username;
+    item->password = password;
+
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeLogin, item));
+    mWaitCondition.wakeAll();
+}
+
 void UI::SerialDeviceWorker::stop() {
     QMutexLocker stopLock(&mStoppedMutex);
 
@@ -93,6 +102,8 @@ void UI::SerialDeviceWorker::stop() {
             delete static_cast<QSerialPortInfo*>((*i).second);
         } else if((*i).first == WorkTypeCommand) {
             delete static_cast<SerialCommandItem*>((*i).second);
+        } else if((*i).first == WorkTypeLogin) {
+            delete static_cast<LoginItem*>((*i).second);
         }
     }
 
@@ -164,6 +175,10 @@ void UI::SerialDeviceWorker::process() {
                 }
                 case WorkTypeCommand: {
                     processCommand(static_cast<SerialCommandItem*>(data));
+                    break;
+                }
+                case WorkTypeLogin: {
+                    processLogin(static_cast<LoginItem*>(data));
                     break;
                 }
                 default:
@@ -241,10 +256,25 @@ void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
 
 void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device) {
     emit statusChange("Provisioning " + device->name());
+
+    connect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
     device->provision();
+    disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
 }
 
 void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
     item->process();
     item->deleteLater();
+}
+
+void UI::SerialDeviceWorker::processLogin(LoginItem* item) {
+    emit loginStatus(true);
+
+    delete item;
+}
+
+void UI::SerialDeviceWorker::deviceProvisionProgressChanged(int status, int progress) {
+    qDebug()<<"deviceProvisionProgressChanged"<<status<<progress;
+
+    emit provisionProgressChanged(static_cast<Serial::SerialDevice*>(sender()), status, progress);
 }

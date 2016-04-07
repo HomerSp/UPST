@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import "../components"
@@ -27,20 +27,20 @@ Dialog {
         Text {
             text: "Ultimobile Product Support Tool v" + programVersion
             font.family: openSansRegularFont.name
-            font.pixelSize: unit.em(1.3)
+            font.pixelSize: unit.em(1.1)
         }
 
         Text {
             id: aboutDialogPowered
             text: "Powered by Qt v" + qtVersion
             font.family: openSansRegularFont.name
-            font.pixelSize: unit.em(1.3)
+            font.pixelSize: unit.em(1.1)
         }
 
         Text {
             text: "Icons made by Freepik from www.flaticon.com"
             font.family: openSansRegularFont.name
-            font.pixelSize: unit.em(1.3)
+            font.pixelSize: unit.em(1.1)
         }
     }
 

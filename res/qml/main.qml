@@ -1,5 +1,6 @@
-import QtQuick 2.3
+import QtQuick 2.5
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
@@ -41,6 +42,12 @@ ApplicationWindow {
         Menu {
             title: qsTr("File")
             MenuItem {
+                objectName: "fileMenuLogout"
+                text: qsTr("Logout")
+                visible: false
+            }
+
+            MenuItem {
                 text: qsTr("Exit")
                 onTriggered: {
                     Qt.quit()
@@ -49,7 +56,9 @@ ApplicationWindow {
         }
 
         Menu {
+            objectName: "editMenu"
             title: qsTr("Edit")
+            visible: false
             MenuItem {
                 text: qsTr("Refresh")
                 onTriggered: {
@@ -62,6 +71,7 @@ ApplicationWindow {
             id: advancedMenu
             objectName: "advancedMenu"
             title: qsTr("Advanced")
+            visible: false
             MenuItem {
                 id: advancedMenuDeviceInfo
                 text: qsTr("Device info")
@@ -144,7 +154,7 @@ ApplicationWindow {
                 id: connectedDevicesLabelText
                 color: "#ffffff"
                 text: qsTr("Connected Devices")
-                font.pixelSize: unit.em(1.35)
+                font.pixelSize: unit.em(1.2)
                 font.family: openSansRegularFont.name
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: connectedDevicesLabelIcon.right
@@ -174,7 +184,7 @@ ApplicationWindow {
                     id: currentDeviceLabel
                     color: "#ffffff"
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.3)
+                    font.pixelSize: unit.em(1.2)
                     text: "Device"
                 }
 
@@ -261,8 +271,8 @@ ApplicationWindow {
                         id: deviceInfoWrapper
                         anchors.left: parent.left
                         Layout.fillWidth: true
-                        width: deviceInfoIcon.width + deviceInfoText.width + unit.dp(28)
-                        height: deviceInfo.height + unit.dp(18)
+                        width: deviceInfoContainer.width + deviceInfoStatus.width
+                        height: deviceInfoContainer.height + deviceInfoStatusProgress.height
                         x: 0
                         color: "#00ffffff"
 
@@ -270,61 +280,119 @@ ApplicationWindow {
                             ColorAnimation {}
                         }
 
-                        RowLayout {
-                            id: deviceInfo
+                        Item {
+                            id: deviceInfoContainer
 
-                            anchors.left: parent.left
-                            anchors.leftMargin: unit.dp(8)
-                            anchors.right: parent.right
-                            anchors.rightMargin: unit.dp(8)
-                            anchors.verticalCenter: parent.verticalCenter
+                            width: deviceInfoIcon.width + deviceInfoText.width + unit.dp(40)
+                            height: deviceInfo.height + unit.dp(16)
 
-                            spacing: 0
-                            clip: true
+                            RowLayout {
+                                id: deviceInfo
 
-                            Image {
-                                id: deviceInfoIcon
-
-                                Layout.fillHeight: true
-                                Layout.rowSpan: 2
-
-                                source: icon
-                                fillMode: Image.PreserveAspectFit
-                                mipmap: true
-                                sourceSize.height: deviceInfoText.height
-                            }
-
-                            ColorOverlay {
-                                anchors.fill: deviceInfoIcon
-                                source: deviceInfoIcon
-                                color: "#ffffff"
-                            }
-
-                            Column {
-                                id: deviceInfoText
-
-                                anchors.left: deviceInfoIcon.right
+                                anchors.left: parent.left
                                 anchors.leftMargin: unit.dp(8)
+                                anchors.right: parent.right
+                                anchors.rightMargin: unit.dp(8)
+                                anchors.verticalCenter: parent.verticalCenter
 
-                                Text {
-                                    id: deviceInfoName
+                                spacing: 0
+                                clip: true
 
-                                    text: name
-                                    color: "white"
-                                    font.pixelSize: unit.em(1.1)
-                                    font.family: openSansRegularFont.name
-                                    clip: true
+                                Image {
+                                    id: deviceInfoIcon
+
+                                    Layout.fillHeight: true
+                                    Layout.rowSpan: 2
+
+                                    source: icon
+                                    fillMode: Image.PreserveAspectFit
+                                    mipmap: true
+                                    sourceSize.height: deviceInfoText.height
                                 }
 
-                                Text {
-                                    id: deviceInfoPort
+                                ColorOverlay {
+                                    anchors.fill: deviceInfoIcon
+                                    source: deviceInfoIcon
+                                    color: "#ffffff"
+                                }
 
-                                    text: port
-                                    color: "white"
-                                    font.pixelSize: unit.em(1.1)
-                                    font.family: openSansBoldFont.name
-                                    font.bold: true
-                                    clip: true
+                                Column {
+                                    id: deviceInfoText
+
+                                    anchors.left: deviceInfoIcon.right
+                                    anchors.leftMargin: unit.dp(8)
+
+                                    Text {
+                                        id: deviceInfoName
+
+                                        text: name
+                                        color: "white"
+                                        font.pixelSize: unit.em(1.1)
+                                        font.family: openSansRegularFont.name
+                                        clip: true
+                                    }
+
+                                    Text {
+                                        id: deviceInfoPort
+
+                                        text: port
+                                        color: "white"
+                                        font.pixelSize: unit.em(1.0)
+                                        font.family: openSansBoldFont.name
+                                        font.bold: true
+                                        clip: true
+                                    }
+                                }
+                            }
+                        }
+
+                        Image {
+                            id: deviceInfoStatus
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: unit.dp(8)
+
+                            opacity: (progressStatus > 0)?1.0:0.0
+
+                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":((progressStatus == 2)?"done":"download")) + ".svg"
+                            fillMode: Image.PreserveAspectFit
+                            mipmap: true
+                            sourceSize.height: deviceInfoText.height / 2
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 150
+                                }
+                            }
+                        }
+
+                        ProgressBar {
+                            id: deviceInfoStatusProgress
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+
+                            minimumValue: progressMin
+                            maximumValue: progressMax
+                            value: progressCurrent
+
+                            opacity: (progressStatus > 0)?1.0:0.0
+
+                            style: ProgressBarStyle {
+                                background: Rectangle {
+                                    color: 'transparent'
+
+                                    implicitHeight: unit.dp(4)
+                                }
+                                progress: Rectangle {
+                                    color: '#FFF'
+                                }
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 150
                                 }
                             }
                         }
@@ -394,7 +462,6 @@ ApplicationWindow {
                 property string currentView
 
                 id: mainPageLoader
-                source: "main_provisionmode.qml"
                 objectName: "mainPageLoader"
 
                 anchors.left: parent.left
@@ -437,7 +504,7 @@ ApplicationWindow {
 
                     text: qsTr("No devices attached")
                     font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.4)
+                    font.pixelSize: unit.em(1.2)
                 }
 
                 Behavior on opacity {
@@ -647,8 +714,37 @@ ApplicationWindow {
                 objectName: "statusBarText"
                 color: "#ffffff"
                 font.family: openSansRegularFont.name
-                font.pixelSize: unit.em(1.3)
+                font.pixelSize: unit.em(1.2)
                 text: "STATUS"
+            }
+        }
+    }
+
+    Rectangle {
+        id: loginOverlay
+        objectName: "loginOverlay"
+        anchors.fill: parent
+
+        color: "#f1f1f1"
+        visible: true
+        opacity: 1.0
+
+        Loader {
+            anchors.fill: parent
+
+            source: "login.qml"
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 300
+                onRunningChanged: {
+                    if(running && opacity < 1.0) {
+                        visible = true;
+                    } else if(!running && opacity === 0.0) {
+                        visible = false;
+                    }
+                }
             }
         }
     }

@@ -1,4 +1,6 @@
-import QtQuick 2.0
+import QtQuick 2.5
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 
@@ -21,6 +23,7 @@ ColumnLayout {
     }
 
     Rectangle {
+        id: deviceInfoBoxHeader
         Layout.fillWidth: true
         Layout.minimumHeight: childrenRect.height + unit.dp(8)
         color: "#000"
@@ -30,7 +33,7 @@ ColumnLayout {
             anchors.leftMargin: unit.dp(8)
             anchors.verticalCenter: parent.verticalCenter
             font.family: openSansRegularFont.name
-            font.pixelSize: unit.em(1)
+            font.pixelSize: unit.em(1.0)
             text: deviceInfoBox.header
             color: "#FFF"
         }
@@ -38,21 +41,30 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.minimumHeight: childrenRect.height + unit.dp(8)
+        Layout.minimumHeight: deviceInfoBoxHeader.height
+        Layout.maximumHeight: deviceInfoBoxHeader.height
         color: "#f1f1f1"
 
-        TextEdit {
-            anchors.left: parent.left
+        TextArea {
+            id: deviceInfoBoxText
+            anchors.fill: parent
             anchors.leftMargin: unit.dp(8)
             anchors.verticalCenter: parent.verticalCenter
             font.family: openSansRegularFont.name
-            font.pixelSize: unit.em(1)
-            readOnly: false
+            font.pixelSize: unit.em(1.0)
+
+            frameVisible: false
+            backgroundVisible: false
+            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+
+            readOnly: true
             selectByMouse: true
-            focus: true
-            persistentSelection: true
+            selectByKeyboard: true
+            tabChangesFocus: true
+
             text: deviceInfoBox.value
-            color: "#000"
+            textColor: '#000'
         }
     }
 }

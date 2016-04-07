@@ -6,7 +6,8 @@
         <file>res/images/icons/smartphone.svg</file>
         <file>res/images/icons/tablet.svg</file>
         <file>res/images/icons/unknown.svg</file>
-        <file>res/images/icons/upload.svg</file>
         <file>res/images/icons/mifi.svg</file>
+        <file>res/images/icons/done.svg</file>
+        <file>res/images/icons/failed.svg</file>
     </qresource>
 </RCC>

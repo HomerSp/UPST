@@ -80,12 +80,19 @@ bool SerialDevice::isValid() {
 }
 
 bool SerialDevice::provision() {
+    emit provisionProgressChanged(1, 0);
+
     QFile sourceFile(":/res/data/provision_data.json");
     if(!sourceFile.open(QFile::ReadOnly | QFile::Text)) {
         return false;
     }
 
+    emit provisionProgressChanged(1, 1);
+
     SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
+
+    emit provisionProgressChanged(1, 2);
+
     bool ret = provision(provisionData);
     delete provisionData;
 
@@ -194,12 +201,18 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     devices.append(this);
     devices.append(mChildren);
 
+    float mod = (98.0f / (data->constCommands().size() + 5)) / devices.size();
+    float i = 2;
+
     foreach(SerialDevice* device, devices) {
         qDebug()<<"===== Provisioning port"<<device->communicator()->port()<<"=====";
 
         qDebug()<<"===== RESETTING DEVICE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdBefore.execute();
+
+        i += mod;
+        emit provisionProgressChanged(1, i);
 
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
@@ -223,6 +236,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             ret = false;
         }
 
+        i += mod;
+        emit provisionProgressChanged(1, i);
+
         qDebug()<<"===== WRITING MDN =====";
         Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mMdn);
         mdnCmd.execute();
@@ -232,6 +248,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             qDebug()<<"Could not write MDN";
             ret = false;
         }
+
+        i += mod;
+        emit provisionProgressChanged(1, i);
 
         qDebug()<<"===== WRITING MIN =====";
         Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mMin);
@@ -243,10 +262,16 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             ret = false;
         }
 
+        i += mod;
+        emit provisionProgressChanged(1, i);
+
         qDebug()<<"Provision items"<<data->constCommands().size();
 
         foreach(Serial::SerialCommand* cmd, data->constCommands()) {
             provision(device, data, cmd);
+
+            i += mod;
+            emit provisionProgressChanged(1, i);
         }
 
         // We need to reset the command results for the next device.
@@ -255,7 +280,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"===== RESETTING DEVICE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdAfter(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdAfter.execute();
+
+        i += mod;
+        emit provisionProgressChanged(1, i);
     }
+
+    emit provisionProgressChanged(2, 100);
 
     return ret;
 }

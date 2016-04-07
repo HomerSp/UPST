@@ -5,7 +5,20 @@
 #include "devicefilterevent.h"
 
 DeviceFilterEvent::DeviceFilterEvent()
+    : mEnabled(false)
 {
+
+}
+
+void DeviceFilterEvent::enable() {
+    mEnabled = true;
+
+    refresh();
+}
+
+void DeviceFilterEvent::disable() {
+    mEnabled = false;
+
 
 }
 
@@ -16,10 +29,18 @@ bool DeviceFilterEvent::nativeEventFilter(const QByteArray &, void*, long*) {
 #endif
 
 void DeviceFilterEvent::handleDeviceAdded() {
+    if(!mEnabled) {
+        return;
+    }
+
     emit devicesChanged();
 }
 
 void DeviceFilterEvent::handleDeviceRemoved(const QString& port) {
+    if(!mEnabled) {
+        return;
+    }
+
     emit deviceRemove(port);
 }
 
