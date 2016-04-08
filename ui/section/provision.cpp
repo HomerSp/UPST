@@ -12,11 +12,29 @@ UI::Section::Provision::Provision(UI::MainUI* ui)
 }
 
 UI::Section::Provision::~Provision() {
+    beforeDeviceChanged();
+}
 
+void UI::Section::Provision::beforeDeviceChanged() {
+    if(currentDevice() == nullptr) {
+        return;
+    }
+
+    QObject* rootObject = UISection::rootObject();
+    QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();
+    uint64_t min = (uint64_t)rootObject->findChild<QObject*>("textMIN")->property("text").toString().toULongLong();
+
+    currentDevice()->setProvisionData(mdn, min);
 }
 
 void UI::Section::Provision::update() {
     UISection::startUpdate();
+
+    if(currentDevice() != nullptr) {
+        QObject* rootObject = UISection::rootObject();
+        rootObject->findChild<QObject*>("textMDN")->setProperty("text", currentDevice()->newMdnStr());
+        rootObject->findChild<QObject*>("textMIN")->setProperty("text", currentDevice()->newMinStr());
+    }
 
     UISection::endUpdate();
 }

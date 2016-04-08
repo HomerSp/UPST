@@ -53,8 +53,8 @@ namespace Serial {
         }
 
         void setProvisionData(const QString& mdn, uint64_t min) {
-            mMdn = mdn;
-            mMin = min;
+            mNewMdn = mdn;
+            mNewMin = min;
         }
 
         bool operator==(const SerialDevice& other);
@@ -202,6 +202,26 @@ namespace Serial {
             return QString("%1").arg(mIMEI, 14, 16, QChar('0'));
         }
 
+        QString newMdnStr() const {
+            if(mNewMdn.length() == 0) {
+                return mMdn;
+            }
+
+            return mNewMdn;
+        }
+        QString newMinStr() const {
+            if(mNewMin == 0) {
+                QString ret = minStr();
+                if(ret == "-") {
+                    return "";
+                }
+
+                return ret;
+            }
+
+            return QString("%1").arg(mNewMin, 10, 10, QChar('0'));
+        }
+
     signals:
         void provisionProgressChanged(int status, int progress);
 
@@ -232,6 +252,9 @@ namespace Serial {
         uint32_t mESN;
         uint64_t mIMEI;
         uint64_t mMEID;
+
+        QString mNewMdn;
+        uint64_t mNewMin;
     };
 }
 

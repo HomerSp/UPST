@@ -12,6 +12,7 @@ namespace UI {
             Provision(MainUI* ui);
             ~Provision();
 
+            virtual void beforeDeviceChanged();
             virtual void update();
 
         protected slots:

@@ -33,7 +33,9 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mMin(0),
       mESN(0),
       mIMEI(0),
-      mMEID(0)
+      mMEID(0),
+      mNewMdn(""),
+      mNewMin(0)
 
 {
     mCommunicator = new SerialCommunicator(*this);
@@ -251,7 +253,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         emit provisionProgressChanged(1, i);
 
         qDebug()<<"===== WRITING MDN =====";
-        Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mMdn);
+        Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mNewMdn);
         mdnCmd.execute();
         if(mdnCmd.result()->success()) {
             qDebug()<<"Result="<<mdnCmd.result()->data().toString();
@@ -265,7 +267,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         emit provisionProgressChanged(1, i);
 
         qDebug()<<"===== WRITING MIN =====";
-        Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mMin);
+        Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mNewMin);
         minCmd.execute();
         if(minCmd.result()->success()) {
             qDebug()<<"Result="<<minCmd.result()->data().toString();

@@ -34,6 +34,10 @@ namespace UI {
             return mDevicesModel;
         }
 
+        int currentIndex() {
+            return mCurrentIndex;
+        }
+
     signals:
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
@@ -73,6 +77,8 @@ namespace UI {
 
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;
+
+        int mCurrentIndex;
     };
 
     class UISection : public QObject {
@@ -82,6 +88,7 @@ namespace UI {
 
         }
 
+        virtual void beforeDeviceChanged();
         virtual void update() = 0;
 
     protected:

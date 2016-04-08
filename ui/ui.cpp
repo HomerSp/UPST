@@ -148,8 +148,11 @@ void UI::MainUI::deviceRemove(const QString& port) {
 }
 
 void UI::MainUI::currentDeviceChanged(int index) {
-    Q_UNUSED(index);
+    if(mSection != nullptr) {
+        mSection->beforeDeviceChanged();
+    }
 
+    mCurrentIndex = index;
     viewUpdate();
 }
 
@@ -243,6 +246,10 @@ UI::UISection::UISection(UI::MainUI* ui)
 
 }
 
+void UI::UISection::beforeDeviceChanged() {
+
+}
+
 void UI::UISection::startUpdate() {
     QObject* rootObject = this->rootObject();
 
@@ -293,10 +300,8 @@ void UI::UISection::endUpdate() {
 }
 
 Serial::SerialDevice* UI::UISection::currentDevice() {
-    QObject* connectedDevicesList = rootObject()->findChild<QObject*>("connectedDevicesList");
-    int currentIndex = connectedDevicesList->property("currentIndex").toInt();
-
     // The index defaults to -1, so we check the first item if it's the default.
+    int currentIndex = ui()->currentIndex();
     if(currentIndex < 0) {
         currentIndex = 0;
     }
