@@ -210,6 +210,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"===== RESETTING DEVICE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdBefore.execute();
+        if(!radioCmdBefore.resultSuccess()) {
+            ret = false;
+            break;
+        }
 
         i += mod;
         emit provisionProgressChanged(1, i);
@@ -223,6 +227,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             } else {
                 qDebug()<<"Could not send password";
                 ret = false;
+                break;
             }
         }
 
@@ -234,6 +239,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         } else {
             qDebug()<<"Could not unlock SPC";
             ret = false;
+            break;
         }
 
         i += mod;
@@ -247,6 +253,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         } else {
             qDebug()<<"Could not write MDN";
             ret = false;
+            break;
         }
 
         i += mod;
@@ -260,6 +267,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         } else {
             qDebug()<<"Could not write MIN";
             ret = false;
+            break;
         }
 
         i += mod;
@@ -268,10 +276,17 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"Provision items"<<data->constCommands().size();
 
         foreach(Serial::SerialCommand* cmd, data->constCommands()) {
-            provision(device, data, cmd);
+            if(!provision(device, data, cmd)) {
+                ret = false;
+                break;
+            }
 
             i += mod;
             emit provisionProgressChanged(1, i);
+        }
+
+        if(!ret) {
+            break;
         }
 
         // We need to reset the command results for the next device.
@@ -280,12 +295,20 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"===== RESETTING DEVICE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdAfter(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdAfter.execute();
+        if(!radioCmdAfter.resultSuccess()) {
+            ret = false;
+            break;
+        }
 
         i += mod;
         emit provisionProgressChanged(1, i);
     }
 
-    emit provisionProgressChanged(2, 100);
+    if(ret) {
+        emit provisionProgressChanged(2, 100);
+    } else {
+        emit provisionProgressChanged(3, i);
+    }
 
     return ret;
 }
@@ -299,10 +322,16 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
         if(data->password16().size() == 16) {
             Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
             passwordCmd.execute();
+            if(!passwordCmd.resultSuccess()) {
+                return false;
+            }
         }
 
         Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
         spcCommand.execute();
+        if(!spcCommand.resultSuccess()) {
+            return false;
+        }
     }
 
     // Increase the timeout period
@@ -311,6 +340,7 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     foreach(Serial::SerialCommandResult* result, cmd->results()) {
         if(!result->success()) {
             qDebug()<<"Failed to provision";
+            return false;
         } else {
             qDebug()<<"Provision success";
         }
@@ -319,6 +349,9 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     if(data->sequentialOffline()) {
         Serial::QCDM::Commands::RadioModeCommand radioCmd(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmd.execute();
+        if(!radioCmd.resultSuccess()) {
+            return false;
+        }
     }
 
     return true;
