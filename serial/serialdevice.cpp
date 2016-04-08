@@ -201,7 +201,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     devices.append(this);
     devices.append(mChildren);
 
+    // This is the amount the progress should increase after each command,
+    // that is, the modifier to which we increase the progress so that we
+    // reach 100% at completion.
     float mod = (98.0f / (data->constCommands().size() + 5)) / devices.size();
+
+    // The progress starts at 2 (downloading the provision data is 1%, and parsing it is another 1%).
     float i = 2;
 
     foreach(SerialDevice* device, devices) {
