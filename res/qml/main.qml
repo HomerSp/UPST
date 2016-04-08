@@ -499,6 +499,8 @@ ApplicationWindow {
                 visible: true
                 opacity: 1.0
 
+                z: 999
+
                 Text {
                     anchors.centerIn: parent
 
@@ -507,13 +509,17 @@ ApplicationWindow {
                     font.pixelSize: unit.em(1.2)
                 }
 
+                MouseArea {
+                    anchors.fill: parent
+                }
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 300
                         onRunningChanged: {
                             if(running && noDeviceOverlay.opacity < 1.0) {
                                 noDeviceOverlay.visible = true;
-                            } else if(!running && noDeviceOverlay.opacity == 0.0) {
+                            } else if(!running && noDeviceOverlay.opacity === 0.0) {
                                 noDeviceOverlay.visible = false;
                             }
                         }
@@ -729,20 +735,27 @@ ApplicationWindow {
         visible: true
         opacity: 1.0
 
+        z: 1000
+
         Loader {
             anchors.fill: parent
+            z: 1001
 
             source: "login.qml"
+        }
+
+        MouseArea {
+            anchors.fill: parent
         }
 
         Behavior on opacity {
             NumberAnimation {
                 duration: 300
                 onRunningChanged: {
-                    if(running && opacity < 1.0) {
-                        visible = true;
-                    } else if(!running && opacity === 0.0) {
-                        visible = false;
+                    if(running && loginOverlay.opacity < 1.0) {
+                        loginOverlay.visible = true;
+                    } else if(!running && loginOverlay.opacity === 0.0) {
+                        loginOverlay.visible = false;
                     }
                 }
             }
