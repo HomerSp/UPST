@@ -143,16 +143,15 @@ bool SerialDevice::update() {
 }
 
 bool SerialDevice::updateJson(const QJsonObject& obj) {
-    if(obj.contains("make")) {
+    if(obj.contains("make") && obj.contains("model") && obj.contains("type")) {
         mMake = obj["make"].toString();
-    }
-    if(obj.contains("model")) {
         mModel = obj["model"].toString();
-    }
-    if(obj.contains("codename")) {
-        mCodename = obj["codename"].toString();
-    }
-    if(obj.contains("type")) {
+
+        // This isn't a required parameter.
+        if(obj.contains("codename")) {
+            mCodename = obj["codename"].toString();
+        }
+
         QString type = obj["type"].toString();
         if(type == "smartphone") {
             mType = SerialDeviceTypeSmartphone;
@@ -162,10 +161,14 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
             mType = SerialDeviceTypeTablet;
         } else if(type == "mifi") {
             mType = SerialDeviceTypeMifi;
+        } else {
+            return false;
         }
+
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 bool SerialDevice::operator==(const SerialDevice& other) {

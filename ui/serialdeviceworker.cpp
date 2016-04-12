@@ -245,8 +245,14 @@ void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
     } else {
         qDebug()<<"Device"<<portInfo->portName()<<"is valid";
         device->update();
+#ifndef TESTING_MODE
+        if(mDeviceConfig->updateDevice(device)) {
+            emit deviceAdd(device);
+        }
+#else
         mDeviceConfig->updateDevice(device);
         emit deviceAdd(device);
+#endif
     }
 
     emit statusChange("");

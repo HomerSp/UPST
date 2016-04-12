@@ -44,6 +44,8 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
      }
 
      SerialItemParser parser(device);
+
+     bool foundDevice = false;
      foreach(QJsonValue val, devicesArr) {
         QJsonObject obj = val.toObject();
         if(!obj.contains("vid") || !obj.contains("pid")) {
@@ -83,12 +85,12 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
         }
 
         if(isCorrect) {
-            device->updateJson(obj);
+            foundDevice = device->updateJson(obj);
             break;
         }
      }
 
-     return true;
+     return foundDevice;
 }
 
 void SerialDeviceConfig::updateConfig() {
