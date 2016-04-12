@@ -18,6 +18,13 @@ namespace Serial {
         SerialDeviceTypeMifi,
     };
 
+    enum SerialProvisionStatus {
+        SerialProvisionStatusIdle = 0,
+        SerialProvisionStatusProgress,
+        SerialProvisionStatusDone,
+        SerialProvisionStatusError,
+    };
+
     class SerialDevice : public QObject
     {
         Q_OBJECT

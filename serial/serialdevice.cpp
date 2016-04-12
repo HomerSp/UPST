@@ -82,24 +82,24 @@ bool SerialDevice::isValid() {
 }
 
 bool SerialDevice::provision() {
-    emit provisionProgressChanged(1, 0);
+    emit provisionProgressChanged(SerialProvisionStatusProgress, 0);
 
     QFile sourceFile(":/res/data/provision_data.json");
     if(!sourceFile.open(QFile::ReadOnly | QFile::Text)) {
-         emit provisionProgressChanged(2, 0);
+         emit provisionProgressChanged(SerialProvisionStatusError, 0);
         return false;
     }
 
-    emit provisionProgressChanged(1, 1);
+    emit provisionProgressChanged(SerialProvisionStatusProgress, 1);
 
     SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
     if(!provisionData->valid()) {
-        emit provisionProgressChanged(2, 1);
+        emit provisionProgressChanged(SerialProvisionStatusError, 1);
         delete provisionData;
         return false;
     }
 
-    emit provisionProgressChanged(1, 2);
+    emit provisionProgressChanged(SerialProvisionStatusProgress, 2);
 
     bool ret = provision(provisionData);
     delete provisionData;
@@ -232,7 +232,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         i += mod;
-        emit provisionProgressChanged(1, i);
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
@@ -259,7 +259,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         i += mod;
-        emit provisionProgressChanged(1, i);
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
         qDebug()<<"===== WRITING MDN =====";
         Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mNewMdn);
@@ -273,7 +273,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         i += mod;
-        emit provisionProgressChanged(1, i);
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
         qDebug()<<"===== WRITING MIN =====";
         Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mNewMin);
@@ -287,7 +287,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         i += mod;
-        emit provisionProgressChanged(1, i);
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
         qDebug()<<"Provision items"<<data->constCommands().size();
 
@@ -298,7 +298,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             }
 
             i += mod;
-            emit provisionProgressChanged(1, i);
+            emit provisionProgressChanged(SerialProvisionStatusProgress, i);
         }
 
         if(!ret) {
@@ -317,13 +317,13 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         i += mod;
-        emit provisionProgressChanged(1, i);
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
     }
 
     if(ret) {
-        emit provisionProgressChanged(2, 100);
+        emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
-        emit provisionProgressChanged(3, i);
+        emit provisionProgressChanged(SerialProvisionStatusError, i);
     }
 
     return ret;
