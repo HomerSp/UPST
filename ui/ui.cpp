@@ -61,14 +61,14 @@ UI::MainUI::MainUI(const QGuiApplication& app)
 }
 
 UI::MainUI::~MainUI() {
+    if(mSection != nullptr) {
+        delete mSection;
+    }
+
     mWorker->stop();
 
     delete mEngine;
     delete mDevicesModel;
-
-    if(mSection != nullptr) {
-        delete mSection;
-    }
 }
 
 void UI::MainUI::devicesChanged() {
