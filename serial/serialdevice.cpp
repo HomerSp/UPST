@@ -86,12 +86,18 @@ bool SerialDevice::provision() {
 
     QFile sourceFile(":/res/data/provision_data.json");
     if(!sourceFile.open(QFile::ReadOnly | QFile::Text)) {
+         emit provisionProgressChanged(2, 0);
         return false;
     }
 
     emit provisionProgressChanged(1, 1);
 
     SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
+    if(!provisionData->valid()) {
+        emit provisionProgressChanged(2, 1);
+        delete provisionData;
+        return false;
+    }
 
     emit provisionProgressChanged(1, 2);
 

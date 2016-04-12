@@ -60,11 +60,12 @@ void NvProvisionData::updateStart(const QJsonObject &rootObject) {
 
 void NvProvisionData::update(const QString &data) {
     QJsonDocument jsonDoc = QJsonDocument::fromJson(data.toLatin1());
+    if(jsonDoc.isObject()) {
+        QJsonObject rootObject = jsonDoc.object();
 
-    QJsonObject rootObject = jsonDoc.object();
-
-    updateStart(rootObject);
-    SerialProvisionData::update(rootObject);
+        updateStart(rootObject);
+        SerialProvisionData::update(rootObject);
+    }
 }
 
 void NvProvisionData::updateCalibration(const QUrl& url, const QString& md5) {

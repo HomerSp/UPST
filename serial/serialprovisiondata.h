@@ -24,6 +24,10 @@ namespace Serial {
         static QString getUser(SerialDevice* device, UserType type, const QString& userNai);
         static QString getPassword(SerialDevice* device, const QString& str);
 
+        bool valid() const {
+            return mValid;
+        }
+
         const QString& carrierSPC() const {
             return mCarrierSPC;
         }
@@ -73,6 +77,8 @@ namespace Serial {
         void updateObj(const QString& parent, const QJsonObject& obj);
 
         SerialDevice* mDevice;
+
+        bool mValid;
 
         QString mCarrierSPC;
         bool mSequentialOffline;

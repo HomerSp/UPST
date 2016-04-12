@@ -9,7 +9,8 @@
 using namespace Serial;
 
 SerialProvisionData::SerialProvisionData(SerialDevice* device)
-    : mDevice(device)
+    : mDevice(device),
+      mValid(false)
 {
     mSequentialOffline = false;
     mPassword16 = "";
@@ -28,7 +29,9 @@ void SerialProvisionData::resetCommands() {
 }
 
 void SerialProvisionData::update(const QJsonObject& rootObject) {
-    mCarrierSPC = rootObject["carrierSPC"].toString();
+    if(rootObject.contains("carrierSPC")) {
+        mCarrierSPC = rootObject["carrierSPC"].toString();
+    }
     if(rootObject.contains("sequentialOffline")) {
         mSequentialOffline = rootObject["sequentialOffline"].toString().toUInt() != 0;
     }
@@ -51,6 +54,8 @@ void SerialProvisionData::update(const QJsonObject& rootObject) {
         }
         updateCalibration(QUrl(rootObject["calibrationFile"].toString()), md5);
     }
+
+    mValid = true;
 }
 
 void SerialProvisionData::updateObj(const QString& parent, const QJsonObject& obj) {
