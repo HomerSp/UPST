@@ -1,110 +1,103 @@
 {
-	"devices":
-	[
-		{
-                        "make": "HTC",
-                        "model": "Rezound",
-                        "codename": "",
-                        "vid": "0x0bb4",
-                        "pid": "0x0fdc,0x0fdd",
-                        "type": "smartphone",
-                        "match_items":
-			[
-				{
-                                        "type": "nv",
-					"id": 8,
-                                        "datatype": "8bit",
-					"value": "0xcf"
-                                },
-                                {
-                                        "type": "nv",
-                                        "id": 30015,
-                                        "datatype": "string",
-                                        "offset": 55,
-                                        "value": "ADR6425LVW"
-                                }
-			]
-		},
-		{
-			"make": "Motorola",
-			"model": "RAZR M",
-			"codename": "XT905",
-			"vid": "0x22b8",
-			"pid": "0x2e29",
-                        "type": "smartphone",
-                        "match_items":
-			[
-				{
-                                        "type": "nv",
-					"id": 8,
-                                        "datatype": "8bit",
-					"value": "0xc5"
-				}
-			]
-		},
-		{
-			"make": "SAMSUNG",
-			"model": "Galaxy Discover",
-			"codename": "SCH-R740C",
-			"vid": "0x04e8",
-			"pid": "0x6860",
-                        "type": "smartphone",
-                        "match_items":
-			[
-				{
-                                        "type": "nv",
-					"id": 8,
-                                        "datatype": "8bit",
-					"value": "0xf1"
-				}
-			]
-		},
+    "devices": [
+        {
+            "make": "HTC",
+            "model": "Rezound",
+            "codename": "",
+            "vid": "0x0bb4",
+            "pid": "0x0fdc,0x0fdd",
+            "type": "smartphone",
+            "match_items": [
                 {
-			"make": "SAMSUNG",
-			"model": "Galaxy S5 Mini",
-			"codename": "G800R4",
-			"vid": "0x04e8",
-			"pid": "0x685d",
-                        "type": "smartphone",
-                        "match_items":
-			[
-				{
-                                        "type": "nv",
-					"id": 8,
-                                        "datatype": "8bit",
-					"value": "0xf3"
-				},
-				{
-                                        "type": "nv",
-					"id": 10002,
-                                        "datatype": "string",
-					"value": "800r4*"
-				}
-			]
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xcf"
                 },
                 {
-                        "make": "HTC",
-                        "model": "Desire 510",
-                        "codename": "0PCV1",
-                        "vid": "0x0bb4",
-                        "pid": "0x0f99",
-                        "type": "smartphone",
-                        "match_items":
-                        [
-                                {
-                                        "type": "nv",
-                                        "id": 7,
-                                        "datatype": "8bit",
-                                        "value": "0x64"
-                                },
-                                {
-                                        "type": "nv",
-                                        "id": 8,
-                                        "datatype": "8bit",
-                                        "value": "0x0"
-                                }
-                        ]
+                    "type": "nv",
+                    "id": 30015,
+                    "datatype": "string",
+                    "offset": 55,
+                    "value": "ADR6425LVW"
                 }
-
-	]
+            ]
+        },
+        {
+            "make": "Motorola",
+            "model": "RAZR M",
+            "codename": "XT905",
+            "vid": "0x22b8",
+            "pid": "0x2e29",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xc5"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "Galaxy Discover",
+            "codename": "SCH-R740C",
+            "vid": "0x04e8",
+            "pid": "0x6860",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf1"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "Galaxy S5 Mini",
+            "codename": "G800R4",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "800r4*"
+                }
+            ]
+        },
+        {
+            "make": "HTC",
+            "model": "Desire 510",
+            "codename": "0PCV1",
+            "vid": "0x0bb4",
+            "pid": "0x0f99",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 7,
+                    "datatype": "8bit",
+                    "value": "0x64"
+                },
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                }
+            ]
+        }
+    ]
 }
