@@ -8,7 +8,8 @@
 
 namespace UI {
     struct DeviceModelProgress {
-        int status;
+        Serial::SerialProvisionStatus status;
+        Serial::SerialProvisionError error;
         int min;
         int max;
         int current;
@@ -25,6 +26,7 @@ namespace UI {
             ProgressMinRole,
             ProgressCurrentRole,
             ProgressStatusRole,
+            ProgressErrorRole,
         };
 
         ConnectedDevicesModel(QObject* parent = 0);
@@ -40,10 +42,11 @@ namespace UI {
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
 
-        void setProgress(Serial::SerialDevice* device, int status, int current);
+        void setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error);
 
     private:
         QString getDeviceIcon(Serial::SerialDevice* device) const;
+        QString getProgressError(Serial::SerialProvisionError error) const;
 
         QList<Serial::SerialDevice*> mDevices;
         QMap<Serial::SerialDevice*, DeviceModelProgress*> mDeviceProgress;

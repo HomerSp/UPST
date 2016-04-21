@@ -1,5 +1,7 @@
 #include <QtGlobal>
 #include <QGuiApplication>
+#include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QStandardPaths>
@@ -8,6 +10,8 @@
 #include "ui/ui.h"
 #include "devicefilterevent.h"
 #include "serial/serialdeviceconfig.h"
+
+static QString sLogData = "";
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -23,8 +27,17 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     case QtDebugMsg:
         data += "[Debug]";
         break;
+    case QtInfoMsg:
+        data += "[Info]";
+        break;
     case QtWarningMsg:
         data += "[Warning]";
+        break;
+    case QtCriticalMsg:
+        data += "[Critical]";
+        break;
+    case QtFatalMsg:
+        data += "[Fatal]";
         break;
     default:
         data += "[Error]";
@@ -44,6 +57,11 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     file.close();
 
     QTextStream(stdout) << data;
+
+    sLogData += data + "\n";
+    if(LOG_LIMIT > 0 && sLogData.length() > LOG_LIMIT) {
+        sLogData.remove(0, sLogData.length() - LOG_LIMIT);
+    }
 }
 
 void updateConfigs() {
@@ -61,9 +79,11 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    qInfo()<<"Starting UPST"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
+
     updateConfigs();
 
-    UI::MainUI mainUI(app);
+    UI::MainUI mainUI(app, sLogData);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);

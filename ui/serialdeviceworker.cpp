@@ -279,8 +279,8 @@ void UI::SerialDeviceWorker::processLogin(LoginItem* item) {
     delete item;
 }
 
-void UI::SerialDeviceWorker::deviceProvisionProgressChanged(int status, int progress) {
-    qDebug()<<"deviceProvisionProgressChanged"<<status<<progress;
+void UI::SerialDeviceWorker::deviceProvisionProgressChanged(Serial::SerialProvisionStatus status, int progress, Serial::SerialProvisionError error) {
+    qDebug()<<"deviceProvisionProgressChanged"<<status<<progress<<error;
 
-    emit provisionProgressChanged(static_cast<Serial::SerialDevice*>(sender()), status, progress);
+    emit provisionProgressChanged(static_cast<Serial::SerialDevice*>(sender()), status, progress, error);
 }

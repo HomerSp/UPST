@@ -15,7 +15,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        MainUI(const QGuiApplication& app);
+        MainUI(const QGuiApplication& app, const QString& logData);
         ~MainUI();
 
         QQmlApplicationEngine* engine() {
@@ -68,6 +68,8 @@ namespace UI {
         void updateLoginStatus(bool loggedIn);
 
         const QGuiApplication& mApp;
+
+        const QString& mLogData;
 
         UISection* mSection;
 

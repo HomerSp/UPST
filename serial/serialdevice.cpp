@@ -82,11 +82,13 @@ bool SerialDevice::isValid() {
 }
 
 bool SerialDevice::provision() {
+    qInfo()<<"Provisioning"<<name();
+
     emit provisionProgressChanged(SerialProvisionStatusProgress, 0);
 
     QFile sourceFile(":/res/data/provision_data.json");
     if(!sourceFile.open(QFile::ReadOnly | QFile::Text)) {
-         emit provisionProgressChanged(SerialProvisionStatusError, 0);
+        emit provisionProgressChanged(SerialProvisionStatusError, 0, SerialProvisionErrorDownload);
         return false;
     }
 
@@ -94,7 +96,7 @@ bool SerialDevice::provision() {
 
     SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
     if(!provisionData->valid()) {
-        emit provisionProgressChanged(SerialProvisionStatusError, 1);
+        emit provisionProgressChanged(SerialProvisionStatusError, 1, SerialProvisionErrorData);
         delete provisionData;
         return false;
     }
@@ -323,7 +325,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
-        emit provisionProgressChanged(SerialProvisionStatusError, i);
+        emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
     }
 
     return ret;

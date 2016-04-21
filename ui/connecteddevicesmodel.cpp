@@ -31,6 +31,8 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
         return progress->current;
     case ProgressStatusRole:
         return progress->status;
+    case ProgressErrorRole:
+        return getProgressError(progress->error);
     }
 
     return "";
@@ -76,16 +78,30 @@ QString UI::ConnectedDevicesModel::getDeviceIcon(Serial::SerialDevice* device) c
     return "qrc:/res/images/icons/" + type + ".svg";
 }
 
+QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError error) const {
+    switch(error) {
+    case Serial::SerialProvisionErrorData:
+        return "Failed to parse provision data.";
+    case Serial::SerialProvisionErrorDownload:
+        return "Failed to download provision data.";
+    case Serial::SerialProvisionErrorNv:
+        return "Failed to write one or more items.";
+    default:
+        return "";
+    }
+}
+
 void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool added) {
     if(added) {
         QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
         mDevices.append(device);
 
         DeviceModelProgress* progress = new DeviceModelProgress();
+        progress->status = Serial::SerialProvisionStatusIdle;
+        progress->error = Serial::SerialProvisionErrorNone;
         progress->current = 0;
         progress->max = 100;
         progress->min = 0;
-        progress->status = 0;
         mDeviceProgress.insert(device, progress);
 
         QAbstractListModel::endInsertRows();
@@ -116,9 +132,10 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     }
 }
 
-void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int status, int current) {
+void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error) {
     DeviceModelProgress* progress = mDeviceProgress.find(device).value();
     progress->status = status;
+    progress->error = error;
     progress->current = current;
 
     deviceUpdate(device);

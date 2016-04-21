@@ -490,43 +490,6 @@ ApplicationWindow {
                 }
             }
 
-            Rectangle {
-                id: noDeviceOverlay
-                objectName: "noDeviceOverlay"
-                anchors.fill: mainPageLoader
-
-                color: "#f1f1f1"
-                visible: true
-                opacity: 1.0
-
-                z: 999
-
-                Text {
-                    anchors.centerIn: parent
-
-                    text: qsTr("No devices attached")
-                    font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.2)
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                }
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 300
-                        onRunningChanged: {
-                            if(running && noDeviceOverlay.opacity < 1.0) {
-                                noDeviceOverlay.visible = true;
-                            } else if(!running && noDeviceOverlay.opacity === 0.0) {
-                                noDeviceOverlay.visible = false;
-                            }
-                        }
-                    }
-                }
-            }
-
             RectangularGlow {
                 anchors.fill: mainPageBottomTabArrowRect
                 color: mainPageBottomTabShadow.color
@@ -698,6 +661,148 @@ ApplicationWindow {
                     }
                 }
             }
+
+            Rectangle {
+               id: provisionFailedContainer
+               objectName: 'provisionFailedContainer'
+               anchors.fill: parent
+               z: 100
+
+               color: '#33000000'
+               visible: false
+
+               Behavior on opacity {
+                   NumberAnimation {
+                       duration: 300
+                       onRunningChanged: {
+                           if(running && provisionFailedContainer.opacity < 1.0) {
+                               provisionFailedContainer.visible = true;
+                           } else if(!running && provisionFailedContainer.opacity === 0.0) {
+                               provisionFailedContainer.visible = false;
+                           }
+                       }
+                   }
+               }
+
+               MouseArea {
+                   anchors.fill: parent
+
+                   z: 101
+
+                   hoverEnabled: true
+               }
+
+
+               Column {
+                   anchors.fill: parent
+                   anchors.margins: unit.dp(8)
+                   z: 102
+
+                   opacity: 1.0
+
+                   Rectangle {
+                       id: provisionFailedHeaderContent
+                       anchors {left: parent.left; right: parent.right}
+                       height: provisionFailedHeaderClose.height + unit.dp(16)
+                       color: '#5f92eb'
+
+                       RowLayout {
+                           anchors.fill: parent
+                           anchors.margins: {left: unit.dp(8); right: unit.dp(8)}
+
+                           Text {
+                               Layout.fillWidth: true
+                               id: provisionFailedHeaderText
+                               color: "#ffffff"
+                               font.family: openSansBoldFont.name
+                               font.pixelSize: unit.em(1.2)
+                               text: qsTr("Provisioning failed")
+                           }
+
+                           UPButton {
+                               id: provisionFailedHeaderClose
+                               text: "X"
+                               height: provisionFailedHeaderText.height
+                               width: unit.dp(24)
+                           }
+                       }
+                   }
+
+                   Rectangle {
+                       anchors {left: parent.left; right: parent.right}
+                       height: provisionFailedContent.childrenRect.height + unit.dp(32)
+                       color: '#232b2e'
+
+                       ColumnLayout {
+                           id: provisionFailedContent
+                           anchors.fill: parent
+                           anchors.margins: unit.dp(16)
+                           spacing: unit.dp(8)
+
+                           Text {
+                               anchors {left: parent.left; right: parent.right}
+                               color: "#ffffff"
+                               font.family: openSansRegularFont.name
+                               font.pixelSize: unit.em(1.2)
+                               text: qsTr("An error occured while provisioning the device:")
+                           }
+                           Text {
+                               anchors {left: parent.left; right: parent.right}
+                               id: provisionFailedContentText
+                               color: "#ffffff"
+                               font.family: openSansRegularFont.name
+                               font.pixelSize: unit.em(1.2)
+                               text: qsTr("Unknown")
+                           }
+                           Text {
+                               anchors {left: parent.left; right: parent.right}
+                               color: "#ffffff"
+                               font.family: openSansRegularFont.name
+                               font.pixelSize: unit.em(1.2)
+                               text: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 555-55555.")
+                           }
+                       }
+                   }
+               }
+           }
+
+           Rectangle {
+               id: noDeviceOverlay
+               objectName: "noDeviceOverlay"
+               anchors.fill: parent
+
+               color: "#f1f1f1"
+               visible: true
+               opacity: 1.0
+
+               z: 999
+
+               Text {
+                   anchors.centerIn: parent
+
+                   text: qsTr("No devices attached")
+                   font.family: openSansRegularFont.name
+                   font.pixelSize: unit.em(1.2)
+               }
+
+               MouseArea {
+                   anchors.fill: parent
+                   hoverEnabled: true
+               }
+
+               Behavior on opacity {
+                   NumberAnimation {
+                       duration: 300
+                       onRunningChanged: {
+                           if(running && noDeviceOverlay.opacity < 1.0) {
+                               noDeviceOverlay.visible = true;
+                           } else if(!running && noDeviceOverlay.opacity === 0.0) {
+                               noDeviceOverlay.visible = false;
+                           }
+                       }
+                   }
+               }
+           }
         }
 
         Rectangle {
@@ -745,7 +850,10 @@ ApplicationWindow {
         }
 
         MouseArea {
+            z: 1000
+
             anchors.fill: parent
+            hoverEnabled: true
         }
 
         Behavior on opacity {

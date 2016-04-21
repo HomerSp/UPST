@@ -17,10 +17,18 @@ Item {
         id: openSansRegularFont;
         source: "qrc:/res/fonts/OpenSans-Regular.ttf"
     }
+    FontLoader {
+        id: openSansBoldFont;
+        source: "qrc:/res/fonts/OpenSans-Bold.ttf"
+    }
 
     GridLayout {
+        id: provisionViewLayout
         anchors.fill: parent
+        z: 99
+
         columns: 2
+
         Item {
             id: mdnContainer
             Layout.alignment: Qt.AlignLeft

@@ -25,6 +25,13 @@ namespace Serial {
         SerialProvisionStatusError,
     };
 
+    enum SerialProvisionError {
+        SerialProvisionErrorNone = 0,
+        SerialProvisionErrorDownload,
+        SerialProvisionErrorData,
+        SerialProvisionErrorNv,
+    };
+
     class SerialDevice : public QObject
     {
         Q_OBJECT
@@ -230,7 +237,7 @@ namespace Serial {
         }
 
     signals:
-        void provisionProgressChanged(int status, int progress);
+        void provisionProgressChanged(Serial::SerialProvisionStatus status, int progress, Serial::SerialProvisionError error = Serial::SerialProvisionErrorNone);
 
     private:
         bool provision(SerialProvisionData* data);

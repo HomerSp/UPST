@@ -8,9 +8,10 @@
 #include "section/manual.h"
 #include "section/provision.h"
 
-UI::MainUI::MainUI(const QGuiApplication& app)
+UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     : QObject(),
       mApp(app),
+      mLogData(logData),
       mSection(nullptr)
 {
     mDevicesModel = new UI::ConnectedDevicesModel();
@@ -124,6 +125,8 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         }
     }
 
+    qInfo()<<"Adding port"<<device->port();
+
     mDevices.append(device);
 
     emit deviceChanged(device, true);
@@ -220,6 +223,8 @@ void UI::MainUI::loginStatusChanged(bool success) {
         return;
     }
 
+    qInfo()<<"Logged in successfully!";
+
     updateLoginStatus(true);
 
     emit loggedIn();
@@ -234,7 +239,6 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 #ifdef TESTING_MODE
     rootObject->findChild<QObject*>("advancedMenu")->setProperty("visible", loggedIn);
 #endif
-
 
     rootObject->findChild<QObject*>("loginOverlay")->setProperty("opacity", (loggedIn)?0:1);
 }
