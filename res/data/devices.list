@@ -18,7 +18,7 @@
                     "type": "nv",
                     "id": 30015,
                     "datatype": "string",
-                    "offset": 55,
+                    "offset": 56,
                     "value": "ADR6425LVW"
                 }
             ]
@@ -40,7 +40,7 @@
             ]
         },
         {
-            "make": "SAMSUNG",
+            "make": "Samsung",
             "model": "Galaxy Discover",
             "codename": "SCH-R740C",
             "vid": "0x04e8",
@@ -56,13 +56,19 @@
             ]
         },
         {
-            "make": "SAMSUNG",
+            "make": "Samsung",
             "model": "Galaxy S5 Mini",
             "codename": "G800R4",
             "vid": "0x04e8",
             "pid": "0x685d",
             "type": "smartphone",
             "match_items": [
+                {
+                    "type": "nv",
+                    "id": 7,
+                    "datatype": "8bit",
+                    "value": "0x45a"
+                },
                 {
                     "type": "nv",
                     "id": 8,
@@ -96,6 +102,57 @@
                     "id": 8,
                     "datatype": "8bit",
                     "value": "0x0"
+                }
+            ]
+        },
+        {
+            "make": "HTC",
+            "model": "Droid Incredible",
+            "codename": "",
+            "vid": "0x0bb4",
+            "pid": "0x0e37",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xe5"
+                },
+                {
+                    "type": "nv",
+                    "id": 30015,
+                    "datatype": "string",
+                    "offset": 56,
+                    "value": "ADR6410LVW"
+                }
+            ]
+        },
+        {
+            "make": "Samsung",
+            "model": "Galaxy S3",
+            "codename": "SCH-R530U",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 7,
+                    "datatype": "8bit",
+                    "value": "0x41f"
+                },
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "R530U*"
                 }
             ]
         }
