@@ -57,7 +57,9 @@ void NvCommand::execute() {
             continue;
         }
 
-        resultData.remove(0, offset());
+        if(offset() > 0) {
+            resultData.remove(0, offset());
+        }
 
         result->setData(resultData);
     }
@@ -282,7 +284,7 @@ void NvCommandString::execute() {
 
         QByteArray resultData = result->data().toByteArray();
         QString data = "";
-        for(int x = 1; x < resultData.size(); x++) {
+        for(int x = 0; x < resultData.size(); x++) {
             if(resultData[x] == '\0') {
                 break;
             }

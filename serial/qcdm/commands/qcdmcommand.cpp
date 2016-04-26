@@ -101,7 +101,7 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
 
         data.remove(0, 1);
 
-        if(obeyOffset) {
+        if(obeyOffset && offset() > 0) {
             data.remove(0, offset());
         }
 
