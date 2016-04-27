@@ -185,7 +185,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi4510L",
+            "model": "Mifi4510L FIXME",
             "codename": "MiFi4510L",
             "vid": "0x1410",
             "pid": "0xb003",
@@ -207,7 +207,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi4510",
+            "model": "Mifi4510 FIXME",
             "codename": "MiFi4510",
             "vid": "0x1410",
             "pid": "0xb003",
@@ -310,7 +310,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Converse",
             "codename": "AN272",
             "vid": "0x1004",
@@ -322,11 +322,18 @@
                     "id": 8,
                     "datatype": "8bit",
                     "value": "0xa9"
+                },
+                {
+                    "type": "nv",
+                    "id": 23010,
+                    "datatype": "string",
+                    "offset": 1,
+                    "value": "LG-AN272"
                 }
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Wine 3",
             "codename": "UN530",
             "vid": "0x1004",
@@ -342,7 +349,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Freedom",
             "codename": "UN272",
             "vid": "0x1004",
@@ -354,6 +361,13 @@
                     "id": 8,
                     "datatype": "8bit",
                     "value": "0xa9"
+                },
+                {
+                    "type": "nv",
+                    "id": 23010,
+                    "datatype": "string",
+                    "offset": 1,
+                    "value": "LG-UN272"
                 }
             ]
         },
@@ -374,7 +388,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Optimus F7",
             "codename": "LG-US780",
             "vid": "0x1004",
@@ -390,7 +404,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Venice",
             "codename": "LG-LG730",
             "vid": "0x1004",
@@ -406,7 +420,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Optimus Elite",
             "codename": "VM696",
             "vid": "0x1004",
@@ -422,7 +436,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Optimus Elite",
             "codename": "LS696",
             "vid": "0x1004",
@@ -455,7 +469,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi2200 (Wireless Satus Port) TESTME",
+            "model": "Mifi2200 FIXME",
             "codename": "Mifi2200",
             "vid": "0x1410",
             "pid": "0x6000",
@@ -471,7 +485,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi2200 VZW (Wireless Satus Port) TESTME",
+            "model": "Mifi2200 V FIXME",
             "codename": "",
             "vid": "0x1410",
             "pid": "0x6000",
@@ -568,7 +582,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Optimus Zone",
             "codename": "VS410PP",
             "vid": "0x1004",
@@ -584,7 +598,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Optimus Zone 2",
             "codename": "VS415PP",
             "vid": "0x1004",
@@ -742,7 +756,7 @@
             ]
         },
         {
-            "make": "LG",
+            "make": "LGE",
             "model": "Fluid",
             "codename": "LG-AN160",
             "vid": "0x1004",
@@ -776,6 +790,28 @@
                     "id": 60124,
                     "datatype": "string",
                     "value": "MiFi5510L"
+                }
+            ]
+        },
+        {
+            "make": "LGE",
+            "model": "G3 U",
+            "codename": "LGUS990",
+            "vid": "0x1004",
+            "pid": "0x633e",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                },
+                {
+                    "type": "nv",
+                    "id": 33799,
+                    "datatype": "string",
+                    "value": "LGUS990"
                 }
             ]
         }
