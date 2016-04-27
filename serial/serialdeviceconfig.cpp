@@ -71,6 +71,8 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
             continue;
         }
 
+        qInfo()<<"Vid and Pid of"<<obj["make"].toString()<<obj["model"].toString()<<"matches, checking items...";
+
         bool isCorrect = true;
 
         if(obj.contains("match_items")) {
@@ -85,6 +87,8 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
         }
 
         if(isCorrect) {
+            qInfo()<<"Device"<<obj["make"].toString()<<obj["model"].toString()<<"is a match!";
+
             foundDevice = device->updateJson(obj);
             break;
         }
@@ -95,6 +99,11 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
 
 void SerialDeviceConfig::updateConfig() {
     QFile sourceFile(QStringLiteral(":/res/data/devices.list"));
+#ifdef TESTING_MODE
+    if(QFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json").exists()) {
+        sourceFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json");
+    }
+#endif
     QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
     if(targetFile.exists()) {
         if(QFileInfo(sourceFile).size() != QFileInfo(targetFile).size()) {
