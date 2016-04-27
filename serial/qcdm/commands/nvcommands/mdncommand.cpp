@@ -10,4 +10,6 @@ MDNCommand::MDNCommand(SerialDevice* device, bool read, QString data)
     QByteArray mdnData = data.toLatin1();
     mdnData.insert(0, (QChar)0x0);
     setData(mdnData, 0);
+
+    setOffset(1);
 }
