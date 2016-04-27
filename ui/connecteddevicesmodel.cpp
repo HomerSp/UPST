@@ -126,6 +126,18 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     for(int i = 0; i < mDevices.size(); i++) {
         if(*(mDevices[i]) == *(device)) {
             mDevices.replace(i, device);
+
+            // The device may have a new parent, so we need to find the child and update it to the new parent.
+            if(!mDeviceProgress.contains(device)) {
+                foreach(Serial::SerialDevice* child, device->deviceChildren()) {
+                    if(mDeviceProgress.contains(child)) {
+                        mDeviceProgress.insert(device, mDeviceProgress.value(child));
+                        mDeviceProgress.remove(child);
+                        break;
+                    }
+                }
+            }
+
             emit dataChanged(index(i), index(i));
             break;
         }

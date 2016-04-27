@@ -44,6 +44,10 @@ namespace Serial {
 
         void addChild(SerialDevice* device);
 
+        const QList<SerialDevice*> deviceChildren() const {
+            return mChildren;
+        }
+
         bool isSameDevice(SerialDevice* device);
         bool isValid();
 
