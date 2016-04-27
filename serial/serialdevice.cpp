@@ -39,8 +39,9 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
 
 {
     mCommunicator = new SerialCommunicator(*this);
-    mCommunicator->open();
-    mCommunicator->clear();
+    if(mCommunicator->open()) {
+        mCommunicator->clear();
+    }
 }
 
 SerialDevice::SerialDevice(const QSerialPortInfo& info)
@@ -152,14 +153,6 @@ bool SerialDevice::update() {
 
 bool SerialDevice::updateJson(const QJsonObject& obj) {
     if(obj.contains("make") && obj.contains("model") && obj.contains("type")) {
-        mMake = obj["make"].toString();
-        mModel = obj["model"].toString();
-
-        // This isn't a required parameter.
-        if(obj.contains("codename")) {
-            mCodename = obj["codename"].toString();
-        }
-
         QString type = obj["type"].toString();
         if(type == "smartphone") {
             mType = SerialDeviceTypeSmartphone;
@@ -171,6 +164,14 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
             mType = SerialDeviceTypeMifi;
         } else {
             return false;
+        }
+
+        mMake = obj["make"].toString();
+        mModel = obj["model"].toString();
+
+        // This isn't a required parameter.
+        if(obj.contains("codename")) {
+            mCodename = obj["codename"].toString();
         }
 
         return true;

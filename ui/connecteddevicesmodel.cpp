@@ -123,8 +123,10 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
 }
 
 void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
+    bool found = false;
     for(int i = 0; i < mDevices.size(); i++) {
         if(*(mDevices[i]) == *(device)) {
+            found = true;
             mDevices.replace(i, device);
 
             // The device may have a new parent, so we need to find the child and update it to the new parent.
@@ -141,6 +143,11 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
             emit dataChanged(index(i), index(i));
             break;
         }
+    }
+
+    // We couldn't find it in the list, add it as a new device
+    if(!found) {
+        deviceChanged(device, true);
     }
 }
 

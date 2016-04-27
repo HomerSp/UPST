@@ -148,10 +148,10 @@ namespace Serial {
         }
 
         QString vidStr() const {
-            return QString("%1").arg(mVid, 4, 16, QChar('0'));
+            return QString("%1").arg(mVid, 4, 16, QChar('0')).toUpper();
         }
         QString pidStr() const {
-            return QString("%1").arg(mPid, 4, 16, QChar('0'));
+            return QString("%1").arg(mPid, 4, 16, QChar('0')).toUpper();
         }
 
         QString name() const {
@@ -203,21 +203,21 @@ namespace Serial {
                 return "-";
             }
 
-            return QString("%1").arg(mESN, 8, 16, QChar('0'));
+            return QString("%1").arg(mESN, 8, 16, QChar('0')).toUpper();
         }
         QString meidStr() const {
             if(mMEID == 0) {
                 return "-";
             }
 
-            return QString("%1").arg(mMEID, 14, 16, QChar('0'));
+            return QString("%1").arg(mMEID, 14, 16, QChar('0')).toUpper();
         }
         QString imeiStr() const {
             if(mIMEI == 0) {
                 return "-";
             }
 
-            return QString("%1").arg(mIMEI, 14, 16, QChar('0'));
+            return QString("%1").arg(mIMEI, 14, 16, QChar('0')).toUpper();
         }
 
         QString newMdnStr() const {

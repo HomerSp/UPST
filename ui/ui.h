@@ -79,6 +79,7 @@ namespace UI {
 
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;
+        QList<Serial::SerialDevice*> mPendingDevices;
 
         int mCurrentIndex;
     };

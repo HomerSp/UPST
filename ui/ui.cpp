@@ -84,6 +84,14 @@ void UI::MainUI::devicesChanged() {
                 break;
             }
         }
+        if(shouldAdd) {
+            foreach(Serial::SerialDevice* d, mPendingDevices) {
+                if(*d == port) {
+                    shouldAdd = false;
+                    break;
+                }
+            }
+        }
 
         if(shouldAdd) {
             mWorker->addDeviceCheck(info);
@@ -98,6 +106,12 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
 
     // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
+        if(*d == *device) {
+            delete device;
+            return;
+        }
+    }
+    foreach(Serial::SerialDevice* d, mPendingDevices) {
         if(*d == *device) {
             delete device;
             return;
@@ -125,6 +139,21 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         }
     }
 
+    foreach(Serial::SerialDevice* d, mPendingDevices) {
+        if(device->isSameDevice(d)) {
+            device->addChild(d);
+            mPendingDevices.removeOne(d);
+            break;
+        }
+    }
+
+#ifndef TESTING_MODE
+    if(device->make().size() == 0) {
+        mPendingDevices.append(device);
+        return;
+    }
+#endif
+
     qInfo()<<"Adding port"<<device->port();
 
     mDevices.append(device);
@@ -146,6 +175,17 @@ void UI::MainUI::deviceRemove(const QString& port) {
             break;
         }
     }
+    for(int i = 0; i < mPendingDevices.size(); i++) {
+        if(*mPendingDevices.at(i) == port) {
+            Serial::SerialDevice* device = mPendingDevices[i];
+            mPendingDevices.removeAt(i);
+
+            mWorker->addDeviceRemove(device);
+
+            break;
+        }
+    }
+
 
     viewUpdate();
 }
