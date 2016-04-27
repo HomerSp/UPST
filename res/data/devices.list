@@ -5,7 +5,7 @@
             "model": "Rezound",
             "codename": "",
             "vid": "0x0bb4",
-            "pid": "0x0fdc,0x0fdd",
+            "pid": "0x0fdd,0x0fdc",
             "type": "smartphone",
             "match_items": [
                 {
@@ -24,69 +24,32 @@
             ]
         },
         {
-            "make": "Motorola",
-            "model": "RAZR M",
-            "codename": "XT905",
-            "vid": "0x22b8",
-            "pid": "0x2e29",
+            "make": "HTC",
+            "model": "Droid Incredible",
+            "codename": "",
+            "vid": "0x0bb4",
+            "pid": "0x0e38",
             "type": "smartphone",
             "match_items": [
                 {
                     "type": "nv",
                     "id": 8,
                     "datatype": "8bit",
-                    "value": "0xc5"
-                }
-            ]
-        },
-        {
-            "make": "Samsung",
-            "model": "Galaxy Discover",
-            "codename": "SCH-R740C",
-            "vid": "0x04e8",
-            "pid": "0x6860",
-            "type": "smartphone",
-            "match_items": [
-                {
-                    "type": "nv",
-                    "id": 8,
-                    "datatype": "8bit",
-                    "value": "0xf1"
-                }
-            ]
-        },
-        {
-            "make": "Samsung",
-            "model": "Galaxy S5 Mini",
-            "codename": "G800R4",
-            "vid": "0x04e8",
-            "pid": "0x685d",
-            "type": "smartphone",
-            "match_items": [
-                {
-                    "type": "nv",
-                    "id": 7,
-                    "datatype": "8bit",
-                    "value": "0x45a"
+                    "value": "0xe5"
                 },
                 {
                     "type": "nv",
-                    "id": 8,
-                    "datatype": "8bit",
-                    "value": "0xf3"
-                },
-                {
-                    "type": "nv",
-                    "id": 10002,
+                    "id": 30015,
                     "datatype": "string",
-                    "value": "800r4*"
+                    "offset": 56,
+                    "value": "ADR6410LVW"
                 }
             ]
         },
         {
             "make": "HTC",
             "model": "Desire 510",
-            "codename": "0PCV1",
+            "codename": "",
             "vid": "0x0bb4",
             "pid": "0x0f99",
             "type": "smartphone",
@@ -106,42 +69,172 @@
             ]
         },
         {
-            "make": "HTC",
-            "model": "Droid Incredible",
-            "codename": "",
-            "vid": "0x0bb4",
-            "pid": "0x0e37",
+            "make": "Motorola",
+            "model": "RAZR M",
+            "codename": "XT905",
+            "vid": "0x22b8",
+            "pid": "0x2e29",
             "type": "smartphone",
             "match_items": [
                 {
                     "type": "nv",
                     "id": 8,
                     "datatype": "8bit",
-                    "value": "0xe5"
+                    "value": "0xc5"
                 },
                 {
                     "type": "nv",
                     "id": 30015,
                     "datatype": "string",
                     "offset": 56,
-                    "value": "ADR6410LVW"
+                    "value": "0PCV1"
                 }
             ]
         },
         {
-            "make": "Samsung",
-            "model": "Galaxy S3",
-            "codename": "SCH-R530U",
+            "make": "Kyocera",
+            "model": "Duraforce",
+            "codename": "",
+            "vid": "0x0482",
+            "pid": "0x09b3",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x2"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "G800R4",
+            "codename": "",
             "vid": "0x04e8",
             "pid": "0x685d",
             "type": "smartphone",
             "match_items": [
                 {
                     "type": "nv",
-                    "id": 7,
+                    "id": 8,
                     "datatype": "8bit",
-                    "value": "0x41f"
+                    "value": "0xf3"
                 },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "800r4*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R740C",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x6860",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf1"
+                },
+                {
+                    "type": "nv",
+                    "id": 10215,
+                    "datatype": "string",
+                    "value": "R740C*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SM-B311V",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x6640",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf1"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "Mifi 5792",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0xb007",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "Mifi 4510L",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0xb003",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xd2"
+                },
+                {
+                    "type": "nv",
+                    "id": 60124,
+                    "datatype": "string",
+                    "value": "MiFi4510L"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "Mifi 4510",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0xb003",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xd2"
+                },
+                {
+                    "type": "nv",
+                    "id": 60124,
+                    "datatype": "string",
+                    "value": "MiFi4510"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R530U",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
                 {
                     "type": "nv",
                     "id": 8,
@@ -153,6 +246,530 @@
                     "id": 10002,
                     "datatype": "string",
                     "value": "R530U*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "G900V",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf1"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "900V*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R970",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R530C",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "530C*"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "AN272",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xa9"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "UN530",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xb7"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "UN272",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xa9"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R530x",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "LG-US780",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x61f1",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xb4"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "LG-LG730",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x61f1",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xc4"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "VM696",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xc4"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "LS696",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6310",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xc4"
+                }
+            ]
+        },
+        {
+            "make": "Motorola",
+            "model": "XT1031",
+            "codename": "",
+            "vid": "0x22b8",
+            "pid": "0x2e29",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xd1"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "Mifi2200",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x77"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "i500",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x6640",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xfe"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "i535",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x6860",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf1"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "535*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SM-G920P",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xdf"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "920P*"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SM-G920R7",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xdf"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "920R7"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "VS410PP",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6244",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xb6"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "VS415PP",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6258",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R830",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "830*"
+                }
+            ]
+        },
+        {
+            "make": "HTC",
+            "model": "ADR6410LVW",
+            "codename": "",
+            "vid": "0x0bb4",
+            "pid": "0x0e37",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xe5"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SCH-R530M",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x6860",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "530M*"
+                }
+            ]
+        },
+        {
+            "make": "ZTE",
+            "model": "N9101",
+            "codename": "",
+            "vid": "0x19d2",
+            "pid": "0x0112",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xec"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SPH-M840",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xc8"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "EV0*"
+                }
+            ]
+        },
+        {
+            "make": "Pantech",
+            "model": "ADR8995",
+            "codename": "",
+            "vid": "0x10a9",
+            "pid": "0x6031",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x2a"
+                }
+            ]
+        },
+        {
+            "make": "SAMSUNG",
+            "model": "SM-G900R4",
+            "codename": "",
+            "vid": "0x04e8",
+            "pid": "0x685d",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xf3"
+                },
+                {
+                    "type": "nv",
+                    "id": 10002,
+                    "datatype": "string",
+                    "value": "900R4*"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "Mifi510L",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0xb00a",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                }
+            ]
+        },
+        {
+            "make": "LG",
+            "model": "LG-AN160",
+            "codename": "",
+            "vid": "0x1004",
+            "pid": "0x6000",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0xb0"
+                }
+            ]
+        },
+        {
+            "make": "Novatel",
+            "model": "MiFi5510L",
+            "codename": "",
+            "vid": "0x1410",
+            "pid": "0xb00a",
+            "type": "smartphone",
+            "match_items": [
+                {
+                    "type": "nv",
+                    "id": 8,
+                    "datatype": "8bit",
+                    "value": "0x0"
+                },
+                {
+                    "type": "nv",
+                    "id": 71,
+                    "datatype": "string",
+                    "value": " MiFi5510L"
                 }
             ]
         }
