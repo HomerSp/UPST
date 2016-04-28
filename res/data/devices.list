@@ -469,7 +469,7 @@
         },
         {
             "make": "Novatel",
-            "model": "MiFi2200 (Wireless Satus Port) TESTME",
+            "model": "MiFi2200 TESTME",
             "codename": "MiFi2200",
             "vid": "0x1410",
             "pid": "0x6000",
@@ -491,7 +491,7 @@
         },
         {
             "make": "Novatel",
-            "model": "MiFi2200 VZW (Wireless Satus Port) TESTME",
+            "model": "MiFi2200 V TESTME",
             "codename": "MiFi2200 VZW",
             "vid": "0x1410",
             "pid": "0x6000",
@@ -507,7 +507,7 @@
                     "type": "nv",
                     "id": 10030,
                     "datatype": "string",
-                    "value": "MiFi2200"
+                    "value": "MiFi2200 VZW"
                 }
             ]
         },
