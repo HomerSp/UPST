@@ -11,13 +11,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xcf"
                 },
                 {
                     "type": "nv",
                     "id": 30015,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "offset": 56,
                     "value": "ADR6425LVW"
                 }
@@ -34,13 +34,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xe5"
                 },
                 {
                     "type": "nv",
                     "id": 30015,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "offset": 56,
                     "value": "ADR6410LVW"
                 }
@@ -57,19 +57,19 @@
                 {
                     "type": "nv",
                     "id": 7,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x64"
                 },
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x0"
                 },
                 {
                     "type": "nv",
                     "id": 30015,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "offset": 56,
                     "value": "0PCV1"
                 }
@@ -86,7 +86,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xc5"
                 }
             ]
@@ -102,7 +102,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x2"
                 }
             ]
@@ -118,13 +118,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "800r4*"
                 }
             ]
@@ -140,13 +140,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf1"
                 },
                 {
                     "type": "nv",
                     "id": 10215,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "R740C*"
                 }
             ]
@@ -162,7 +162,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf1"
                 }
             ]
@@ -178,8 +178,16 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x0"
+                },
+                {
+                    "type": "qcdm",
+                    "id": 75,
+                    "data": "FA0B00",
+                    "offset": 3,
+                    "datatype": "string",
+                    "value": "MiFi5792"
                 }
             ]
         },
@@ -194,13 +202,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xd2"
                 },
                 {
                     "type": "nv",
                     "id": 60124,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi4510L"
                 }
             ]
@@ -216,13 +224,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xd2"
                 },
                 {
                     "type": "nv",
                     "id": 60124,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi4510"
                 }
             ]
@@ -238,13 +246,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "R530U*"
                 }
             ]
@@ -260,13 +268,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf1"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "900V*"
                 }
             ]
@@ -282,7 +290,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 }
             ]
@@ -298,13 +306,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "R530C*"
                 }
             ]
@@ -320,13 +328,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xa9"
                 },
                 {
                     "type": "nv",
                     "id": 23010,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "offset": 1,
                     "value": "LG-AN272"
                 }
@@ -343,7 +351,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xb7"
                 }
             ]
@@ -359,13 +367,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xa9"
                 },
                 {
                     "type": "nv",
                     "id": 23010,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "offset": 1,
                     "value": "LG-UN272"
                 }
@@ -382,7 +390,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 }
             ]
@@ -398,7 +406,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xb4"
                 }
             ]
@@ -414,7 +422,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xc4"
                 }
             ]
@@ -430,7 +438,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xc4"
                 }
             ]
@@ -446,7 +454,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xc4"
                 }
             ]
@@ -462,7 +470,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xd1"
                 }
             ]
@@ -478,13 +486,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x77"
                 },
                 {
                     "type": "nv",
                     "id": 10030,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi2200"
                 }
             ]
@@ -500,13 +508,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x77"
                 },
                 {
                     "type": "nv",
                     "id": 10030,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi2200 VZW"
                 }
             ]
@@ -522,7 +530,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xfe"
                 }
             ]
@@ -538,13 +546,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf1"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "535*"
                 }
             ]
@@ -560,13 +568,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xdf"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "920P*"
                 }
             ]
@@ -582,13 +590,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xdf"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "920R7"
                 }
             ]
@@ -604,7 +612,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xb6"
                 }
             ]
@@ -620,7 +628,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x0"
                 }
             ]
@@ -636,13 +644,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "830*"
                 }
             ]
@@ -658,13 +666,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "530M*"
                 }
             ]
@@ -680,7 +688,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xec"
                 }
             ]
@@ -696,13 +704,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xc8"
                 },
                 {
                     "type": "nv",
                     "id": 10215,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "M840*"
                 }
             ]
@@ -718,7 +726,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x2a"
                 }
             ]
@@ -734,13 +742,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "900R4*"
                 }
             ]
@@ -756,13 +764,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xf3"
                 },
                 {
                     "type": "nv",
                     "id": 10002,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "900R4*"
                 }
             ]
@@ -778,7 +786,7 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0xb0"
                 }
             ]
@@ -794,13 +802,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x0"
                 },
                 {
                     "type": "nv",
                     "id": 60124,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi5510L"
                 }
             ]
@@ -816,13 +824,13 @@
                 {
                     "type": "nv",
                     "id": 8,
-                    "datatype": "8bit",
+                    "valuetype": "8bit",
                     "value": "0x0"
                 },
                 {
                     "type": "nv",
                     "id": 33799,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "LGUS990"
                 }
             ]

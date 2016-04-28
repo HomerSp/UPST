@@ -4,15 +4,7 @@
 #include "serialdevice.h"
 
 namespace Serial {
-    class SerialItemParser
-    {
-    public:
-        SerialItemParser(SerialDevice* device);
-
-        bool checkItem(const QJsonObject& obj);
-        Serial::SerialCommand* getItem(const QJsonObject& obj);
-
-    private:
+    namespace ItemParser {
         enum ItemType {
             ItemTypeNone,
             ItemTypeAT,
@@ -20,27 +12,108 @@ namespace Serial {
             ItemTypeNV,
         };
 
-        enum DataType {
-            DataTypeNone,
-            DataType8Bit,
-            DataType16Bit,
-            DataType32Bit,
-            DataType64Bit,
-            DataTypeString,
-            DataTypeRaw,
+        enum ValueType {
+            ValueTypeNone,
+            ValueType8Bit,
+            ValueType16Bit,
+            ValueType32Bit,
+            ValueType64Bit,
+            ValueTypeString,
+            ValueTypeRaw,
         };
 
-        bool checkItem(SerialDevice* device, ItemType itemType, DataType type, const QVariant& checkData, QVariant& outData, uint16_t id = 0);
-        Serial::SerialCommand* getItem(const QJsonObject& obj, bool isCheck, QVariant& checkData, uint16_t& id);
+        class DataItem {
+        public:
+            DataItem(const QJsonObject& obj);
+            virtual ~DataItem() {
 
-        bool nvDataEquals(const QVariant& checkData, const QVariant& nvData);
+            }
 
-        ItemType getItemType(const QString& itemType);
-        Serial::SerialCommand* getItem(ItemType itemType, DataType dataType, QVariant checkData = 0, uint16_t id = 0);
-        QVariant getValue(const QString& type, const QString& checkData, DataType& outType);
+            bool equals(const QVariant& value);
+
+            virtual Serial::SerialCommand* getCommand(Serial::SerialDevice* device) = 0;
+
+            virtual QString hashID() const = 0;
+
+            static ItemType getItemType(const QString& type);
+
+        protected:
+            ItemType itemType() const {
+                return mItemType;
+            }
+            int offset() const {
+                return mOffset;
+            }
+            ValueType valueType() const {
+                return mValueType;
+            }
+            QVariant value() const {
+                return mValue;
+            }
+
+            ValueType getValueType(const QString& type) const;
+            QVariant getValue(const QString& value, ValueType type) const;
+
+        private:
+            ItemType mItemType;
+
+            int mOffset;
+            ValueType mValueType;
+            QVariant mValue;
+        };
+
+        class QcdmDataItem : public DataItem {
+        public:
+            QcdmDataItem(const QJsonObject& obj);
+            virtual ~QcdmDataItem() {
+
+            }
+
+            virtual Serial::SerialCommand* getCommand(Serial::SerialDevice* device);
+
+            virtual QString hashID() const;
+
+        protected:
+            int id() const {
+                return mID;
+            }
+            ValueType dataType() const {
+                return mDataType;
+            }
+            QVariant data() const {
+                return mData;
+            }
+
+        private:
+            int mID;
+
+            ValueType mDataType;
+            QVariant mData;
+        };
+
+        class NvDataItem : public QcdmDataItem {
+        public:
+            NvDataItem(const QJsonObject& obj);
+            virtual ~NvDataItem() {
+
+            }
+
+            virtual Serial::SerialCommand* getCommand(SerialDevice *device);
+        };
+    }
+
+    class SerialItemParser
+    {
+    public:
+        SerialItemParser(SerialDevice* device);
+
+        bool checkItem(const QJsonObject& obj);
+
+    private:
+        ItemParser::DataItem* getDataItem(const QJsonObject& obj);
 
         SerialDevice* mDevice;
-        QHash<int, QVariant> mCachedData;
+        QHash<QString, QVariant> mCachedData;
     };
 }
 

@@ -61,6 +61,10 @@ namespace Serial {
                 {
                 public:
                     NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint8_t data = 0);
+                    NvCommand8Bit(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+                        : NvCommand(device, read, item, data) {
+
+                    }
 
                     virtual void execute();
 
@@ -73,6 +77,10 @@ namespace Serial {
                 {
                 public:
                     NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint16_t data = 0);
+                    NvCommand16Bit(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+                        : NvCommand(device, read, item, data) {
+
+                    }
 
                     virtual void execute();
 
@@ -86,6 +94,10 @@ namespace Serial {
                 {
                 public:
                     NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint32_t data = 0);
+                    NvCommand32Bit(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+                        : NvCommand(device, read, item, data) {
+
+                    }
 
                     virtual void execute();
 
@@ -99,6 +111,10 @@ namespace Serial {
                 {
                 public:
                     NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, uint64_t data = 0);
+                    NvCommand64Bit(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+                        : NvCommand(device, read, item, data) {
+
+                    }
 
                     virtual void execute();
 
@@ -111,8 +127,11 @@ namespace Serial {
                 {
                 public:
                     NvCommandString(SerialDevice* device, bool read, QCDM::NvItem item, QString data = "")
-                        : NvCommand(device, read, item, data.toLatin1())
-                    {
+                        : NvCommand(device, read, item, data.toLatin1()) {
+
+                    }
+                    NvCommandString(SerialDevice* device, bool read, QCDM::NvItem item, QByteArray data)
+                        : NvCommand(device, read, item, data) {
 
                     }
 
