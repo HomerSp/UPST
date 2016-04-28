@@ -77,18 +77,14 @@ namespace Serial {
             int id() const {
                 return mID;
             }
-            ValueType dataType() const {
-                return mDataType;
-            }
-            QVariant data() const {
+            QByteArray data() const {
                 return mData;
             }
 
         private:
             int mID;
 
-            ValueType mDataType;
-            QVariant mData;
+            QByteArray mData;
         };
 
         class NvDataItem : public QcdmDataItem {

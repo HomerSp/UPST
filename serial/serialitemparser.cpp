@@ -109,22 +109,18 @@ QVariant ItemParser::DataItem::getValue(const QString &value, ValueType type) co
 ItemParser::QcdmDataItem::QcdmDataItem(const QJsonObject &obj)
     : ItemParser::DataItem(obj),
       mID(0),
-      mDataType(ValueTypeNone),
       mData(0)
 {
     if(obj.contains("id")) {
         mID = obj["id"].toInt();
     }
-    if(obj.contains("datatype")) {
-        mDataType = getValueType(obj["datatype"].toString());
-    }
     if(obj.contains("data")) {
-        mData = getValue(obj["data"].toString(), mDataType);
+        mData = QByteArray::fromHex(obj["data"].toString().toLatin1());
     }
 }
 
 Serial::SerialCommand* ItemParser::QcdmDataItem::getCommand(Serial::SerialDevice* device) {
-    Serial::SerialCommand* cmd = new Serial::QCDM::Commands::QcdmCommand(device, static_cast<Serial::QCDM::DiagCommands>(id()), data().toByteArray());
+    Serial::SerialCommand* cmd = new Serial::QCDM::Commands::QcdmCommand(device, static_cast<Serial::QCDM::DiagCommands>(id()), data());
     if(cmd != nullptr) {
         cmd->setOffset(offset());
     }
@@ -133,22 +129,10 @@ Serial::SerialCommand* ItemParser::QcdmDataItem::getCommand(Serial::SerialDevice
 
 QString ItemParser::QcdmDataItem::hashID() const {
     QString ret = QString::number(mID);
-    switch(mDataType) {
-    case ValueType8Bit:
-    case ValueType16Bit:
-    case ValueType32Bit:
-        ret += QString::number(mData.toUInt());
-    case ValueType64Bit:
-        ret += QString::number(mData.toULongLong());
-        break;
-    case ValueTypeString:
-        ret += mData.toString();
-        break;
-    case ValueTypeRaw:
-        ret += QString(mData.toString().toLatin1().toHex());
-    default:
-        break;
+    if(mData.size() > 0) {
+        ret += QString(mData.toHex());
     }
+
     return ret;
 }
 
@@ -163,27 +147,27 @@ Serial::SerialCommand* ItemParser::NvDataItem::getCommand(SerialDevice *device) 
     Serial::QCDM::NvItem id = static_cast<Serial::QCDM::NvItem>(QcdmDataItem::id());
     switch(valueType()) {
         case ValueType8Bit: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommand8Bit(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommand8Bit(device, true, id, data());
             break;
         }
         case ValueType16Bit: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommand16Bit(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommand16Bit(device, true, id, data());
             break;
         }
         case ValueType32Bit: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommand32Bit(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommand32Bit(device, true, id, data());
             break;
         }
         case ValueType64Bit: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommand64Bit(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommand64Bit(device, true, id, data());
             break;
         }
         case ValueTypeString: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommandString(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommandString(device, true, id, data());
             break;
         }
         case ValueTypeRaw: {
-            cmd = new Serial::QCDM::Commands::Nv::NvCommand(device, true, id, data().toByteArray());
+            cmd = new Serial::QCDM::Commands::Nv::NvCommand(device, true, id, data());
             break;
         }
         default: {
