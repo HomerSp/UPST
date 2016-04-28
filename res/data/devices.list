@@ -78,7 +78,7 @@
         {
             "make": "Motorola",
             "model": "RAZR M",
-            "codename": "",
+            "codename": "XT907",
             "vid": "0x22b8",
             "pid": "0x2e29",
             "type": "smartphone",
@@ -110,7 +110,7 @@
         {
             "make": "Samsung",
             "model": "Galaxy S5 Mini",
-            "codename": "G800R4",
+            "codename": "SM-G800R4",
             "vid": "0x04e8",
             "pid": "0x685d",
             "type": "smartphone",
@@ -131,7 +131,7 @@
         },
         {
             "make": "Samsung",
-            "model": "Galaxy S3 C",
+            "model": "Galaxy Discover",
             "codename": "SCH-R740C",
             "vid": "0x04e8",
             "pid": "0x6860",
@@ -169,7 +169,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi 5792",
+            "model": "MiFi5792",
             "codename": "",
             "vid": "0x1410",
             "pid": "0xb007",
@@ -185,7 +185,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi4510L FIXME",
+            "model": "Mifi4510L",
             "codename": "MiFi4510L",
             "vid": "0x1410",
             "pid": "0xb003",
@@ -207,7 +207,7 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi4510 FIXME",
+            "model": "Mifi4510",
             "codename": "MiFi4510",
             "vid": "0x1410",
             "pid": "0xb003",
@@ -252,7 +252,7 @@
         {
             "make": "Samsung",
             "model": "Galaxy S5 V",
-            "codename": "G900V",
+            "codename": "SM-G900V",
             "vid": "0x04e8",
             "pid": "0x685d",
             "type": "smartphone",
@@ -274,7 +274,7 @@
         {
             "make": "Samsung",
             "model": "SCH-R970 TESTME",
-            "codename": "",
+            "codename": "SCH-R970",
             "vid": "0x04e8",
             "pid": "0x685d",
             "type": "smartphone",
@@ -305,14 +305,14 @@
                     "type": "nv",
                     "id": 10002,
                     "datatype": "string",
-                    "value": "530C*"
+                    "value": "R530C*"
                 }
             ]
         },
         {
             "make": "LGE",
             "model": "Converse",
-            "codename": "AN272",
+            "codename": "AN272    169",
             "vid": "0x1004",
             "pid": "0x6000",
             "type": "featurephone",
@@ -335,7 +335,7 @@
         {
             "make": "LGE",
             "model": "Wine 3",
-            "codename": "UN530",
+            "codename": "UN530    183",
             "vid": "0x1004",
             "pid": "0x6000",
             "type": "featurephone",
@@ -351,7 +351,7 @@
         {
             "make": "LGE",
             "model": "Freedom",
-            "codename": "UN272",
+            "codename": "UN272    169",
             "vid": "0x1004",
             "pid": "0x6000",
             "type": "featurephone",
@@ -422,7 +422,7 @@
         {
             "make": "LGE",
             "model": "Optimus Elite",
-            "codename": "VM696",
+            "codename": "LG-VM696",
             "vid": "0x1004",
             "pid": "0x6000",
             "type": "smartphone",
@@ -437,8 +437,8 @@
         },
         {
             "make": "LGE",
-            "model": "Optimus Elite",
-            "codename": "LS696",
+            "model": "Optimus Elite S",
+            "codename": "LG-LS696  196",
             "vid": "0x1004",
             "pid": "0x6310",
             "type": "smartphone",
@@ -469,8 +469,8 @@
         },
         {
             "make": "Novatel",
-            "model": "Mifi2200 FIXME",
-            "codename": "Mifi2200",
+            "model": "MiFi2200 (Wireless Satus Port) TESTME",
+            "codename": "MiFi2200",
             "vid": "0x1410",
             "pid": "0x6000",
             "type": "mifi",
@@ -480,13 +480,19 @@
                     "id": 8,
                     "datatype": "8bit",
                     "value": "0x77"
+                },
+                {
+                    "type": "nv",
+                    "id": 10030,
+                    "datatype": "string",
+                    "value": "MiFi2200"
                 }
             ]
         },
         {
             "make": "Novatel",
-            "model": "Mifi2200 V FIXME",
-            "codename": "",
+            "model": "MiFi2200 VZW (Wireless Satus Port) TESTME",
+            "codename": "MiFi2200 VZW",
             "vid": "0x1410",
             "pid": "0x6000",
             "type": "mifi",
@@ -496,13 +502,19 @@
                     "id": 8,
                     "datatype": "8bit",
                     "value": "0x77"
+                },
+                {
+                    "type": "nv",
+                    "id": 10030,
+                    "datatype": "string",
+                    "value": "MiFi2200"
                 }
             ]
         },
         {
             "make": "Samsung",
             "model": "Showcase",
-            "codename": "i500",
+            "codename": "SCH-I500",
             "vid": "0x04e8",
             "pid": "0x6640",
             "type": "smartphone",
@@ -584,7 +596,7 @@
         {
             "make": "LGE",
             "model": "Optimus Zone",
-            "codename": "VS410PP",
+            "codename": "LG-VS410PP",
             "vid": "0x1004",
             "pid": "0x6244",
             "type": "smartphone",
