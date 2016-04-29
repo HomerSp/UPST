@@ -186,7 +186,7 @@
                     "id": 75,
                     "data": "FA0B00",
                     "offset": 3,
-                    "datatype": "string",
+                    "valuetype": "string",
                     "value": "MiFi5792"
                 }
             ]
