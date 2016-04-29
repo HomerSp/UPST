@@ -257,10 +257,6 @@ bool SerialItemParser::checkItem(const QJsonObject &obj) {
         return false;
     }
 
-    if(obj.contains("offset")) {
-        cmd->setOffset(obj["offset"].toInt());
-    }
-
     cmd->execute();
     if(!cmd->resultSuccess()) {
         delete cmd;
