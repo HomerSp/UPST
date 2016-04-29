@@ -273,7 +273,9 @@ bool SerialItemParser::checkItem(const QJsonObject &obj) {
 
     delete cmd;
 
-    return dataItem->equals(outData);
+    bool ret = dataItem->equals(outData);
+    delete dataItem;
+    return ret;
 }
 
 ItemParser::DataItem *SerialItemParser::getDataItem(const QJsonObject &obj) {
