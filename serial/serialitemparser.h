@@ -31,8 +31,9 @@ namespace Serial {
 
             bool equals(const QVariant& value);
 
-            virtual Serial::SerialCommand* getCommand(Serial::SerialDevice* device) = 0;
+            QVariant getItemValue(const QVariant &value);
 
+            virtual Serial::SerialCommand* getCommand(Serial::SerialDevice* device) = 0;
             virtual QString hashID() const = 0;
 
             static ItemType getItemType(const QString& type);

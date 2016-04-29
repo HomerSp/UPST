@@ -55,6 +55,57 @@ bool ItemParser::DataItem::equals(const QVariant &value) {
     return mValue == value;
 }
 
+QVariant ItemParser::DataItem::getItemValue(const QVariant &value) {
+    // We may need to convert the value.
+    if(value.type() == QVariant::ByteArray && valueType() != ItemParser::ValueTypeRaw) {
+        switch(mValueType) {
+        case ValueType8Bit:
+        case ValueType16Bit:
+        case ValueType32Bit:
+        case ValueType64Bit: {
+            QByteArray data = value.toByteArray();
+
+            uint64_t val = static_cast<uint64_t>(data[0] & 0xFF);
+            if(mValueType > ValueType8Bit) {
+                val |= static_cast<uint64_t>(data[1] & 0xFF) << 8;
+                if(mValueType > ValueType16Bit) {
+                    val |= static_cast<uint64_t>(data[2] & 0xFF) << 16;
+                    val |= static_cast<uint64_t>(data[3] & 0xFF) << 24;
+                    if(mValueType > ValueType32Bit) {
+                        val |= static_cast<uint64_t>(data[4] & 0xFF) << 32;
+                        val |= static_cast<uint64_t>(data[5] & 0xFF) << 40;
+                        val |= static_cast<uint64_t>(data[6] & 0xFF) << 48;
+                        val |= static_cast<uint64_t>(data[7] & 0xFF) << 56;
+                    }
+                }
+            }
+
+            switch(mValueType) {
+            case ValueType8Bit:
+                return static_cast<uint8_t>(val);
+            case ValueType16Bit:
+                return static_cast<uint16_t>(val);
+            case ValueType32Bit:
+                return static_cast<uint32_t>(val);
+            default:
+                break;
+            }
+
+            return val;
+        }
+        case ValueTypeString:
+            return QString(value.toByteArray());
+        default:
+            break;
+        }
+
+        return value.toByteArray();
+    }
+
+    return value;
+}
+
+
 ItemParser::ItemType ItemParser::DataItem::getItemType(const QString &type) {
     if(type == "at") {
         return ItemTypeAT;
@@ -217,7 +268,7 @@ bool SerialItemParser::checkItem(const QJsonObject &obj) {
         return false;
     }
 
-    QVariant outData = cmd->result()->data();
+    QVariant outData = dataItem->getItemValue(cmd->result()->data());
     mCachedData.insert(hashID, outData);
 
     delete cmd;
