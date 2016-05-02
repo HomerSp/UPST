@@ -241,7 +241,7 @@ namespace Serial {
         }
 
     signals:
-        void provisionProgressChanged(Serial::SerialProvisionStatus status, int progress, Serial::SerialProvisionError error = Serial::SerialProvisionErrorNone);
+        void provisionProgressChanged(int status, int progress, int error = Serial::SerialProvisionErrorNone);
 
     private:
         bool provision(SerialProvisionData* data);

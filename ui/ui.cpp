@@ -40,8 +40,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
     QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
-    viewChanged();
-    currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
+    QObject::connect(rootObject->findChild<QObject*>("provisionFailedHeaderClose"), SIGNAL(clicked()), this, SLOT(provisionFailedClose()));
 
     QThread* thread = new QThread;
 
@@ -57,6 +56,9 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
     connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+
+    viewChanged();
+    currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
 
     thread->start();
 }
@@ -281,6 +283,10 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 #endif
 
     rootObject->findChild<QObject*>("loginOverlay")->setProperty("opacity", (loggedIn)?0:1);
+}
+
+void UI::MainUI::provisionFailedClose() {
+    mDevicesModel->setProgress(mDevices.at(currentIndex()), Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
 }
 
 UI::UISection::UISection(UI::MainUI* ui)

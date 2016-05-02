@@ -64,14 +64,14 @@ namespace UI {
     public slots:
         void process();
 
-        void deviceProvisionProgressChanged(Serial::SerialProvisionStatus status, int progress, Serial::SerialProvisionError error = Serial::SerialProvisionErrorNone);
+        void deviceProvisionProgressChanged(int status, int progress, int error = Serial::SerialProvisionErrorNone);
 
     signals:
         void finished();
 
         void deviceAdd(Serial::SerialDevice* device);
 
-        void provisionProgressChanged(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int progress, Serial::SerialProvisionError error);
+        void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress, int error);
         void provisionSPCFailed(Serial::SerialDevice* device);
 
         void loginStatus(bool success);

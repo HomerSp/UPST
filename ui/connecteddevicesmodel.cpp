@@ -52,6 +52,7 @@ QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     roles[ProgressMinRole] = "progressMin";
     roles[ProgressCurrentRole] = "progressCurrent";
     roles[ProgressStatusRole] = "progressStatus";
+    roles[ProgressErrorRole] = "progressError";
     return roles;
 }
 
@@ -151,10 +152,10 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     }
 }
 
-void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error) {
+void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int status, int current, int error) {
     DeviceModelProgress* progress = mDeviceProgress.find(device).value();
-    progress->status = status;
-    progress->error = error;
+    progress->status = static_cast<Serial::SerialProvisionStatus>(status);
+    progress->error = static_cast<Serial::SerialProvisionError>(error);
     progress->current = current;
 
     deviceUpdate(device);

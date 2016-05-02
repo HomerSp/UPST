@@ -55,6 +55,8 @@ namespace UI {
 
         void loginStatusChanged(bool success);
 
+        void provisionFailedClose();
+
     protected slots:
         void viewChanged();
         void viewUpdate();

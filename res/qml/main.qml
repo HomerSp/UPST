@@ -267,6 +267,8 @@ ApplicationWindow {
                 delegate: Component {
                     id: deviceListDelegate
                     Rectangle {
+                        property bool haveError
+
                         objectName: "deviceInfoWrapper"
                         id: deviceInfoWrapper
                         anchors.left: parent.left
@@ -275,6 +277,8 @@ ApplicationWindow {
                         height: deviceInfoContainer.height + deviceInfoStatusProgress.height
                         x: 0
                         color: "#00ffffff"
+
+                        haveError: progressError.length > 0
 
                         Behavior on color {
                             ColorAnimation {}
@@ -435,6 +439,10 @@ ApplicationWindow {
 
                         transitions: Transition {
                             NumberAnimation { properties: "anchors.leftMargin"; duration: 100 }
+                        }
+
+                        onHaveErrorChanged: {
+                            provisionFailedContainer.setError(progressError);
                         }
                     }
                 }
@@ -670,6 +678,12 @@ ApplicationWindow {
 
                color: '#33000000'
                visible: false
+               opacity: 0.0
+
+               function setError(error) {
+                   provisionFailedContentText.text = error;
+                   opacity = error.length > 0?1.0:0.0
+               }
 
                Behavior on opacity {
                    NumberAnimation {
@@ -721,9 +735,14 @@ ApplicationWindow {
 
                            UPButton {
                                id: provisionFailedHeaderClose
+                               objectName: 'provisionFailedHeaderClose'
                                text: "X"
                                height: provisionFailedHeaderText.height
                                width: unit.dp(24)
+
+                               onClicked: {
+                                   provisionFailedContainer.opacity = 0.0;
+                               }
                            }
                        }
                    }
@@ -748,11 +767,12 @@ ApplicationWindow {
                            }
                            Text {
                                anchors {left: parent.left; right: parent.right}
+                               objectName: 'provisionFailedContentText'
                                id: provisionFailedContentText
                                color: "#ffffff"
                                font.family: openSansRegularFont.name
                                font.pixelSize: unit.em(1.2)
-                               text: qsTr("Unknown")
+                               text: ""
                            }
                            Text {
                                anchors {left: parent.left; right: parent.right}
