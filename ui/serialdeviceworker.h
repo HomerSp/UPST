@@ -15,6 +15,7 @@ namespace UI {
     struct LoginItem {
         QString username;
         QString password;
+        QString token;
     };
 
     class SerialCommandItem : public QObject {
@@ -58,6 +59,7 @@ namespace UI {
         void addCommand(SerialCommandItem* cmd);
 
         void addLogin(const QString& username, const QString& password);
+        void addLoginCheck(const QString& token);
 
         void stop();
 
@@ -74,7 +76,7 @@ namespace UI {
         void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress, int error);
         void provisionSPCFailed(Serial::SerialDevice* device);
 
-        void loginStatus(bool success);
+        void loginStatus(bool success, const QString& token);
 
         void statusChange(const QString& status);
 

@@ -670,121 +670,14 @@ ApplicationWindow {
                 }
             }
 
-            Rectangle {
-               id: provisionFailedContainer
-               objectName: 'provisionFailedContainer'
-               anchors.fill: parent
-               z: 100
+            UPErrorBox {
+                objectName: 'provisionFailedContainer'
+                id: provisionFailedContainer
 
-               color: '#33000000'
-               visible: false
-               opacity: 0.0
-
-               function setError(error) {
-                   provisionFailedContentText.text = error;
-                   opacity = error.length > 0?1.0:0.0
-               }
-
-               Behavior on opacity {
-                   NumberAnimation {
-                       duration: 300
-                       onRunningChanged: {
-                           if(running && provisionFailedContainer.opacity < 1.0) {
-                               provisionFailedContainer.visible = true;
-                           } else if(!running && provisionFailedContainer.opacity === 0.0) {
-                               provisionFailedContainer.visible = false;
-                           }
-                       }
-                   }
-               }
-
-               MouseArea {
-                   anchors.fill: parent
-
-                   z: 101
-
-                   hoverEnabled: true
-               }
-
-
-               Column {
-                   anchors.fill: parent
-                   anchors.margins: unit.dp(8)
-                   z: 102
-
-                   opacity: 1.0
-
-                   Rectangle {
-                       id: provisionFailedHeaderContent
-                       anchors {left: parent.left; right: parent.right}
-                       height: provisionFailedHeaderClose.height + unit.dp(16)
-                       color: '#5f92eb'
-
-                       RowLayout {
-                           anchors.fill: parent
-                           anchors.margins: {left: unit.dp(8); right: unit.dp(8)}
-
-                           Text {
-                               Layout.fillWidth: true
-                               id: provisionFailedHeaderText
-                               color: "#ffffff"
-                               font.family: openSansBoldFont.name
-                               font.pixelSize: unit.em(1.2)
-                               text: qsTr("Provisioning failed")
-                           }
-
-                           UPButton {
-                               id: provisionFailedHeaderClose
-                               objectName: 'provisionFailedHeaderClose'
-                               text: "X"
-                               height: provisionFailedHeaderText.height
-                               width: unit.dp(24)
-
-                               onClicked: {
-                                   provisionFailedContainer.opacity = 0.0;
-                               }
-                           }
-                       }
-                   }
-
-                   Rectangle {
-                       anchors {left: parent.left; right: parent.right}
-                       height: provisionFailedContent.childrenRect.height + unit.dp(32)
-                       color: '#232b2e'
-
-                       ColumnLayout {
-                           id: provisionFailedContent
-                           anchors.fill: parent
-                           anchors.margins: unit.dp(16)
-                           spacing: unit.dp(8)
-
-                           Text {
-                               anchors {left: parent.left; right: parent.right}
-                               color: "#ffffff"
-                               font.family: openSansRegularFont.name
-                               font.pixelSize: unit.em(1.2)
-                               text: qsTr("An error occured while provisioning the device:")
-                           }
-                           Text {
-                               anchors {left: parent.left; right: parent.right}
-                               objectName: 'provisionFailedContentText'
-                               id: provisionFailedContentText
-                               color: "#ffffff"
-                               font.family: openSansRegularFont.name
-                               font.pixelSize: unit.em(1.2)
-                               text: ""
-                           }
-                           Text {
-                               anchors {left: parent.left; right: parent.right}
-                               color: "#ffffff"
-                               font.family: openSansRegularFont.name
-                               font.pixelSize: unit.em(1.2)
-                               text: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 555-55555.")
-                           }
-                       }
-                   }
-               }
-           }
+                header: "Failed to provision device"
+                errorLine1: qsTr("An error has ocurred while provisioning the device:")
+                errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 555-55555.")
+            }
 
            Rectangle {
                id: noDeviceOverlay
@@ -862,6 +755,23 @@ ApplicationWindow {
 
         z: 1000
 
+        function show() {
+            visible = true;
+            opacity = 1.0;
+            loginOverlayAnimation.complete();
+        }
+        function hide() {
+            visible = false;
+            opacity = 0.0;
+            loginOverlayAnimation.complete();
+        }
+
+        onOpacityChanged: {
+            if(opacity == 1.0) {
+                loggingInOverlay.opacity = 0.0;
+            }
+        }
+
         Loader {
             anchors.fill: parent
             z: 1001
@@ -878,6 +788,7 @@ ApplicationWindow {
 
         Behavior on opacity {
             NumberAnimation {
+                id: loginOverlayAnimation
                 duration: 300
                 onRunningChanged: {
                     if(running && loginOverlay.opacity < 1.0) {
@@ -889,5 +800,67 @@ ApplicationWindow {
             }
         }
     }
+
+    Rectangle {
+        id: loggingInOverlay
+        objectName: "loggingInOverlay"
+        anchors.fill: parent
+
+        color: "#f1f1f1"
+        visible: userTokenSet
+        opacity: (userTokenSet)?1.0:0.0
+
+        z: 1002
+
+        onOpacityChanged: {
+            if(opacity == 1.0) {
+                loginOverlay.hide();
+            }
+        }
+
+        Component.onCompleted: {
+            if(userTokenSet) {
+                loginOverlay.hide();
+            }
+        }
+
+        Loader {
+            anchors.fill: parent
+            z: 1001
+
+            source: "logging_in.qml"
+        }
+
+        MouseArea {
+            z: 1000
+
+            anchors.fill: parent
+            hoverEnabled: true
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 300
+                onRunningChanged: {
+                    if(running && loggingInOverlay.opacity < 1.0) {
+                        loggingInOverlay.visible = true;
+                    } else if(!running && loggingInOverlay.opacity === 0.0) {
+                        loggingInOverlay.visible = false;
+                    }
+                }
+            }
+        }
+    }
+
+    UPErrorBox {
+        anchors.fill: loginOverlay
+        z: 1003
+
+        id: loginFailedContainer
+        objectName: 'loginFailedContainer'
+
+        header: qsTr("Could not login")
+    }
+
 }
 

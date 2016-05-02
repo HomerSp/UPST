@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QQmlContext>
 #include <QQmlProperty>
+#include <QSettings>
 #include <QThread>
 
 #include "ui.h"
@@ -22,6 +23,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
+    mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
@@ -40,7 +42,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
     QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
-    QObject::connect(rootObject->findChild<QObject*>("provisionFailedHeaderClose"), SIGNAL(clicked()), this, SLOT(provisionFailedClose()));
+    QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
 
     QThread* thread = new QThread;
 
@@ -61,6 +63,11 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
 
     thread->start();
+
+    QSettings settings;
+    if(settings.contains("user/token")) {
+        mWorker->addLoginCheck(settings.value("user/token").toString());
+    }
 }
 
 UI::MainUI::~MainUI() {
@@ -246,10 +253,19 @@ void UI::MainUI::viewUpdate() {
 }
 
 void UI::MainUI::login() {
-    mWorker->addLogin("", "");
+    QObject* rootObject = mEngine->rootObjects().first();
+    QString username = rootObject->findChild<QObject*>("usernameText")->property("text").toString();
+    QString password = rootObject->findChild<QObject*>("passwordText")->property("text").toString();
+
+    rootObject->findChild<QObject*>("loggingInOverlay")->setProperty("opacity", 1.0f);
+
+    mWorker->addLogin(username, password);
 }
 
 void UI::MainUI::logout() {
+    QSettings settings;
+    settings.remove("user/token");
+
     updateLoginStatus(false);
 
     emit loggedOut();
@@ -259,11 +275,19 @@ void UI::MainUI::logout() {
     }
 }
 
-void UI::MainUI::loginStatusChanged(bool success) {
+void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
+    qDebug()<<"loginStatusChanged"<<success;
     if(!success) {
-        // TODO: Display an error.
+        updateLoginStatus(false);
+
+        QObject* rootObject = mEngine->rootObjects().first();
+        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginFailedContainer"), "setError", Q_ARG(QVariant, "Please check your username or password."));
+
         return;
     }
+
+    QSettings settings;
+    settings.setValue("user/token", token);
 
     qInfo()<<"Logged in successfully!";
 
@@ -273,6 +297,8 @@ void UI::MainUI::loginStatusChanged(bool success) {
 }
 
 void UI::MainUI::updateLoginStatus(bool loggedIn) {
+    qDebug()<<"updateLoginStatus"<<loggedIn;
+
     QObject* rootObject = mEngine->rootObjects().first();
 
     rootObject->findChild<QObject*>("fileMenuLogout")->setProperty("visible", loggedIn);
@@ -282,7 +308,14 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
     rootObject->findChild<QObject*>("advancedMenu")->setProperty("visible", loggedIn);
 #endif
 
-    rootObject->findChild<QObject*>("loginOverlay")->setProperty("opacity", (loggedIn)?0:1);
+    if(loggedIn) {
+        rootObject->findChild<QObject*>("usernameText")->setProperty("text", "");
+        rootObject->findChild<QObject*>("passwordText")->setProperty("text", "");
+
+        rootObject->findChild<QObject*>("loggingInOverlay")->setProperty("opacity", 0.0f);
+    } else {
+        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "show");
+    }
 }
 
 void UI::MainUI::provisionFailedClose() {

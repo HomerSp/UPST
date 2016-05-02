@@ -56,6 +56,10 @@ Rectangle {
 
             font.family: openSansRegularFont.name
             font.pixelSize: usernameLabel.font.pixelSize
+
+            Keys.onReturnPressed: {
+                passwordText.forceActiveFocus();
+            }
         }
 
         Text {
@@ -79,9 +83,16 @@ Rectangle {
 
             font.family: openSansRegularFont.name
             font.pixelSize: usernameLabel.font.pixelSize
+
+            echoMode: TextInput.Password
+
+            Keys.onReturnPressed: {
+                loginButton.clicked();
+            }
         }
 
         UPButton {
+            id: loginButton
             objectName: "loginButton"
 
             anchors.horizontalCenter: parent.horizontalCenter

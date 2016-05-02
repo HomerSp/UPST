@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QThread>
 
+#include "../web/webutils.h"
 #include "serialdeviceworker.h"
 
 UI::SerialCommandItem::SerialCommandItem(Serial::SerialDevice* device)
@@ -80,6 +81,17 @@ void UI::SerialDeviceWorker::addLogin(const QString &username, const QString &pa
     LoginItem* item = new LoginItem();
     item->username = username;
     item->password = password;
+    item->token = "";
+
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeLogin, item));
+    mWaitCondition.wakeAll();
+}
+
+void UI::SerialDeviceWorker::addLoginCheck(const QString& token) {
+    LoginItem* item = new LoginItem();
+    item->username = "";
+    item->password = "";
+    item->token = token;
 
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeLogin, item));
     mWaitCondition.wakeAll();
@@ -272,7 +284,30 @@ void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
 }
 
 void UI::SerialDeviceWorker::processLogin(LoginItem* item) {
-    emit loginStatus(true);
+    QByteArray output;
+    QHash<QString, QString> headers;
+    QString postData = "";
+
+    if(item->token.size() > 0) {
+        headers.insert("U-Token", item->token);
+    } else {
+        postData = "u=" + QString(QCryptographicHash::hash(item->username.toLatin1(), QCryptographicHash::Sha256).toHex()) + "&p=" + QString(QCryptographicHash::hash(item->password.toLatin1(), QCryptographicHash::Sha256).toHex());
+    }
+
+    if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/login.php"), output, headers, postData)) {
+        emit loginStatus(false, "");
+    } else {
+        if(item->token.size() > 0) {
+            emit loginStatus(true, item->token);
+        } else {
+            QJsonDocument doc = QJsonDocument::fromJson(output);
+            if(doc.isObject() && doc.object().contains("token")) {
+                emit loginStatus(true, doc.object()["token"].toString());
+            } else {
+                emit loginStatus(false, "");
+            }
+        }
+    }
 
     delete item;
 }

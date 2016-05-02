@@ -9,5 +9,7 @@
         <file>res/qml/dialog/dialog_about.qml</file>
         <file>res/qml/login.qml</file>
         <file>res/qml/components/UPButton.qml</file>
+        <file>res/qml/components/UPErrorBox.qml</file>
+        <file>res/qml/logging_in.qml</file>
     </qresource>
 </RCC>

@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(&logMessageHandler);
 
     QGuiApplication::setApplicationName("UPST");
+    QGuiApplication::setOrganizationDomain("ultimobile.net");
     QGuiApplication::setOrganizationName("Ultimobile");
 
     QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));

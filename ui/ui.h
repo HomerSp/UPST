@@ -53,7 +53,7 @@ namespace UI {
 
         void setStatus(const QString& status);
 
-        void loginStatusChanged(bool success);
+        void loginStatusChanged(bool success, const QString &token);
 
         void provisionFailedClose();
 
