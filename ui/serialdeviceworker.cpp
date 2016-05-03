@@ -324,8 +324,10 @@ void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
 void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device) {
     emit statusChange("Provisioning " + device->name());
 
+    QString userToken = QSettings().value("user/token").toString();
+
     connect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
-    device->provision();
+    device->provision(userToken);
     disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
 }
 

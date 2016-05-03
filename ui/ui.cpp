@@ -83,9 +83,8 @@ UI::MainUI::~MainUI() {
 }
 
 void UI::MainUI::devicesListChanged(bool success) {
-    if(success) {
-        emit loggedIn();
-    }
+    qDebug()<<"devicesListChanged"<<success;
+    emit loggedIn();
 }
 
 void UI::MainUI::devicesChanged() {

@@ -55,7 +55,7 @@ namespace Serial {
 
         bool updateJson(const QJsonObject& obj);
 
-        bool provision();
+        bool provision(const QString& userToken);
 
         void setBaudRate(QSerialPort::BaudRate baudRate) {
             mBaudRate = baudRate;
@@ -152,6 +152,10 @@ namespace Serial {
         }
         QString pidStr() const {
             return QString("%1").arg(mPid, 4, 16, QChar('0')).toUpper();
+        }
+
+        QString id() const {
+            return mID;
         }
 
         QString name() const {
@@ -260,6 +264,7 @@ namespace Serial {
         QSerialPort::Parity mParity;
         QSerialPort::StopBits mStopBits;
 
+        QString mID;
         QString mMake;
         QString mModel;
         QString mCodename;

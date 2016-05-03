@@ -26,6 +26,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mDataBits(QSerialPort::Data8),
       mParity(QSerialPort::NoParity),
       mStopBits(QSerialPort::OneStop),
+      mID(""),
       mMake(""),
       mModel(""),
       mType(SerialDeviceTypeUnknown),
@@ -82,20 +83,25 @@ bool SerialDevice::isValid() {
     return cmd.result()->success();
 }
 
-bool SerialDevice::provision() {
+bool SerialDevice::provision(const QString& userToken) {
     qInfo()<<"Provisioning"<<name();
 
     emit provisionProgressChanged(SerialProvisionStatusProgress, 0);
 
-    QFile sourceFile(":/res/data/provision_data.json");
-    if(!sourceFile.open(QFile::ReadOnly | QFile::Text)) {
+    QByteArray output;
+    QHash<QString, QString> headers;
+    headers.insert("U-Token", userToken);
+
+    QString postData = "d=" + mID;
+
+    if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/provision.php"), output, headers, postData)) {
         emit provisionProgressChanged(SerialProvisionStatusError, 0, SerialProvisionErrorDownload);
         return false;
     }
 
     emit provisionProgressChanged(SerialProvisionStatusProgress, 1);
 
-    SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, sourceFile.readAll());
+    SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, QString(output));
     if(!provisionData->valid()) {
         emit provisionProgressChanged(SerialProvisionStatusError, 1, SerialProvisionErrorData);
         delete provisionData;
@@ -164,6 +170,10 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
             mType = SerialDeviceTypeMifi;
         } else {
             return false;
+        }
+
+        if(obj.contains("id")) {
+            mID = obj["id"].toString();
         }
 
         mMake = obj["make"].toString();
