@@ -140,17 +140,40 @@ void NvProvisionData::updateCalibration(const QUrl& url, const QString& md5) {
 }
 
 Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const QString& name, const QJsonValue& jsonValue) {
+    bool found = false;
     QString parentLower = parent.toLower();
     QString nameLower = name.toLower();
 #define PROVISION_CMD(n, className, args...) \
-        if(nameLower == n && (!jsonValue.isString() || (jsonValue.isString() && jsonValue.toString().toInt() != -1))) {\
-            cmd = new Serial::QCDM::Commands::Nv::Provision::className(device(), false, &jsonValue,##args);\
+        if(nameLower == n) {\
+            found = true;\
+            if(!jsonValue.isString() || (jsonValue.isString() && jsonValue.toString().toInt() != -1)) {\
+                cmd = new Serial::QCDM::Commands::Nv::Provision::className(device(), false, &jsonValue,##args);\
+            }\
             break;\
         }
+#define PROVISION_CMD_NULL(n) \
+    if(nameLower == n) {\
+        found = true; \
+        break;\
+    }
 
     Serial::SerialCommand* cmd = nullptr;
     do {
-        if(parent == "") {
+        if(parentLower == "") {
+            PROVISION_CMD_NULL("calibrationfile");
+            PROVISION_CMD_NULL("calibrationfilemd5");
+            PROVISION_CMD_NULL("carrierprl");
+            PROVISION_CMD_NULL("carrierprlmd5");
+            PROVISION_CMD_NULL("carrierspc");
+            PROVISION_CMD_NULL("data");
+            PROVISION_CMD_NULL("mobileip");
+            PROVISION_CMD_NULL("nam");
+            PROVISION_CMD_NULL("nvitems");
+            PROVISION_CMD_NULL("sequentialoffline");
+            PROVISION_CMD_NULL("sixteendigitpassword");
+            PROVISION_CMD_NULL("user");
+            PROVISION_CMD_NULL("usertype");
+
             PROVISION_CMD("genuserprof", GenUserProfCommand, user());
             PROVISION_CMD("genuserss", GenUserSSCommand);
             PROVISION_CMD("password", PasswordCommand);
@@ -168,6 +191,9 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("dormanthandoffoptenable", ProvisionCommand, NvItem::NV_DS_MIP_QC_HANDDOWN_TO_1X_OPT_I, NvItemType::NV_GENERIC_FLAG_ARRAY);
             PROVISION_CMD("mnharfc2002bis", ProvisionCommand, NvItem::NV_DS_MIP_2002BIS_MN_HA_AUTH_I, NvItemType::NV_GENERIC_FLAG_ARRAY);
         } else if(parentLower == "data") {
+            PROVISION_CMD_NULL("tetheredmipnai");
+            PROVISION_CMD_NULL("tetherednai");
+
             PROVISION_CMD("pppuser", GenericNaiCommand, NvItem::NV_PPP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("papuser", GenericNaiCommand, NvItem::NV_PAP_USER_ID_I, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
             PROVISION_CMD("hdranuser", HDRAnUserCommand, NvItemType::NV_GENERIC_NAI_BYTE_ARRAY, userType());
@@ -179,6 +205,10 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD("hdrscpatconfig", ProvisionCommand, NvItem::NV_HDRSCP_FORCE_AT_CONFIG_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("scphdrrel0config", ProvisionCommand, NvItem::NV_HDRSCP_FORCE_REL0_CONFIG_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
         } else if(parentLower == "nam") {
+            PROVISION_CMD_NULL("banner");
+            PROVISION_CMD_NULL("cdmaprefserv");
+            PROVISION_CMD_NULL("systempref");
+
             PROVISION_CMD("evrc", EvrcCommand);
             PROVISION_CMD("sid_nid_list", SidNidListCommand);
 
@@ -198,7 +228,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
         }
     } while(false);
 
-    if(cmd == nullptr) {
+    if(!found) {
         qWarning()<<"Could not find a handler for"<<parent<<"/"<<name;
     }
 
