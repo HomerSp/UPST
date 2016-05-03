@@ -49,6 +49,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     mWorker = new SerialDeviceWorker();
     mWorker->moveToThread(thread);
 
+    connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);
     connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
     connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
@@ -79,6 +80,12 @@ UI::MainUI::~MainUI() {
 
     delete mEngine;
     delete mDevicesModel;
+}
+
+void UI::MainUI::devicesListChanged(bool success) {
+    if(success) {
+        emit loggedIn();
+    }
 }
 
 void UI::MainUI::devicesChanged() {
@@ -291,9 +298,9 @@ void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
 
     qInfo()<<"Logged in successfully!";
 
-    updateLoginStatus(true);
+    mWorker->addDevicesListUpdate();
 
-    emit loggedIn();
+    updateLoginStatus(true);
 }
 
 void UI::MainUI::updateLoginStatus(bool loggedIn) {

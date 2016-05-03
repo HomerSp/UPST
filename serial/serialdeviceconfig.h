@@ -12,6 +12,8 @@ namespace Serial {
         SerialDeviceConfig();
         ~SerialDeviceConfig();
 
+        bool update(const QString& data);
+
         bool updateDevice(SerialDevice* device);
 
         static void updateConfig();

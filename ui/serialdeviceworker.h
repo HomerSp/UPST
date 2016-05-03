@@ -51,6 +51,8 @@ namespace UI {
         SerialDeviceWorker();
         ~SerialDeviceWorker();
 
+        void addDevicesListUpdate();
+
         void addDeviceCheck(const QSerialPortInfo &info);
         void addDeviceRemove(Serial::SerialDevice* device);
 
@@ -71,6 +73,7 @@ namespace UI {
     signals:
         void finished();
 
+        void devicesListChanged(bool success);
         void deviceAdd(Serial::SerialDevice* device);
 
         void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress, int error);
@@ -82,6 +85,7 @@ namespace UI {
 
     private:
         enum WorkType {
+            WorkTypeDevicesListUpdate,
             WorkTypeDeviceCheck,
             WorkTypeDeviceRemove,
             WorkTypeCommand,
@@ -90,6 +94,7 @@ namespace UI {
         };
 
         void processDeviceRemove(Serial::SerialDevice* device);
+        void processDevicesListUpdate();
         void processDeviceCheck(QSerialPortInfo* portInfo);
         void processDeviceProvision(Serial::SerialDevice* device);
         void processCommand(SerialCommandItem* command);

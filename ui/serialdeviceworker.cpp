@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QSettings>
 #include <QThread>
 
 #include "../web/webutils.h"
@@ -36,6 +37,12 @@ UI::SerialDeviceWorker::SerialDeviceWorker()
 
 UI::SerialDeviceWorker::~SerialDeviceWorker() {
     delete mDeviceConfig;
+}
+
+void UI::SerialDeviceWorker::addDevicesListUpdate() {
+    QMutexLocker locker(&mWorkMutex);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDevicesListUpdate, nullptr));
+    mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
@@ -130,8 +137,33 @@ void UI::SerialDeviceWorker::process() {
 
             qDebug()<<"SerialDeviceWorker::process";
 
-            // We want to process all of the removals first as removing a device may also affect commands.
+            // Process the devices list update first.
             int i = 0, size = 0;
+            do {
+                {
+                    QMutexLocker locker(&mWorkMutex);
+                    size = mWorkItems.size();
+                    if(size <= 0 || i >= size || !mRunning.load()) {
+                        break;
+                    }
+
+                    if(mWorkItems[i].first != WorkTypeDevicesListUpdate) {
+                        i++;
+                        continue;
+                    }
+
+                    mWorkItems.erase(mWorkItems.begin() + i);
+
+                    size--;
+                }
+
+                processDevicesListUpdate();
+
+                waitForNextCommand = false;
+            } while(i < size);
+
+            // We want to process all of the removals first as removing a device may also affect commands.
+            i = size = 0;
             do {
                 Serial::SerialDevice* device = nullptr;
                 {
@@ -245,6 +277,25 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
 
     delete device;
     device = nullptr;
+}
+
+void UI::SerialDeviceWorker::processDevicesListUpdate() {
+    emit statusChange("Updating devices list");
+
+    QString token = QSettings().value("user/token").toString();
+
+    QByteArray output;
+    QHash<QString, QString> headers;
+    headers.insert("U-Token", token);
+
+    if(Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/devices.php"), output, headers)) {
+        bool r = mDeviceConfig->update(QString(output));
+        emit devicesListChanged(r);
+    } else {
+         emit devicesListChanged(false);
+    }
+
+    emit statusChange("");
 }
 
 void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {

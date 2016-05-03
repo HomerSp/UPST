@@ -33,6 +33,35 @@ SerialDeviceConfig::~SerialDeviceConfig() {
 
 }
 
+bool SerialDeviceConfig::update(const QString& data) {
+#ifdef TESTING_MODE
+    if(QFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json").exists()) {
+        return true;
+    }
+#endif
+
+    QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
+    if(targetFile.exists()) {
+        targetFile.remove();
+    }
+
+    if(!targetFile.exists()) {
+        QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data");
+
+        if(!targetFile.open(QIODevice::WriteOnly)) {
+            qDebug()<<"!targetFile open";
+            return false;
+        }
+
+        targetFile.write(QJsonDocument::fromJson(data.toLatin1()).toBinaryData());
+        targetFile.flush();
+        targetFile.close();
+    }
+
+    mDevices = QJsonDocument::fromJson(data.toLatin1());
+    return mDevices.isObject();
+}
+
 bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
     if(!mDevices.isObject() || mDevices.object().isEmpty() || !mDevices.object().contains("devices")) {
         return false;
@@ -98,18 +127,19 @@ bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
 }
 
 void SerialDeviceConfig::updateConfig() {
+    QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
+    if(targetFile.exists()) {
+        return;
+    }
+
     QFile sourceFile(QStringLiteral(":/res/data/devices.list"));
 #ifdef TESTING_MODE
     if(QFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json").exists()) {
         sourceFile.setFileName(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json");
+
+        targetFile.remove();
     }
 #endif
-    QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
-    if(targetFile.exists()) {
-        if(QFileInfo(sourceFile).size() != QFileInfo(targetFile).size()) {
-            targetFile.remove();
-        }
-    }
 
     if(!targetFile.exists()) {
         QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data");
@@ -125,4 +155,5 @@ void SerialDeviceConfig::updateConfig() {
 
         sourceFile.close();
     }
+
 }

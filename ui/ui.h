@@ -48,6 +48,7 @@ namespace UI {
     public slots:
         void devicesChanged();
 
+        void devicesListChanged(bool success);
         void deviceAdd(Serial::SerialDevice* device);
         void deviceRemove(const QString& port);
 
