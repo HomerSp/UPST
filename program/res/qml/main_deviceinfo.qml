@@ -1,5 +1,5 @@
 import QtQuick 2.5
-import "components"
+import "qrc:/res/qml/components"
 
 Item {
     id: deviceInfoView

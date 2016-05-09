@@ -5,7 +5,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
-import "components"
+import "qrc:/res/qml/components"
 
 ApplicationWindow {
     id: mainWindow

@@ -3,5 +3,9 @@
         <file>res/fonts/OpenSans-Bold.ttf</file>
         <file>res/fonts/OpenSans-Regular.ttf</file>
         <file>res/images/logo.png</file>
+        <file>res/qml/components/DeviceInfoBox.qml</file>
+        <file>res/qml/components/Units.qml</file>
+        <file>res/qml/components/UPButton.qml</file>
+        <file>res/qml/components/UPErrorBox.qml</file>
     </qresource>
 </RCC>
