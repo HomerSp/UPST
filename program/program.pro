@@ -4,6 +4,11 @@ TARGET = UPST
 QT += qml quick serialport
 CONFIG += c++11
 
+RESOURCES += \
+    resources.qrc \
+    icons.qrc \
+    qml.qrc
+
 SOURCES += main.cpp \
     devicefilterevent.cpp
 
@@ -15,11 +20,6 @@ win32 {
 }
 
 HEADERS += devicefilterevent.h
-
-RESOURCES += \
-    resources.qrc \
-    icons.qrc \
-    qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

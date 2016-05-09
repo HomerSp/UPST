@@ -71,6 +71,8 @@ void updateConfigs() {
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(common);
+
     qInstallMessageHandler(&logMessageHandler);
 
     QGuiApplication::setApplicationName("UPST");
