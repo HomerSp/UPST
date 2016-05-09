@@ -1,6 +1,4 @@
 TEMPLATE = lib
-TARGET = serial
-DESTDIR = serial
 CONFIG += staticlib
 
 QT += qml quick serialport
