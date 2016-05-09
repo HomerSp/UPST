@@ -4,7 +4,7 @@
 #include <QList>
 #include <QDataStream>
 
-#include "../web/webutils.h"
+#include "web/webutils.h"
 #include "serialcommunicator.h"
 #include "serialdevice.h"
 #include "serialprovisiondata.h"

@@ -2,7 +2,7 @@
 #include <QSettings>
 #include <QThread>
 
-#include "../web/webutils.h"
+#include "web/webutils.h"
 #include "serialdeviceworker.h"
 
 UI::SerialCommandItem::SerialCommandItem(Serial::SerialDevice* device)

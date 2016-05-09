@@ -1,6 +1,6 @@
 #include <QDebug>
 
-#include "../../serial/qcdm/commands/qcdmcommand.h"
+#include "serial/qcdm/commands/qcdmcommand.h"
 
 #include "provision.h"
 

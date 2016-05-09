@@ -9,6 +9,7 @@
 
 #include "ui/ui.h"
 #include "devicefilterevent.h"
+
 #include "serial/serialdeviceconfig.h"
 
 static QString sLogData = "";

@@ -6,7 +6,7 @@
 #include "../../serialcommand.h"
 #include "nvprovisiondata.h"
 
-#include "../../../web/webutils.h"
+#include "web/webutils.h"
 
 #include "../commands/prlcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/aoccommand.h"

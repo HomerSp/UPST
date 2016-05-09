@@ -6,6 +6,7 @@
 
 #include "connecteddevicesmodel.h"
 #include "serialdeviceworker.h"
+
 #include "serial/serialdevice.h"
 
 namespace UI {

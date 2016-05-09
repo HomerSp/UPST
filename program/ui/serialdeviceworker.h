@@ -7,9 +7,9 @@
 #include <QSerialPortInfo>
 #include <QPair>
 
-#include "../serial/serialdevice.h"
-#include "../serial/serialdeviceconfig.h"
-#include "../serial/serialcommand.h"
+#include "serial/serialdevice.h"
+#include "serial/serialdeviceconfig.h"
+#include "serial/serialcommand.h"
 
 namespace UI {
     struct LoginItem {
