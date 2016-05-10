@@ -18,8 +18,6 @@ void DeviceFilterEvent::enable() {
 
 void DeviceFilterEvent::disable() {
     mEnabled = false;
-
-
 }
 
 #ifdef NATIVEFILTER_MISSING

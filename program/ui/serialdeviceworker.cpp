@@ -40,6 +40,8 @@ UI::SerialDeviceWorker::~SerialDeviceWorker() {
 }
 
 void UI::SerialDeviceWorker::addDevicesListUpdate() {
+    qDebug()<<"addDevicesListUpdate";
+
     QMutexLocker locker(&mWorkMutex);
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDevicesListUpdate, nullptr));
     mWaitCondition.wakeAll();
@@ -205,9 +207,9 @@ void UI::SerialDeviceWorker::process() {
 
                     type = (*mWorkItems.begin()).first;
                     data = (*mWorkItems.begin()).second;
-                    mWorkItems.erase(mWorkItems.begin());
                 }
 
+                bool unknownCommand = false;
                 switch(type) {
                 case WorkTypeDeviceCheck: {
                     processDeviceCheck(static_cast<QSerialPortInfo*>(data));
@@ -226,7 +228,19 @@ void UI::SerialDeviceWorker::process() {
                     break;
                 }
                 default:
+                    unknownCommand = true;
+                }
+
+                if(unknownCommand) {
+                    waitForNextCommand = false;
                     break;
+                }
+
+                {
+                    QMutexLocker locker(&mWorkMutex);
+                    if(mWorkItems.size() > 0) {
+                        mWorkItems.erase(mWorkItems.begin());
+                    }
                 }
 
                 waitForNextCommand = false;
@@ -280,6 +294,8 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
 }
 
 void UI::SerialDeviceWorker::processDevicesListUpdate() {
+    qDebug()<<"processDevicesListUpdate";
+
     emit statusChange("Updating devices list");
 
     QString token = QSettings().value("user/token").toString();
