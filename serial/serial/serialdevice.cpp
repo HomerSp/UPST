@@ -14,6 +14,7 @@
 #include "qcdm/commands/nvcommands/meidcommand.h"
 #include "qcdm/commands/nvcommands/mdncommand.h"
 #include "qcdm/commands/nvcommands/mincommand.h"
+#include "qcdm/commands/passwordcommand.h"
 #include "qcdm/commands/prlcommand.h"
 #include "qcdm/commands/radiomodecommand.h"
 
@@ -93,6 +94,8 @@ bool SerialDevice::provision(const QString& userToken) {
     headers.insert("U-Token", userToken);
 
     QString postData = "d=" + mID;
+
+    qDebug()<<"Downloading provisioning data for"<<mID;
 
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/provision.php"), output, headers, postData)) {
         emit provisionProgressChanged(SerialProvisionStatusError, 0, SerialProvisionErrorDownload);
@@ -228,7 +231,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     // This is the amount the progress should increase after each command,
     // that is, the modifier to which we increase the progress so that we
     // reach 100% at completion.
-    float mod = (98.0f / (data->constCommands().size() + 5)) / devices.size();
+    float mod = (98.0f / (data->constCommands().size() + 3)) / devices.size();
 
     // The progress starts at 2 (downloading the provision data is 1%, and parsing it is another 1%).
     float i = 2;
@@ -236,7 +239,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     foreach(SerialDevice* device, devices) {
         qDebug()<<"===== Provisioning port"<<device->communicator()->port()<<"=====";
 
-        qDebug()<<"===== RESETTING DEVICE BEFORE =====";
+        qDebug()<<"===== SETTING DEVICE OFFLINE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdBefore.execute();
         if(!radioCmdBefore.resultSuccess()) {
@@ -249,7 +252,8 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
-            Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
+            Serial::QCDM::Commands::PasswordCommand passwordCmd(device, data->password16());
+            passwordCmd.setTimeout(10000);
             passwordCmd.execute();
             if(passwordCmd.result()->success()) {
                 qDebug()<<"Result="<<passwordCmd.result()->data().toString();
@@ -262,6 +266,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         qDebug()<<"===== Writing SPC =====";
         Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+        spcCommand.setTimeout(10000);
         spcCommand.execute();
         if(spcCommand.result()->success()) {
             qDebug()<<"Result="<<spcCommand.result()->data().toString();
@@ -276,6 +281,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         qDebug()<<"===== WRITING MDN =====";
         Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mNewMdn);
+        mdnCmd.setTimeout(10000);
         mdnCmd.execute();
         if(mdnCmd.result()->success()) {
             qDebug()<<"Result="<<mdnCmd.result()->data().toString();
@@ -290,6 +296,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         qDebug()<<"===== WRITING MIN =====";
         Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mNewMin);
+        minCmd.setTimeout(10000);
         minCmd.execute();
         if(minCmd.result()->success()) {
             qDebug()<<"Result="<<minCmd.result()->data().toString();
@@ -321,7 +328,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         // We need to reset the command results for the next device.
         data->resetCommands();
 
-        qDebug()<<"===== RESETTING DEVICE AFTER =====";
+        qDebug()<<"===== SETTING DEVICE OFFLINE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdAfter(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdAfter.execute();
         if(!radioCmdAfter.resultSuccess()) {
@@ -331,6 +338,14 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+    }
+
+    qDebug()<<"===== RESETTING DEVICE AFTER =====";
+    Serial::QCDM::Commands::RadioModeCommand radioResetAfter(this, Serial::QCDM::MODE_RADIO_RESET);
+    radioResetAfter.setTimeout(10000);
+    radioResetAfter.execute();
+    if(!radioResetAfter.resultSuccess()) {
+        ret = false;
     }
 
     if(ret) {
@@ -349,7 +364,8 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
 
     if(data->sequentialOffline()) {
         if(data->password16().size() == 16) {
-            Serial::QCDM::Commands::QcdmCommand passwordCmd(device, Serial::QCDM::DIAG_PASSWORD_F, data->password16().toLatin1());
+            Serial::QCDM::Commands::PasswordCommand passwordCmd(device, data->password16());
+            passwordCmd.setTimeout(10000);
             passwordCmd.execute();
             if(!passwordCmd.resultSuccess()) {
                 return false;
@@ -357,14 +373,13 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
         }
 
         Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+        spcCommand.setTimeout(10000);
         spcCommand.execute();
         if(!spcCommand.resultSuccess()) {
             return false;
         }
     }
 
-    // Increase the timeout period
-    cmd->setTimeout(10000);
     cmd->execute(device);
     foreach(Serial::SerialCommandResult* result, cmd->results()) {
         if(!result->success()) {
@@ -377,6 +392,7 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
 
     if(data->sequentialOffline()) {
         Serial::QCDM::Commands::RadioModeCommand radioCmd(device, Serial::QCDM::MODE_RADIO_OFFLINE);
+        radioCmd.setTimeout(10000);
         radioCmd.execute();
         if(!radioCmd.resultSuccess()) {
             return false;

@@ -70,6 +70,7 @@ void SerialProvisionData::updateObj(const QString& parent, const QJsonObject& ob
             continue;
         }
 
+        cmd->setTimeout(10000);
         mCommands.append(cmd);
     }
 }

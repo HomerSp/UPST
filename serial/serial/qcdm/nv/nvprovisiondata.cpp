@@ -17,7 +17,7 @@
 #include "../commands/nvcommands/nvprovisioncommands/mccimsicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/mncimsicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/sidnidlistcommand.h"
-#include "../commands/nvcommands/nvprovisioncommands/passwordcommand.h"
+#include "../commands/nvcommands/nvprovisioncommands/authpasswordcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genericnaicommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/provisioncommand.h"
 
@@ -176,7 +176,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
 
             PROVISION_CMD("genuserprof", GenUserProfCommand, user());
             PROVISION_CMD("genuserss", GenUserSSCommand);
-            PROVISION_CMD("password", PasswordCommand);
+            PROVISION_CMD("password", AuthPasswordCommand);
         } else if(parentLower == "mobileip") {
             PROVISION_CMD("mippref", ProvisionCommand, NvItem::NV_DS_QCMIP_I, NvItemType::NV_GENERIC_BYTE_ARRAY);
             PROVISION_CMD("numofprof", ProvisionCommand, NvItem::NV_DS_MIP_NUM_PROF_I, NvItemType::NV_GENERIC_BYTE_ARRAY);

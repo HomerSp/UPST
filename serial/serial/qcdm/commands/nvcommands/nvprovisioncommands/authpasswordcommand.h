@@ -8,10 +8,10 @@ namespace Serial {
         namespace Commands {
             namespace Nv {
                 namespace Provision {
-                    class PasswordCommand : public NvCommand
+                    class AuthPasswordCommand : public NvCommand
                     {
                     public:
-                        PasswordCommand(SerialDevice* device, bool read = true, const QJsonValue* jsonValue = nullptr);
+                        AuthPasswordCommand(SerialDevice* device, bool read = true, const QJsonValue* jsonValue = nullptr);
                     };
                 }
             }

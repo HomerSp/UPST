@@ -1,9 +1,9 @@
 #include "../../../../serialprovisiondata.h"
-#include "passwordcommand.h"
+#include "authpasswordcommand.h"
 
 using namespace Serial::QCDM::Commands::Nv::Provision;
 
-PasswordCommand::PasswordCommand(SerialDevice* device, bool read, const QJsonValue* jsonValue)
+AuthPasswordCommand::AuthPasswordCommand(SerialDevice* device, bool read, const QJsonValue* jsonValue)
     : NvCommand(device)
 {
     if(!read) {
