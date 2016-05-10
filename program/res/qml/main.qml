@@ -93,6 +93,21 @@ ApplicationWindow {
                     mainPageLoader.currentView = "manual"
                 }
             }
+
+            MenuItem {
+                id: advancedMenuLog
+                text: qsTr("Log")
+                onTriggered: {
+                    var component = Qt.createComponent("dialog/dialog_log.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainWindow);
+                        dialog.modality = Qt.ApplicationModal;
+                        dialog.open();
+                    } else {
+                        console.error("Could not load log dialog: " + component.errorString());
+                    }
+                }
+            }
         }
 
         Menu {

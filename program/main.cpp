@@ -12,7 +12,7 @@
 
 #include "serial/serialdeviceconfig.h"
 
-static QString sLogData = "";
+static UI::LogObject sLogObject;
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -59,9 +59,12 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 
     QTextStream(stdout) << data;
 
-    sLogData += data + "\n";
-    if(LOG_LIMIT > 0 && sLogData.length() > LOG_LIMIT) {
-        sLogData.remove(0, sLogData.length() - LOG_LIMIT);
+    sLogObject += data;
+    if(data.at(data.length() - 1) != '\n') {
+        sLogObject += "\n";
+    }
+    if(LOG_LIMIT > 0 && sLogObject.length() > LOG_LIMIT) {
+        sLogObject.remove(0, sLogObject.length() - LOG_LIMIT);
     }
 }
 
@@ -87,7 +90,7 @@ int main(int argc, char *argv[])
 
     updateConfigs();
 
-    UI::MainUI mainUI(app, sLogData);
+    UI::MainUI mainUI(app, &sLogObject);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);

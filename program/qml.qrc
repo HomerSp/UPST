@@ -7,5 +7,6 @@
         <file>res/qml/dialog/dialog_about.qml</file>
         <file>res/qml/login.qml</file>
         <file>res/qml/logging_in.qml</file>
+        <file>res/qml/dialog/dialog_log.qml</file>
     </qresource>
 </RCC>

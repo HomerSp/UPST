@@ -12,11 +12,52 @@
 namespace UI {
     class UISection;
 
+    class LogObject : public QObject {
+        Q_OBJECT
+    public:
+        LogObject(QObject* parent = 0)
+            : QObject(parent),
+              mLogData("")
+        {
+
+        }
+
+        Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
+
+        QString getLogData() const {
+            return mLogData;
+        }
+
+        int length() const {
+            return mLogData.length();
+        }
+
+        void remove(int i, int len) {
+            mLogData.remove(i, len);
+
+            emit logDataChanged(mLogData);
+        }
+
+        LogObject& operator+=(const QString& data) {
+            mLogData += data;
+
+            emit logDataChanged(mLogData);
+
+            return *this;
+        }
+
+    signals:
+        void logDataChanged(const QString &logData);
+
+    private:
+        QString mLogData;
+    };
+
     class MainUI : public QObject
     {
         Q_OBJECT
     public:
-        MainUI(const QGuiApplication& app, const QString& logData);
+        MainUI(const QGuiApplication& app, LogObject* logData);
         ~MainUI();
 
         QQmlApplicationEngine* engine() {
@@ -72,8 +113,6 @@ namespace UI {
         void updateLoginStatus(bool loggedIn);
 
         const QGuiApplication& mApp;
-
-        const QString& mLogData;
 
         UISection* mSection;
 

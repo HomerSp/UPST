@@ -9,10 +9,9 @@
 #include "section/manual.h"
 #include "section/provision.h"
 
-UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
+UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     : QObject(),
       mApp(app),
-      mLogData(logData),
       mSection(nullptr)
 {
     mDevicesModel = new UI::ConnectedDevicesModel();
@@ -20,6 +19,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& logData)
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
     mEngine = new QQmlApplicationEngine();
+    mEngine->rootContext()->setContextProperty("logText", logData);
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
