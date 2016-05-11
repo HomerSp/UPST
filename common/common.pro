@@ -11,4 +11,5 @@ RESOURCES += \
     common.qrc
 
 include(../defines.pri)
+include(utils/utils.pri)
 include(web/web.pri)
