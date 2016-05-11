@@ -3,6 +3,7 @@
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QTemporaryDir>
 
 #include "connecteddevicesmodel.h"
 #include "serialdeviceworker.h"
@@ -97,6 +98,9 @@ namespace UI {
         void setStatus(const QString& status);
 
         void loginStatusChanged(bool success, const QString &token);
+
+        void versionUpdateCheck();
+        void versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
 
         void provisionFailedClose();
 

@@ -18,7 +18,7 @@ bool WebUtils::download(const QUrl& url, QByteArray& output) {
     return download(url, output, headers);
 }
 
-bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData) {
+bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData, WebDownloadStatus* status) {
     WebLoop loop;
 
     QNetworkAccessManager *manager = new QNetworkAccessManager(&loop);
@@ -29,27 +29,32 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
         req.setRawHeader(i.key().toLatin1(), i.value().toLatin1());
     }
 
+    QNetworkReply* reply = nullptr;
     if(postData.size() > 0) {
         req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-        manager->post(req, postData.toLatin1());
+        reply = manager->post(req, postData.toLatin1());
     } else {
-        manager->get(req);
+        reply = manager->get(req);
     }
+
+    if(reply == nullptr) {
+        manager->deleteLater();
+        return false;
+    }
+
+    if(status != nullptr) {
+        QObject::connect(reply, &QNetworkReply::downloadProgress, status, &WebDownloadStatus::progress);
+    }
+
     loop.exec();
 
-    QNetworkReply* reply = loop.reply();
-    if(reply != nullptr) {
-        if(reply->error() == QNetworkReply::NoError) {
-            output.clear();
-            output = reply->readAll();
-        }
-
-        reply->deleteLater();
-        manager->deleteLater();
-
-        return reply->error() == QNetworkReply::NoError;
+    if(reply->error() == QNetworkReply::NoError) {
+        output.clear();
+        output = reply->readAll();
     }
 
+    reply->deleteLater();
     manager->deleteLater();
-    return false;
+
+    return reply->error() == QNetworkReply::NoError;
 }

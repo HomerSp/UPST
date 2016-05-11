@@ -1,8 +1,16 @@
 #include <QDebug>
 #include <QQmlContext>
 #include <QQmlProperty>
+#include <QFile>
+#include <QProcess>
 #include <QSettings>
+#include <QTemporaryDir>
 #include <QThread>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <shellapi.h>
+#endif
 
 #include "ui.h"
 #include "section/deviceinfo.h"
@@ -54,6 +62,8 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
     connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, mDevicesModel, &ConnectedDevicesModel::setProgress);
+    connect(mWorker, &SerialDeviceWorker::updateCheck, this, &MainUI::versionUpdateCheck);
+    connect(mWorker, &SerialDeviceWorker::updateAvailable, this, &MainUI::versionUpdateAvailable);
 
     connect(thread, SIGNAL(started()), mWorker, SLOT(process()));
     connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
@@ -322,6 +332,46 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
     } else {
         QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "show");
     }
+}
+
+void UI::MainUI::versionUpdateCheck() {
+    QObject* rootObject = mEngine->rootObjects().first();
+    QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loggingInView"), "setCheckForUpdates", Q_ARG(QVariant, true));
+}
+
+void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString &id, const QString &version, const QDateTime &updateTime) {
+    qDebug()<<"New Update is available"<<version;
+
+#ifdef Q_OS_WIN
+    QFile updaterFile(updaterDir + "/Updater.exe");
+
+    wchar_t* file = new wchar_t[updaterFile.fileName().size() + 1];
+    updaterFile.fileName().toWCharArray(file);
+
+    QString arguments = id + " " + version + " \"" + QCoreApplication::applicationDirPath() + "\"";
+    wchar_t* args = new wchar_t[arguments.size() + 1];
+    arguments.toWCharArray(args);
+
+    wchar_t* dir = new wchar_t[updaterDir.size() + 1];
+    QCoreApplication::applicationDirPath().toWCharArray(dir);
+
+    ::ShellExecuteW(0, L"runas", file, args, dir, SW_SHOWNORMAL);
+
+    delete [] file;
+    delete [] args;
+    delete [] dir;
+#else
+    QFile updaterFile(updaterDir + "/Updater");
+
+    QStringList argumentsList;
+    argumentsList << id << version << QCoreApplication::applicationDirPath();
+
+    if(!QProcess::startDetached(updaterFile.fileName(), argumentsList, updaterDir)) {
+        qWarning()<<"Failed to start"<<updaterFile.fileName();
+    }
+#endif
+
+    mApp.quit();
 }
 
 void UI::MainUI::provisionFailedClose() {

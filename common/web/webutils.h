@@ -7,6 +7,14 @@
 #include <QByteArray>
 
 namespace Web {
+    class WebDownloadStatus : public QObject {
+        Q_OBJECT
+    public:
+
+    signals:
+        void progress(qint64 received, qint64 total);
+    };
+
     class WebLoop : public QEventLoop {
         Q_OBJECT
     public:
@@ -35,7 +43,7 @@ namespace Web {
     {
     public:
         static bool download(const QUrl& url, QByteArray& output);
-        static bool download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData = "");
+        static bool download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData = "", WebDownloadStatus* status = nullptr);
 
     private:
         WebUtils();

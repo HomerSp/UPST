@@ -2,6 +2,7 @@
 #include <QSettings>
 #include <QThread>
 
+#include "utils/fileutils.h"
 #include "web/webutils.h"
 #include "serialdeviceworker.h"
 
@@ -367,11 +368,15 @@ void UI::SerialDeviceWorker::processLogin(LoginItem* item) {
         emit loginStatus(false, "");
     } else {
         if(item->token.size() > 0) {
-            emit loginStatus(true, item->token);
+            if(!processLoginCheckUpdate(item->token)) {
+                emit loginStatus(true, item->token);
+            }
         } else {
             QJsonDocument doc = QJsonDocument::fromJson(output);
             if(doc.isObject() && doc.object().contains("token")) {
-                emit loginStatus(true, doc.object()["token"].toString());
+                if(!processLoginCheckUpdate(doc.object()["token"].toString())) {
+                    emit loginStatus(true, doc.object()["token"].toString());
+                }
             } else {
                 emit loginStatus(false, "");
             }
@@ -380,6 +385,56 @@ void UI::SerialDeviceWorker::processLogin(LoginItem* item) {
 
     delete item;
 }
+
+bool UI::SerialDeviceWorker::processLoginCheckUpdate(const QString& token) {
+    emit updateCheck();
+
+    QByteArray output;
+    QHash<QString, QString> headers;
+    headers.insert("U-Token", token);
+
+    QString postData = "v=" + QString(PROG_VERSION);
+
+    if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/check_update.php"), output, headers, postData)) {
+        return false;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(output);
+    if(doc.isObject()) {
+        QJsonObject obj = doc.object();
+        if(obj.contains("id") && obj.contains("version") && obj.contains("time")) {
+            QTemporaryDir updaterDir;
+            if(!updaterDir.isValid()) {
+                return false;
+            }
+
+            QString sourcePath = QCoreApplication::applicationDirPath();
+            QString targetPath = updaterDir.path();
+
+            qDebug()<<"Copying"<<sourcePath<<"to"<<targetPath;
+
+            QList<QString> files;
+            Utils::FileUtils::listFiles(files, sourcePath);
+
+            foreach(QString fileName, files) {
+                QFile source(sourcePath + "/" + fileName);
+                QFileInfo target(targetPath + "/" + fileName);
+
+                QDir().mkpath(target.absoluteDir().absolutePath());
+                source.copy(target.absoluteFilePath());
+            }
+
+            updaterDir.setAutoRemove(false);
+
+            emit updateAvailable(updaterDir.path(), token, obj["id"].toString(), obj["version"].toString(), QDateTime::fromTime_t(obj["time"].toInt()));
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 void UI::SerialDeviceWorker::deviceProvisionProgressChanged(int status, int progress, int error) {
     qDebug()<<"deviceProvisionProgressChanged"<<status<<progress<<error;

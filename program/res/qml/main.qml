@@ -830,6 +830,8 @@ ApplicationWindow {
         onOpacityChanged: {
             if(opacity == 1.0) {
                 loginOverlay.hide();
+            } else if(opacity == 0.0) {
+                loggingInLoader.item.setCheckForUpdates(false);
             }
         }
 
@@ -840,6 +842,7 @@ ApplicationWindow {
         }
 
         Loader {
+            id: loggingInLoader
             anchors.fill: parent
             z: 1001
 

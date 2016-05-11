@@ -6,6 +6,7 @@
 #include <QWaitCondition>
 #include <QSerialPortInfo>
 #include <QPair>
+#include <QTemporaryDir>
 
 #include "serial/serialdevice.h"
 #include "serial/serialdeviceconfig.h"
@@ -81,6 +82,9 @@ namespace UI {
 
         void loginStatus(bool success, const QString& token);
 
+        void updateCheck();
+        void updateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
+
         void statusChange(const QString& status);
 
     private:
@@ -99,6 +103,8 @@ namespace UI {
         void processDeviceProvision(Serial::SerialDevice* device);
         void processCommand(SerialCommandItem* command);
         void processLogin(LoginItem* item);
+
+        bool processLoginCheckUpdate(const QString& token);
 
         Serial::SerialDeviceConfig* mDeviceConfig;
 

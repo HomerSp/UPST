@@ -50,7 +50,7 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 #endif
     data += " " + msg + "\n";
 
-    QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/log.txt");
+    QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/upst.log");
     file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     QTextStream stream(&file);
     stream << data;
