@@ -232,7 +232,7 @@ ApplicationWindow {
                         id: currentDeviceRectLogo
                         anchors.right: parent.right
                         height: parent.height
-                        source: "qrc:/res/images/logo.png"
+                        source: "qrc:/res/images/logo.svg"
                         fillMode: Image.PreserveAspectFit
                         mipmap: true
                     }

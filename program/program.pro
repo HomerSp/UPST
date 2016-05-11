@@ -21,6 +21,8 @@ win32 {
 
 HEADERS += devicefilterevent.h
 
+win32: RC_FILE = res/program.rc
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 

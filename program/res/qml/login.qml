@@ -24,7 +24,7 @@ Rectangle {
         anchors.rightMargin: unit.dp(8)
         anchors.topMargin: unit.dp(8)
 
-        source: "qrc:/res/images/logo.png"
+        source: "qrc:/res/images/logo.svg"
         fillMode: Image.PreserveAspectFit
         sourceSize.height: unit.dp(32)
         mipmap: true
