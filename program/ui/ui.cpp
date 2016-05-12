@@ -338,6 +338,10 @@ void UI::MainUI::versionUpdateCheck() {
 void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString &id, const QString &version, const QDateTime &updateTime) {
     qDebug()<<"New Update is available"<<version;
 
+    QSettings settings;
+    settings.setValue("user/token", token);
+    settings.sync();
+
 #ifdef Q_OS_WIN
     QString updaterPath(updaterDir + "/Updater.exe");
 #else
