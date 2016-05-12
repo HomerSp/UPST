@@ -113,7 +113,12 @@ bool SerialDevice::provision(const QString& userToken) {
 
     emit provisionProgressChanged(SerialProvisionStatusProgress, 2);
 
+    qDebug()<<"Provision process started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
+
     bool ret = provision(provisionData);
+
+    qDebug()<<"Provision process finished at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
+
     delete provisionData;
 
     return ret;
@@ -242,10 +247,6 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"===== SETTING DEVICE OFFLINE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdBefore.execute();
-        if(!radioCmdBefore.resultSuccess()) {
-            ret = false;
-            break;
-        }
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
@@ -331,14 +332,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         qDebug()<<"===== SETTING DEVICE OFFLINE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdAfter(device, Serial::QCDM::MODE_RADIO_OFFLINE);
         radioCmdAfter.execute();
-        if(!radioCmdAfter.resultSuccess()) {
-            ret = false;
-            break;
-        }
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
     }
+
+    qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
     qDebug()<<"===== RESETTING DEVICE AFTER =====";
     Serial::QCDM::Commands::RadioModeCommand radioResetAfter(this, Serial::QCDM::MODE_RADIO_RESET);
@@ -347,6 +346,8 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     if(!radioResetAfter.resultSuccess()) {
         ret = false;
     }
+
+    qDebug()<<"Reset device finished at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
