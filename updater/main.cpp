@@ -8,6 +8,9 @@
 #include <QTextStream>
 
 #include "utils/fileutils.h"
+#ifdef Q_OS_WIN
+#include "utils/winutils.h"
+#endif
 #include "ui/ui.h"
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -62,6 +65,10 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(&logMessageHandler);
 
+#ifdef Q_OS_WIN
+    Utils::WinUtils::enableIntelHack();
+#endif
+
     QGuiApplication::setApplicationName("UPST");
     QGuiApplication::setOrganizationDomain("ultimobile.net");
     QGuiApplication::setOrganizationName("Ultimobile");
@@ -71,9 +78,15 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QStringList args = QCoreApplication::arguments();
-    if(args.size() == 2 && args.at(1) == "create") {
+    if(args.size() >= 2 && args.at(1) == "create") {
         QList<QString> files;
-        Utils::FileUtils::listFiles(files, QCoreApplication::applicationDirPath());
+        if(args.size() == 2) {
+            Utils::FileUtils::listFiles(files, QCoreApplication::applicationDirPath());
+        } else {
+            for(int i = 2; i < args.size(); i++) {
+                files.append(args.at(i));
+            }
+        }
 
         QByteArray data;
         foreach(QString fileName, files) {
