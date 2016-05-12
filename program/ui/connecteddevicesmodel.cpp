@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "connecteddevicesmodel.h"
 
 UI::ConnectedDevicesModel::ConnectedDevicesModel(QObject* parent)
@@ -153,10 +154,22 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
 }
 
 void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int status, int current, int error) {
+    if(mDeviceProgress.find(device) == mDeviceProgress.end()) {
+        return;
+    }
+
+    qDebug()<<"setProgress"<<status<<current<<error;
+
     DeviceModelProgress* progress = mDeviceProgress.find(device).value();
+    if(progress == nullptr) {
+        return;
+    }
+
     progress->status = static_cast<Serial::SerialProvisionStatus>(status);
     progress->error = static_cast<Serial::SerialProvisionError>(error);
     progress->current = current;
 
     deviceUpdate(device);
+
+    qDebug()<<"setProgress done";
 }
