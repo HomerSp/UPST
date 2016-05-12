@@ -53,7 +53,10 @@ void NvProvisionData::updateStart(const QJsonObject &rootObject) {
 
         if(shouldAdd) {
             qDebug()<<"prlData size"<<prlData.size();
-            commands().append(new Serial::QCDM::Commands::PRLCommand(device(), false, prlData));
+
+            Serial::SerialCommand* prlCmd = new Serial::QCDM::Commands::PRLCommand(device(), false, prlData);
+            prlCmd->setTimeout(10000);
+            commands().append(prlCmd);
         }
     }
 }
@@ -134,7 +137,9 @@ void NvProvisionData::updateCalibration(const QUrl& url, const QString& md5) {
 
             qDebug()<<QString(nvItemData.toHex());
 
-            commands().append(new Serial::QCDM::Commands::Nv::NvCommand(device(), false, static_cast<Serial::QCDM::NvItem>(nvItem), nvItemData));
+            Serial::SerialCommand* cmd = new Serial::QCDM::Commands::Nv::NvCommand(device(), false, static_cast<Serial::QCDM::NvItem>(nvItem), nvItemData);
+            cmd->setTimeout(10000);
+            commands().append(cmd);
         }
     }
 }
