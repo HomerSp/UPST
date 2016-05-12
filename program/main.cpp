@@ -8,6 +8,10 @@
 #include <QTextStream>
 #include <QThread>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 #include "utils/fileutils.h"
 #include "ui/ui.h"
 #include "devicefilterevent.h"
@@ -79,6 +83,19 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(common);
 
     qInstallMessageHandler(&logMessageHandler);
+
+    // INTEL GRAPHICS BUGS !!!111one
+#ifdef Q_OS_WIN
+    DISPLAY_DEVICE device;
+    device.cb = sizeof(DISPLAY_DEVICE);
+    EnumDisplayDevices(NULL, 0, &device, 0);
+
+    QString deviceName = QString::fromWCharArray(device.DeviceString);
+    if(deviceName == "Intel(R) HD Graphics 3000") {
+        qWarning()<<"Enabling software OpenGL due to bug in Intel driver";
+        QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
+    }
+#endif
 
     QGuiApplication::setApplicationName("UPST");
     QGuiApplication::setOrganizationDomain("ultimobile.net");
