@@ -83,4 +83,6 @@ void UI::UpdateWorker::process() {
 
         emit installProgress(i, output.size());
     }
+
+    emit installFinished(mInstallDir);
 }

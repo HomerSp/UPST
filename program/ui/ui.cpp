@@ -7,11 +7,7 @@
 #include <QTemporaryDir>
 #include <QThread>
 
-#ifdef Q_OS_WIN
-#include <windows.h>
-#include <shellapi.h>
-#endif
-
+#include "utils/fileutils.h"
 #include "ui.h"
 #include "section/deviceinfo.h"
 #include "section/manual.h"
@@ -343,33 +339,15 @@ void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString
     qDebug()<<"New Update is available"<<version;
 
 #ifdef Q_OS_WIN
-    QFile updaterFile(updaterDir + "/Updater.exe");
-
-    wchar_t* file = new wchar_t[updaterFile.fileName().size() + 1];
-    updaterFile.fileName().toWCharArray(file);
-
-    QString arguments = id + " " + version + " \"" + QCoreApplication::applicationDirPath() + "\"";
-    wchar_t* args = new wchar_t[arguments.size() + 1];
-    arguments.toWCharArray(args);
-
-    wchar_t* dir = new wchar_t[updaterDir.size() + 1];
-    QCoreApplication::applicationDirPath().toWCharArray(dir);
-
-    ::ShellExecuteW(0, L"runas", file, args, dir, SW_SHOWNORMAL);
-
-    delete [] file;
-    delete [] args;
-    delete [] dir;
+    QString updaterPath(updaterDir + "/Updater.exe");
 #else
-    QFile updaterFile(updaterDir + "/Updater");
+    QString updaterPath(updaterDir + "/Updater");
+#endif
 
     QStringList argumentsList;
     argumentsList << id << version << QCoreApplication::applicationDirPath();
 
-    if(!QProcess::startDetached(updaterFile.fileName(), argumentsList, updaterDir)) {
-        qWarning()<<"Failed to start"<<updaterFile.fileName();
-    }
-#endif
+    Utils::FileUtils::execute(updaterPath, argumentsList, updaterDir);
 
     mApp.quit();
 }

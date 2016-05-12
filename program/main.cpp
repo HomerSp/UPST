@@ -6,7 +6,9 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QTextStream>
+#include <QThread>
 
+#include "utils/fileutils.h"
 #include "ui/ui.h"
 #include "devicefilterevent.h"
 
@@ -85,6 +87,42 @@ int main(int argc, char *argv[])
     QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 
     QGuiApplication app(argc, argv);
+
+    if(app.arguments().size() == 3 && app.arguments().at(1) == "update") {
+        QString updatePath = app.arguments().at(2);
+
+        qDebug()<<"Deleting temporary files from"<<updatePath;
+
+        QList<QString> updaterFiles, updaterDirs;
+        Utils::FileUtils::listFiles(updaterFiles, updatePath);
+        Utils::FileUtils::listDirs(updaterDirs, updatePath);
+
+        int retries = 0;
+        bool retry = false;
+        do {
+            if(retries >= 5) {
+                qWarning()<<"Failed to delete temporary files...";
+                break;
+            }
+
+            foreach(QString file, updaterFiles) {
+                if(!QFile::remove(updatePath + "/" + file)) {
+                    break;
+                }
+            }
+
+            if(retry) {
+                retries++;
+                QThread::sleep(1000);
+            }
+        } while(retry);
+
+        foreach(QString dir, updaterDirs) {
+            QDir(updatePath).rmdir(dir);
+        }
+
+        QDir().rmdir(updatePath);
+    }
 
     qInfo()<<"Starting UPST"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 

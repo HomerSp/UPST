@@ -11,6 +11,9 @@ namespace Utils {
     {
     public:
         static void listFiles(QList<QString> &files, const QString& source, const QString& sub = QString());
+        static void listDirs(QList<QString> &dirs, const QString& source, const QString& sub = QString());
+
+        static bool execute(const QString& path, const QStringList& argumentsList, const QString& workingDir);
 
     private:
         FileUtils();

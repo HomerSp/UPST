@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QThread>
 
+#include "utils/fileutils.h"
 #include "ui.h"
 
 UI::MainUI::MainUI(const QGuiApplication& app, const QString& updateID, const QString& installDir)
@@ -25,6 +26,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& updateID, const QS
 
     connect(mWorker, &UpdateWorker::downloadProgress, this, &MainUI::downloadProgress);
     connect(mWorker, &UpdateWorker::installProgress, this, &MainUI::installProgress);
+    connect(mWorker, &UpdateWorker::installFinished, this, &MainUI::installFinished);
     connect(mWorker, &UpdateWorker::updateStatus, this, &MainUI::updateStatus);
 
     connect(thread, &QThread::started, mWorker, &UpdateWorker::process);
@@ -36,6 +38,10 @@ UI::MainUI::MainUI(const QGuiApplication& app, const QString& updateID, const QS
 }
 
 UI::MainUI::~MainUI() {
+    if(mWorker != nullptr) {
+        delete mWorker;
+    }
+
     delete mEngine;
 }
 
@@ -63,6 +69,21 @@ void UI::MainUI::installProgress(quint64 received, quint64 total) {
 
     QObject* progressObject = rootObject->findChild<QObject*>("updatingProgress");
     progressObject->setProperty("value", 50 + p);
+}
+
+void UI::MainUI::installFinished(const QString& installDir) {
+#ifdef Q_OS_WIN
+    QString upstPath(installDir + "/UPST.exe");
+#else
+    QString upstPath(installDir + "/UPST");
+#endif
+
+    QStringList args;
+    args << "update" << QCoreApplication::applicationDirPath();
+
+    Utils::FileUtils::execute(upstPath, args, installDir);
+
+    mApp.quit();
 }
 
 void UI::MainUI::updateStatus(const QString &status) {

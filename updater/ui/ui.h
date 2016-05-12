@@ -23,6 +23,7 @@ namespace UI {
     public slots:
         void downloadProgress(qint64 received, qint64 total);
         void installProgress(quint64 received, quint64 total);
+        void installFinished(const QString& installDir);
 
         void updateStatus(const QString &status);
 
