@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
             if(retry) {
                 retries++;
-                QThread::sleep(1000);
+                QThread::sleep(5);
             }
         } while(retry);
 
