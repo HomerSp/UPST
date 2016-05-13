@@ -51,13 +51,13 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     }
 
 #ifdef QT_DEBUG
-    data += " " + QString(context.file) + "." + QString::number(context.line) + ": ";
+    data += " " + QString(context.file) + "." + QString::number(context.line) + ":";
 #endif
     data += " " + msg;
 
     if(data.length() > 0) {
         if(data.at(data.length() - 1) != '\n') {
-            sLogObject += "\n";
+            data += "\n";
         }
     }
 
