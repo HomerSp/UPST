@@ -98,6 +98,7 @@ bool SerialDevice::provision(const QString& userToken) {
     qDebug()<<"Downloading provisioning data for"<<mID;
 
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/provision.php"), output, headers, postData)) {
+        qCritical()<<"Failed to download provision data";
         emit provisionProgressChanged(SerialProvisionStatusError, 0, SerialProvisionErrorDownload);
         return false;
     }
@@ -106,6 +107,7 @@ bool SerialDevice::provision(const QString& userToken) {
 
     SerialProvisionData* provisionData = new Serial::QCDM::Nv::NvProvisionData(this, QString(output));
     if(!provisionData->valid()) {
+        qCritical()<<"Failed to parse provision data";
         emit provisionProgressChanged(SerialProvisionStatusError, 1, SerialProvisionErrorData);
         delete provisionData;
         return false;
@@ -259,7 +261,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             if(passwordCmd.result()->success()) {
                 qDebug()<<"Result="<<passwordCmd.result()->data().toString();
             } else {
-                qDebug()<<"Could not send password";
+                qCritical()<<"Could not send password";
                 ret = false;
                 break;
             }
@@ -272,7 +274,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(spcCommand.result()->success()) {
             qDebug()<<"Result="<<spcCommand.result()->data().toString();
         } else {
-            qDebug()<<"Could not unlock SPC";
+            qCritical()<<"Could not unlock SPC";
             ret = false;
             break;
         }
@@ -287,7 +289,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(mdnCmd.result()->success()) {
             qDebug()<<"Result="<<mdnCmd.result()->data().toString();
         } else {
-            qDebug()<<"Could not write MDN";
+            qCritical()<<"Could not write MDN";
             ret = false;
             break;
         }
@@ -302,7 +304,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(minCmd.result()->success()) {
             qDebug()<<"Result="<<minCmd.result()->data().toString();
         } else {
-            qDebug()<<"Could not write MIN";
+            qCritical()<<"Could not write MIN";
             ret = false;
             break;
         }
@@ -344,6 +346,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     radioResetAfter.setTimeout(10000);
     radioResetAfter.execute();
     if(!radioResetAfter.resultSuccess()) {
+        qCritical()<<"Could not reset device";
         ret = false;
     }
 
@@ -386,8 +389,6 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
         if(!result->success()) {
             qDebug()<<"Failed to provision";
             return false;
-        } else {
-            qDebug()<<"Provision success";
         }
     }
 
