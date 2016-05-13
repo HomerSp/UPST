@@ -80,11 +80,11 @@ QString SerialProvisionData::getUser(SerialDevice* device, UserType type, const 
     case UserTypeESN:
         return device->esnStr() + userNai;
     case UserTypeMIN:
-        return device->minStr() + userNai;
+        return device->newMinStr() + userNai;
     case UserTypeMEID:
         return device->meidStr() + userNai;
     default:
-        return device->mdnStr() + userNai;
+        return device->newMdnStr() + userNai;
     }
 }
 
@@ -95,7 +95,7 @@ QString SerialProvisionData::getPassword(SerialDevice* device, const QString& st
     } else if (strLow == "decesn") {
         return QString("%1").arg(device->esn(), 10, 10, QChar('0'));
     } else if (strLow == "min") {
-        return device->minStr();
+        return device->newMinStr();
     } else if (strLow == "esn") {
         return device->esnStr();
     }

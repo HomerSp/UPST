@@ -14,11 +14,11 @@ GenericNaiCommand::GenericNaiCommand(SerialDevice* device, bool read, const QJso
         if(nai.startsWith("decesn@")) {
             nai = QString("%1").arg(device->esn(), 10, 10, QChar('0')) + nai.mid(nai.indexOf('@'));
         } else if(nai.startsWith("HSMDN@")) {
-            nai = "HS" + device->mdnStr() + nai.mid(nai.indexOf('@'));
+            nai = "HS" + device->newMdnStr() + nai.mid(nai.indexOf('@'));
         } else if(nai.startsWith("MDN@")) {
-            nai = device->mdnStr() + nai.mid(nai.indexOf('@'));
+            nai = device->newMdnStr() + nai.mid(nai.indexOf('@'));
         } else if(nai.startsWith("MIN@")) {
-            nai = device->minStr() + nai.mid(nai.indexOf('@'));
+            nai = device->newMinStr() + nai.mid(nai.indexOf('@'));
         } else if(!nai.contains("0")) {
             nai = SerialProvisionData::getUser(device, userType, nai);
         }
