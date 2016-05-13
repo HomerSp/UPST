@@ -54,6 +54,7 @@ Rectangle {
            onRunningChanged: {
                if(running && root.opacity < 1.0) {
                    root.visible = true;
+                   root.forceActiveFocus();
                } else if(!running && root.opacity === 0.0) {
                    root.visible = false;
                }
