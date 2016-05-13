@@ -53,21 +53,25 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 #ifdef QT_DEBUG
     data += " " + QString(context.file) + "." + QString::number(context.line) + ": ";
 #endif
-    data += " " + msg + "\n";
+    data += " " + msg;
+
+    if(data.length() > 0) {
+        if(data.at(data.length() - 1) != '\n') {
+            sLogObject += "\n";
+        }
+    }
 
     QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/upst.log");
-    file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
-    QTextStream stream(&file);
-    stream << data;
-    stream.flush();
-    file.close();
+    if(file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text)) {
+        QTextStream stream(&file);
+        stream << data;
+        stream.flush();
+        file.close();
+    }
 
     QTextStream(stdout) << data;
 
     sLogObject += data;
-    if(data.at(data.length() - 1) != '\n') {
-        sLogObject += "\n";
-    }
     if(LOG_LIMIT > 0 && sLogObject.length() > LOG_LIMIT) {
         sLogObject.remove(0, sLogObject.length() - LOG_LIMIT);
     }
