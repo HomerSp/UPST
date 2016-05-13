@@ -346,8 +346,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     radioResetAfter.setTimeout(10000);
     radioResetAfter.execute();
     if(!radioResetAfter.resultSuccess()) {
-        qCritical()<<"Could not reset device";
-        ret = false;
+        qWarning()<<"Could not reset device";
     }
 
     qDebug()<<"Reset device finished at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
