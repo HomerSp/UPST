@@ -691,7 +691,7 @@ ApplicationWindow {
 
                 header: "Failed to provision device"
                 errorLine1: qsTr("An error has ocurred while provisioning the device:")
-                errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 555-55555.")
+                errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 720-433-3028.")
             }
 
            Rectangle {
