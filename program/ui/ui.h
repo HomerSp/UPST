@@ -25,21 +25,25 @@ namespace UI {
 
         Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
 
-        QString getLogData() const {
+        QString getLogData() {
+            QMutexLocker locker(&mLogMutex);
             return mLogData;
         }
 
-        int length() const {
+        int length() {
+            QMutexLocker locker(&mLogMutex);
             return mLogData.length();
         }
 
         void remove(int i, int len) {
+            QMutexLocker locker(&mLogMutex);
             mLogData.remove(i, len);
 
             emit logDataChanged(mLogData);
         }
 
         LogObject& operator+=(const QString& data) {
+            QMutexLocker locker(&mLogMutex);
             mLogData += data;
 
             emit logDataChanged(mLogData);
@@ -48,9 +52,10 @@ namespace UI {
         }
 
     signals:
-        void logDataChanged(const QString &logData);
+        void logDataChanged(QString logData);
 
     private:
+        QMutex mLogMutex;
         QString mLogData;
     };
 
