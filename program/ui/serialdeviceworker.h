@@ -13,6 +13,8 @@
 #include "serial/serialcommand.h"
 
 namespace UI {
+    class LogObject;
+
     struct LoginItem {
         QString username;
         QString password;
@@ -49,7 +51,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        SerialDeviceWorker();
+        SerialDeviceWorker(UI::LogObject* logOject);
         ~SerialDeviceWorker();
 
         void addDevicesListUpdate();
@@ -105,6 +107,9 @@ namespace UI {
         void processLogin(LoginItem* item);
 
         bool processLoginCheckUpdate(const QString& token);
+        bool processDeviceProvisionTracking(Serial::SerialDevice* device, const QString& token, bool error);
+
+        UI::LogObject* mLogObject;
 
         Serial::SerialDeviceConfig* mDeviceConfig;
 

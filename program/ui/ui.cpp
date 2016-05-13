@@ -50,7 +50,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
 
     QThread* thread = new QThread;
 
-    mWorker = new SerialDeviceWorker();
+    mWorker = new SerialDeviceWorker(logData);
     mWorker->moveToThread(thread);
 
     connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);

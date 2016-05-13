@@ -4,6 +4,8 @@
 
 #include "utils/fileutils.h"
 #include "web/webutils.h"
+
+#include "ui.h"
 #include "serialdeviceworker.h"
 
 UI::SerialCommandItem::SerialCommandItem(Serial::SerialDevice* device)
@@ -30,8 +32,9 @@ void UI::SerialCommandItem::process() {
     emit finished();
 }
 
-UI::SerialDeviceWorker::SerialDeviceWorker()
-    : mRunning(true)
+UI::SerialDeviceWorker::SerialDeviceWorker(UI::LogObject* logObject)
+    : mLogObject(logObject),
+      mRunning(true)
 {
     mDeviceConfig = new Serial::SerialDeviceConfig();
 }
@@ -344,8 +347,10 @@ void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device
     QString userToken = QSettings().value("user/token").toString();
 
     connect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
-    device->provision(userToken);
+    bool ret = device->provision(userToken);
     disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
+
+    processDeviceProvisionTracking(device, userToken, ret);
 }
 
 void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
@@ -435,6 +440,29 @@ bool UI::SerialDeviceWorker::processLoginCheckUpdate(const QString& token) {
     return false;
 }
 
+bool UI::SerialDeviceWorker::processDeviceProvisionTracking(Serial::SerialDevice* device, const QString& userToken, bool error) {
+    QByteArray output;
+    QHash<QString, QString> headers;
+    headers.insert("U-Token", userToken);
+
+    QJsonObject deviceObj;
+    deviceObj.insert("id", device->id());
+    deviceObj.insert("min", device->newMinStr());
+    deviceObj.insert("mdn", device->newMdnStr());
+    deviceObj.insert("uniqueID", QString(QCryptographicHash::hash(device->imeiStr().toLatin1(), QCryptographicHash::Sha256).toHex()));
+
+    QJsonObject obj;
+    obj.insert("device", QJsonValue(deviceObj));
+
+    if(error) {
+        obj.insert("log", mLogObject->getLogData());
+    }
+
+    QJsonDocument doc(obj);
+    QString postData = doc.toJson();
+
+    return Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/tracking.php"), output, headers, postData);
+}
 
 void UI::SerialDeviceWorker::deviceProvisionProgressChanged(int status, int progress, int error) {
     qDebug()<<"deviceProvisionProgressChanged"<<status<<progress<<error;
