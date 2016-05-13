@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QQmlContext>
 #include <QQmlProperty>
+#include <QDateTime>
 #include <QFile>
 #include <QProcess>
 #include <QSettings>
@@ -22,9 +23,13 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
+    QDateTime buildTime;
+    buildTime.setTime_t(QString(PROG_BUILDTIME).toULongLong());
+
     mEngine = new QQmlApplicationEngine();
     mEngine->rootContext()->setContextProperty("logText", logData);
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
+    mEngine->rootContext()->setContextProperty("programBuildTime", QVariant::fromValue(buildTime));
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));

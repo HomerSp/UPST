@@ -25,14 +25,20 @@ Dialog {
         spacing: unit.dp(8.0)
 
         Text {
-            text: "Ultimobile Product Support Tool v" + programVersion
+            text: "Ultimobile Product Support Tool"
+            font.family: openSansRegularFont.name
+            font.pixelSize: unit.em(1.1)
+        }
+
+        Text {
+            text: "Version " + programVersion + " built " + programBuildTime.toUTCString() + "\n"
             font.family: openSansRegularFont.name
             font.pixelSize: unit.em(1.1)
         }
 
         Text {
             id: aboutDialogPowered
-            text: "Powered by Qt v" + qtVersion
+            text: "Powered by Qt v" + qtVersion + "\n"
             font.family: openSansRegularFont.name
             font.pixelSize: unit.em(1.1)
         }
