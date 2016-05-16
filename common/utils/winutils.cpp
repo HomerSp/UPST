@@ -41,7 +41,7 @@ bool Utils::WinUtils::execute(const QString &path, const QStringList &argumentsL
         arguments = "/user:" + adminUser + " /savecred \"\\\"" + path + "\\\" " + arguments + "\"";
     }
 
-    qDebug()<<"Running program"<<path<<"with arguments"<<arguments;
+    qDebug()<<"Running program"<<tmpPath<<"with arguments"<<arguments;
 
     wchar_t* wOperation = new wchar_t[operation.size() + 1];
     memset(wOperation, 0x0, sizeof(wchar_t) * (operation.size() + 1));
