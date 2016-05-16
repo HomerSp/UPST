@@ -1,9 +1,9 @@
 #include <QDir>
 #include <QFileInfoList>
+#include <QHostInfo>
 
 #ifdef Q_OS_WIN
-#include <windows.h>
-#include <shellapi.h>
+#include "winutils.h"
 #endif
 
 #include "fileutils.h"
@@ -64,36 +64,7 @@ void Utils::FileUtils::listDirs(QList<QString> &dirs, const QString& source, con
 
 bool Utils::FileUtils::execute(const QString &path, const QStringList &argumentsList, const QString &workingDir) {
 #ifdef Q_OS_WIN
-    wchar_t* file = new wchar_t[path.size() + 1];
-    memset(file, 0x0, sizeof(wchar_t) * (path.size() + 1));
-    path.toWCharArray(file);
-
-    QString arguments = "";
-    foreach(const QString& arg, argumentsList) {
-        if(arguments.size() > 0) {
-            arguments += " ";
-        }
-
-        arguments += "\"" + arg + "\"";
-    }
-
-    qDebug()<<"Running program"<<path<<"with arguments"<<arguments;
-
-    wchar_t* args = new wchar_t[arguments.size() + 1];
-    memset(args, 0x0, sizeof(wchar_t) * (arguments.size() + 1));
-    arguments.toWCharArray(args);
-
-    wchar_t* dir = new wchar_t[workingDir.size() + 1];
-    memset(dir, 0x0, sizeof(wchar_t) * (workingDir.size() + 1));
-    workingDir.toWCharArray(dir);
-
-    ::ShellExecuteW(0, L"runas", file, args, dir, SW_SHOWNORMAL);
-
-    delete [] file;
-    delete [] args;
-    delete [] dir;
-
-    return true;
+    return Utils::WinUtils::execute(path, argumentsList, workingDir);
 #else
     return QProcess::startDetached(path, argumentsList, workingDir);
 #endif
