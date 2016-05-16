@@ -380,7 +380,7 @@ ApplicationWindow {
 
                             opacity: (progressStatus > 0)?1.0:0.0
 
-                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":((progressStatus == 2)?"done":"download")) + ".svg"
+                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":(progressStatus == 2)?(deviceManualReboot?"restart":"done"):"download") + ".svg"
                             fillMode: Image.PreserveAspectFit
                             mipmap: true
                             sourceSize.height: deviceInfoText.height / 2

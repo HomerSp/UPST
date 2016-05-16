@@ -32,6 +32,11 @@ namespace Serial {
         SerialProvisionErrorNv,
     };
 
+    enum SerialDeviceFlags {
+        SerialDeviceFlagNone = 0x0,
+        SerialDeviceFlagManualReboot = 0x1,
+    };
+
     class SerialDevice : public QObject
     {
         Q_OBJECT
@@ -117,10 +122,14 @@ namespace Serial {
             return mType;
         }
 
+        bool flagManualReboot() const {
+            return (mFlags & SerialDeviceFlagManualReboot) != 0;
+        }
+
+
         const QString &mdn() const {
             return mMdn;
         }
-
         uint64_t min() const {
             return mMin;
         }
@@ -269,6 +278,7 @@ namespace Serial {
         QString mModel;
         QString mCodename;
         SerialDeviceType mType;
+        uint32_t mFlags;
 
         QString mMdn;
         uint64_t mMin;

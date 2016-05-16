@@ -31,6 +31,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mMake(""),
       mModel(""),
       mType(SerialDeviceTypeUnknown),
+      mFlags(0),
       mMdn(""),
       mMin(0),
       mESN(0),
@@ -192,6 +193,10 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
         // This isn't a required parameter.
         if(obj.contains("codename")) {
             mCodename = obj["codename"].toString();
+        }
+
+        if(obj.contains("flags")) {
+            mFlags = obj["flags"].toInt();
         }
 
         return true;

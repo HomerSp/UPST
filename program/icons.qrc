@@ -9,5 +9,6 @@
         <file>res/images/icons/mifi.svg</file>
         <file>res/images/icons/done.svg</file>
         <file>res/images/icons/failed.svg</file>
+        <file>res/images/icons/restart.svg</file>
     </qresource>
 </RCC>
