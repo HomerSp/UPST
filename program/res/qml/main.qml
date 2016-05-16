@@ -20,7 +20,7 @@ ApplicationWindow {
     }
 
     function updateTitle() {
-        t = qsTr("UPST") + " v" + programVersion;
+        var t = qsTr("UPST") + " v" + programVersion;
         if(mainPageLoader.currentView == "manual") {
             this.title = t + qsTr(" - Manual mode")
         } else if(mainPageLoader.currentView == "deviceinfo") {
