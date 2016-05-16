@@ -13,19 +13,25 @@ ApplicationWindow {
     minimumWidth: unit.dp(640)
     minimumHeight: unit.dp(480)
     color: "#f1f1f1"
+    title: qsTr("UPST") + " v" + programVersion
 
     Units {
         id: unit
     }
 
     function updateTitle() {
+        t = qsTr("UPST") + " v" + programVersion;
         if(mainPageLoader.currentView == "manual") {
-            this.title = qsTr("UPST - Manual mode")
+            this.title = t + qsTr(" - Manual mode")
         } else if(mainPageLoader.currentView == "deviceinfo") {
-            this.title = qsTr("UPST - Device info");
+            this.title = t + qsTr(" - Device info");
         } else {
-            this.title = qsTr("UPST")
+            this.title = t
         }
+    }
+
+    Component.onCompleted: {
+        updateTitle();
     }
 
     FontLoader {
