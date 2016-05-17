@@ -24,13 +24,16 @@ Rectangle {
     errorLine2: ""
     errorLine3: ""
 
-    function setError(error) {
-        root.errorLine2 = error;
-        root.opacity = (error.length > 0)?1.0:0.0;
+    function hide() {
+        root.opacity = 0.0;
+    }
+
+    function show(error) {
+        root.errorLine2 = (error !== undefined)?error:"";
+        root.opacity = 1.0;
     }
 
     onClosed: {
-        root.errorLine2 = "";
         root.opacity = 0.0;
     }
 
@@ -57,6 +60,7 @@ Rectangle {
                    root.forceActiveFocus();
                } else if(!running && root.opacity === 0.0) {
                    root.visible = false;
+                   root.errorLine2 = "";
                }
            }
        }

@@ -59,6 +59,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
+    QObject::connect(rootObject->findChild<QObject*>("provisionSuccessContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
 
     QThread* thread = new QThread;
 
@@ -316,7 +317,7 @@ void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
         updateLoginStatus(false);
 
         QObject* rootObject = mEngine->rootObjects().first();
-        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginFailedContainer"), "setError", Q_ARG(QVariant, "Please check your username or password."));
+        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginFailedContainer"), "show", Q_ARG(QVariant, "Please check your username or password."));
 
         return;
     }
@@ -388,7 +389,11 @@ void UI::MainUI::provisionFailedClose() {
     device->setProvisioning(false);
     mDevicesModel->setProgress(device, Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
 
-    viewUpdate();
+    if(!device->isAvailable()) {
+        deviceRemove(device->port());
+    } else {
+        viewUpdate();
+    }
 }
 
 UI::UISection::UISection(UI::MainUI* ui)

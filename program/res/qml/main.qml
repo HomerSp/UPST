@@ -275,6 +275,8 @@ ApplicationWindow {
 
                 onCurrentItemChanged: {
                     this.currentIndexChanged(this.currentIndex)
+
+                    currentItem.updateProgress();
                 }
 
                 onCountChanged: {
@@ -288,6 +290,7 @@ ApplicationWindow {
                 delegate: Component {
                     id: deviceListDelegate
                     Rectangle {
+                        property bool isProvisioned
                         property bool haveError
 
                         objectName: "deviceInfoWrapper"
@@ -299,6 +302,7 @@ ApplicationWindow {
                         x: 0
                         color: "#00ffffff"
 
+                        isProvisioned: progressStatus == 2
                         haveError: progressError.length > 0
 
                         Behavior on color {
@@ -462,8 +466,30 @@ ApplicationWindow {
                             NumberAnimation { properties: "anchors.leftMargin"; duration: 100 }
                         }
 
+                        onIsProvisionedChanged: {
+                            updateProgress();
+                        }
+
                         onHaveErrorChanged: {
-                            provisionFailedContainer.setError(progressError);
+                            updateProgress();
+                        }
+
+                        function updateProgress() {
+                            if(haveError) {
+                                provisionFailedContainer.show(progressError);
+                            } else {
+                                provisionFailedContainer.hide();
+                            }
+
+                            if(isProvisioned) {
+                                if(deviceManualReboot) {
+                                    provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
+                                } else {
+                                    provisionSuccessContainer.show();
+                                }
+                            } else {
+                                provisionSuccessContainer.hide();
+                            }
                         }
                     }
                 }
@@ -698,6 +724,14 @@ ApplicationWindow {
                 header: "Failed to provision device"
                 errorLine1: qsTr("An error has ocurred while provisioning the device:")
                 errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 720-433-3028.")
+            }
+
+            UPErrorBox {
+                objectName: 'provisionSuccessContainer'
+                id: provisionSuccessContainer
+
+                header: "Device has been provisioned"
+                errorLine1: qsTr("The device was provisioned successfully!")
             }
 
            Rectangle {
