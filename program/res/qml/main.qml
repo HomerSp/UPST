@@ -329,7 +329,7 @@ ApplicationWindow {
                                     Layout.fillHeight: true
                                     Layout.rowSpan: 2
 
-                                    source: icon
+                                    source: deviceIcon
                                     fillMode: Image.PreserveAspectFit
                                     mipmap: true
                                     sourceSize.height: deviceInfoText.height
@@ -350,8 +350,8 @@ ApplicationWindow {
                                     Text {
                                         id: deviceInfoName
 
-                                        text: name
-                                        color: "white"
+                                        text: deviceName
+                                        color: (deviceAvailable)?"#ffffff":"#eeeeee"
                                         font.pixelSize: unit.em(1.1)
                                         font.family: openSansRegularFont.name
                                         clip: true
@@ -360,8 +360,8 @@ ApplicationWindow {
                                     Text {
                                         id: deviceInfoPort
 
-                                        text: port
-                                        color: "white"
+                                        text: devicePort
+                                        color: deviceInfoName.color
                                         font.pixelSize: unit.em(1.0)
                                         font.family: openSansBoldFont.name
                                         font.bold: true

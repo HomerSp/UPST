@@ -47,17 +47,23 @@ namespace Serial {
 
         SerialCommunicator* communicator();
 
+        bool open();
+        bool close();
+
         void addChild(SerialDevice* device);
 
         const QList<SerialDevice*> deviceChildren() const {
             return mChildren;
         }
 
+        bool isAvailable();
+        bool isProvisioned() const {
+            return mNewMin != 0;
+        }
         bool isSameDevice(SerialDevice* device);
         bool isValid();
 
         bool update(bool* reschedule = nullptr);
-
         bool updateJson(const QJsonObject& obj);
 
         bool provision(const QString& userToken);

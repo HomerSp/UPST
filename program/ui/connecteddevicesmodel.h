@@ -22,6 +22,7 @@ namespace UI {
             NameRole = Qt::UserRole + 1,
             PortRole,
             IconRole,
+            AvailableRole,
             ManualRebootRole,
             ProgressMaxRole,
             ProgressMinRole,

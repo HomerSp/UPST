@@ -16,6 +16,10 @@ namespace Serial {
         bool open();
         bool close();
 
+        bool isOpen() {
+            return mPort != nullptr && mPort->isOpen();
+        }
+
         void clear();
 
         bool read(QByteArray& data, int timeout = 1000);

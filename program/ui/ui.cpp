@@ -230,10 +230,15 @@ void UI::MainUI::deviceRemove(const QString& port) {
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
-            emit deviceChanged(device, false);
-            mDevices.removeAt(i);
+            if(device->isProvisioned()) {
+                device->close();
+                emit deviceUpdate(device);
+            } else {
+                emit deviceChanged(device, false);
+                mDevices.removeAt(i);
 
-            mWorker->addDeviceRemove(device);
+                mWorker->addDeviceRemove(device);
+            }
 
             break;
         }

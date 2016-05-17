@@ -68,8 +68,20 @@ SerialCommunicator* SerialDevice::communicator() {
     return mCommunicator;
 }
 
+bool SerialDevice::open() {
+    return mCommunicator != nullptr && mCommunicator->open();
+}
+
+bool SerialDevice::close() {
+    return mCommunicator != nullptr && mCommunicator->close();
+}
+
 void SerialDevice::addChild(SerialDevice *device) {
     mChildren.append(device);
+}
+
+bool SerialDevice::isAvailable() {
+    return mCommunicator != nullptr && mCommunicator->isOpen();
 }
 
 bool SerialDevice::isSameDevice(SerialDevice *device) {

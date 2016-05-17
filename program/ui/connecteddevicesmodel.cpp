@@ -24,6 +24,8 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
         return device->portStr();
     case IconRole:
         return getDeviceIcon(device);
+    case AvailableRole:
+        return device->isAvailable();
     case ManualRebootRole:
         return device->flagManualReboot();
     case ProgressMaxRole:
@@ -48,9 +50,10 @@ int UI::ConnectedDevicesModel::rowCount(const QModelIndex &parent) const {
 
 QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    roles[PortRole] = "port";
-    roles[IconRole] = "icon";
+    roles[NameRole] = "deviceName";
+    roles[PortRole] = "devicePort";
+    roles[IconRole] = "deviceIcon";
+    roles[AvailableRole] = "deviceAvailable";
     roles[ManualRebootRole] = "deviceManualReboot";
     roles[ProgressMaxRole] = "progressMax";
     roles[ProgressMinRole] = "progressMin";
