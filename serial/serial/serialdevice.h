@@ -57,14 +57,13 @@ namespace Serial {
         }
 
         bool isAvailable();
-        bool isProvisioned() const {
-            return mNewMin != 0;
-        }
         bool isProvisioning() const {
             return mProvisioning;
         }
         bool isSameDevice(SerialDevice* device);
         bool isValid();
+
+        bool canProvision();
 
         bool update(bool* reschedule = nullptr);
         bool updateJson(const QJsonObject& obj);

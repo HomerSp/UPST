@@ -135,7 +135,6 @@ namespace UI {
 
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;
-        QList<Serial::SerialDevice*> mPendingDevices;
 
         QTimer* mRescheduleTimer;
         QSet<QString> mRescheduledDevices;

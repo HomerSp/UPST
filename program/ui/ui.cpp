@@ -38,11 +38,12 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
 
     mEngine->load(QUrl(QStringLiteral("qrc:/res/qml/main.qml")));
 
-    mRescheduleTimer = new QTimer();
+    mRescheduleTimer = new QTimer(this);
+    mRescheduleTimer->moveToThread(thread());
     mRescheduleTimer->setSingleShot(true);
     mRescheduleTimer->setInterval(5000);
     mRescheduleTimer->setTimerType(Qt::TimerType::VeryCoarseTimer);
-    connect(mRescheduleTimer, &QTimer::timeout, this, &UI::MainUI::devicesChanged);
+    QObject::connect(mRescheduleTimer, &QTimer::timeout, this, &UI::MainUI::devicesChanged);
 
     /* Set up signals */
     QObject* rootObject = mEngine->rootObjects().first();
@@ -116,17 +117,9 @@ void UI::MainUI::devicesChanged() {
 
         bool shouldAdd = true;
         foreach(Serial::SerialDevice* d, mDevices) {
-            if(*d == port) {
+            if(*d == port && !d->isProvisioning()) {
                 shouldAdd = false;
                 break;
-            }
-        }
-        if(shouldAdd) {
-            foreach(Serial::SerialDevice* d, mPendingDevices) {
-                if(*d == port) {
-                    shouldAdd = false;
-                    break;
-                }
             }
         }
 
@@ -154,13 +147,16 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
     }
 
     // Do we already have this device?
-    foreach(Serial::SerialDevice* d, mDevices) {
-        if(*d == *device) {
-            delete device;
+    for(int i = 0; i < mDevices.size(); i++) {
+        Serial::SerialDevice* d = mDevices.at(i);
+        if(d->isSameDevice(device) && d->isProvisioning()) {
+            mWorker->addDeviceRemove(d);
+            mDevices.replace(i, device);
             return;
         }
     }
-    foreach(Serial::SerialDevice* d, mPendingDevices) {
+
+    foreach(Serial::SerialDevice* d, mDevices) {
         if(*d == *device) {
             delete device;
             return;
@@ -173,8 +169,8 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         qDebug()<<"deviceAdd"<<d->vidStr()<<device->vidStr()<<d->pidStr()<<device->pidStr()<<d->meidStr()<<device->meidStr();
 
         if(device->isSameDevice(d)) {
-            // If the new device has a make, mdn or a min, use it as the parent. Otherwise we add this one as a child.
-            if(device->make().length() > d->make().length() || (device->mdn().size() > 0 && d->mdn().size() == 0) || (device->min() != 0 && d->min() == 0)) {
+            // If the new device has a type, use it as the parent. Otherwise we add this one as a child.
+            if(device->type() != Serial::SerialDeviceTypeUnknown && d->type() == Serial::SerialDeviceTypeUnknown) {
                 device->addChild(d);
                 mDevices.replace(i, device);
                 d = device;
@@ -187,21 +183,6 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
             return;
         }
     }
-
-    foreach(Serial::SerialDevice* d, mPendingDevices) {
-        if(device->isSameDevice(d)) {
-            device->addChild(d);
-            mPendingDevices.removeOne(d);
-            break;
-        }
-    }
-
-#ifndef TESTING_MODE
-    if(device->make().size() == 0) {
-        mPendingDevices.append(device);
-        return;
-    }
-#endif
 
     qInfo()<<"Adding port"<<device->port();
 
@@ -237,7 +218,7 @@ void UI::MainUI::deviceRemove(const QString& port) {
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
-            if(device->isProvisioned()) {
+            if(device->isProvisioning()) {
                 mWorker->addDeviceClose(device);
             } else {
                 emit deviceChanged(device, false);
@@ -249,17 +230,6 @@ void UI::MainUI::deviceRemove(const QString& port) {
             break;
         }
     }
-    for(int i = 0; i < mPendingDevices.size(); i++) {
-        if(*mPendingDevices.at(i) == port) {
-            Serial::SerialDevice* device = mPendingDevices[i];
-            mPendingDevices.removeAt(i);
-
-            mWorker->addDeviceRemove(device);
-
-            break;
-        }
-    }
-
 
     viewUpdate();
 }

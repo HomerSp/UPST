@@ -70,11 +70,29 @@ SerialCommunicator* SerialDevice::communicator() {
 }
 
 bool SerialDevice::open() {
-    return mCommunicator != nullptr && mCommunicator->open();
+    bool ret = mCommunicator->open();
+    if(!ret) {
+        return false;
+    }
+
+    foreach(Serial::SerialDevice* c, mChildren) {
+        ret = ret || c->open();
+    }
+
+    return ret;
 }
 
 bool SerialDevice::close() {
-    return mCommunicator != nullptr && mCommunicator->close();
+    bool ret = mCommunicator->close();
+    if(!ret) {
+        return false;
+    }
+
+    foreach(Serial::SerialDevice* c, mChildren) {
+        ret = ret || c->close();
+    }
+
+    return ret;
 }
 
 void SerialDevice::addChild(SerialDevice *device) {
@@ -86,7 +104,7 @@ bool SerialDevice::isAvailable() {
 }
 
 bool SerialDevice::isSameDevice(SerialDevice *device) {
-    return mVid == device->mVid && mPid == device->mPid && mMEID == device->mMEID;
+    return mVid == device->mVid && mPid == device->mPid && ((mMEID != 0 && mMEID == device->mMEID) || (mIMEI != 0 && mIMEI == device->mIMEI));
 }
 
 bool SerialDevice::isValid() {
@@ -96,6 +114,10 @@ bool SerialDevice::isValid() {
     cmd.execute();
 
     return cmd.result()->success();
+}
+
+bool SerialDevice::canProvision() {
+    return isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning();
 }
 
 bool SerialDevice::provision(const QString& userToken) {

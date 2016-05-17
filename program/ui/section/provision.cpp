@@ -36,9 +36,9 @@ void UI::Section::Provision::update() {
         rootObject->findChild<QObject*>("textMDN")->setProperty("text", device->newMdnStr());
         rootObject->findChild<QObject*>("textMIN")->setProperty("text", device->newMinStr());
 
-        rootObject->findChild<QObject*>("textMDN")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
-        rootObject->findChild<QObject*>("textMIN")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
-        rootObject->findChild<QObject*>("provisionButton")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
+        rootObject->findChild<QObject*>("textMDN")->setProperty("enabled", device->canProvision());
+        rootObject->findChild<QObject*>("textMIN")->setProperty("enabled", device->canProvision());
+        rootObject->findChild<QObject*>("provisionButton")->setProperty("enabled", device->canProvision());
     }
 
     UISection::endUpdate();
