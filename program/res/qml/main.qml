@@ -294,7 +294,7 @@ ApplicationWindow {
                         id: deviceInfoWrapper
                         anchors.left: parent.left
                         Layout.fillWidth: true
-                        width: deviceInfoContainer.width + deviceInfoStatus.width
+                        width: deviceInfoContainer.width + (deviceInfoText.height / 2)
                         height: deviceInfoContainer.height + deviceInfoStatusProgress.height
                         x: 0
                         color: "#00ffffff"
