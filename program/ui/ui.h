@@ -4,6 +4,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QTemporaryDir>
+#include <QTimer>
+#include <QSet>
 
 #include "connecteddevicesmodel.h"
 #include "serialdeviceworker.h"
@@ -98,6 +100,7 @@ namespace UI {
 
         void devicesListChanged(bool success);
         void deviceAdd(Serial::SerialDevice* device);
+        void deviceAddReschedule(QString port);
         void deviceRemove(const QString& port);
 
         void setStatus(const QString& status);
@@ -132,6 +135,9 @@ namespace UI {
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;
         QList<Serial::SerialDevice*> mPendingDevices;
+
+        QTimer* mRescheduleTimer;
+        QSet<QString> mRescheduledDevices;
 
         int mCurrentIndex;
     };

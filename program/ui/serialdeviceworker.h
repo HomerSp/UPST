@@ -78,6 +78,7 @@ namespace UI {
 
         void devicesListChanged(bool success);
         void deviceAdd(Serial::SerialDevice* device);
+        void deviceAddReschedule(QString port);
 
         void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress, int error);
         void provisionSPCFailed(Serial::SerialDevice* device);

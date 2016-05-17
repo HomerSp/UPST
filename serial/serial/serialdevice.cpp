@@ -127,12 +127,18 @@ bool SerialDevice::provision(const QString& userToken) {
     return ret;
 }
 
-bool SerialDevice::update() {
+bool SerialDevice::update(bool* reschedule) {
     qDebug()<<"===== GETTING ESN =====";
     Serial::QCDM::Commands::Nv::ESNCommand esnCmd(this);
     esnCmd.execute();
     if(esnCmd.result()->success()) {
         mESN = esnCmd.result()->data().toUInt();
+    } else {
+        // Could not retrieve ESN, reschedule the device check.
+        if(reschedule != nullptr) {
+            *reschedule = true;
+            return false;
+        }
     }
 
     qDebug()<<"===== GETTING IMEI =====";

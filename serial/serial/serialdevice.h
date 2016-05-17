@@ -56,7 +56,7 @@ namespace Serial {
         bool isSameDevice(SerialDevice* device);
         bool isValid();
 
-        bool update();
+        bool update(bool* reschedule = nullptr);
 
         bool updateJson(const QJsonObject& obj);
 

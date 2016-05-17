@@ -2,10 +2,11 @@
 
 using namespace Serial;
 
-SerialCommandResult::SerialCommandResult(bool success, QVariant data, uint16_t errorCode)
+SerialCommandResult::SerialCommandResult(bool success, QVariant data, uint16_t errorCode, uint8_t diagCode)
     : mSuccess(success),
     mData(data),
-    mErrorCode(errorCode)
+    mErrorCode(errorCode),
+    mDiagCode(diagCode)
 {
 
 }

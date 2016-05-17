@@ -38,6 +38,12 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
 
     mEngine->load(QUrl(QStringLiteral("qrc:/res/qml/main.qml")));
 
+    mRescheduleTimer = new QTimer();
+    mRescheduleTimer->setSingleShot(true);
+    mRescheduleTimer->setInterval(5000);
+    mRescheduleTimer->setTimerType(Qt::TimerType::VeryCoarseTimer);
+    connect(mRescheduleTimer, &QTimer::timeout, this, &UI::MainUI::devicesChanged);
+
     /* Set up signals */
     QObject* rootObject = mEngine->rootObjects().first();
 
@@ -60,6 +66,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
 
     connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);
     connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
+    connect(mWorker, &SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
     connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
     connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, mDevicesModel, &ConnectedDevicesModel::setProgress);
@@ -91,6 +98,7 @@ UI::MainUI::~MainUI() {
 
     delete mEngine;
     delete mDevicesModel;
+    delete mRescheduleTimer;
 }
 
 void UI::MainUI::devicesListChanged(bool success) {
@@ -99,6 +107,8 @@ void UI::MainUI::devicesListChanged(bool success) {
 }
 
 void UI::MainUI::devicesChanged() {
+    mRescheduleTimer->stop();
+
     qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
         QString port = info.portName();
@@ -125,10 +135,22 @@ void UI::MainUI::devicesChanged() {
             qDebug()<<"Not checking port"<<port;
         }
     }
+
+    if(mRescheduledDevices.size() > 0) {
+        mRescheduleTimer->start();
+    }
 }
 
 void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
     qDebug()<<"deviceAdd"<<device->port();
+
+    mRescheduleTimer->stop();
+    if(mRescheduledDevices.contains(device->port())) {
+        mRescheduledDevices.remove(device->port());
+    }
+    if(mRescheduledDevices.size() > 0) {
+        mRescheduleTimer->start();
+    }
 
     // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
@@ -187,6 +209,21 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
     emit deviceChanged(device, true);
 
     viewUpdate();
+}
+
+void UI::MainUI::deviceAddReschedule(QString port) {
+    qWarning()<<"Rescheduling check for"<<port;
+
+    mRescheduleTimer->stop();
+    if(mRescheduledDevices.contains(port)) {
+        mRescheduledDevices.remove(port);
+    } else {
+        mRescheduledDevices.insert(port);
+    }
+
+    if(mRescheduledDevices.size() > 0) {
+        mRescheduleTimer->start();
+    }
 }
 
 void UI::MainUI::deviceRemove(const QString& port) {

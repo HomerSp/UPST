@@ -327,13 +327,18 @@ void UI::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInfo) {
         delete device;
     } else {
         qDebug()<<"Device"<<portInfo->portName()<<"is valid";
-        device->update();
 
-        if(!mDeviceConfig->updateDevice(device)) {
-            qWarning()<<"Could not find device info for"<<portInfo->portName();
+        bool reschedule = false;
+        if(device->update(&reschedule)) {
+            if(!mDeviceConfig->updateDevice(device)) {
+                qWarning()<<"Could not find device info for"<<portInfo->portName();
+            }
+
+            emit deviceAdd(device);
+        } else if(reschedule) {
+            emit deviceAddReschedule(device->port());
+            delete device;
         }
-
-        emit deviceAdd(device);
     }
 
     emit statusChange("");

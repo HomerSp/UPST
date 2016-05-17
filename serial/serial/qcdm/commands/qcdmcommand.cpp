@@ -79,16 +79,10 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
 
         uint8_t cmd = data[0];
-        if(cmd == Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F) {
-            qWarning()<<"Bad SPC Mode";
-
-            addResult(false, 0, Serial::QCDM::DiagCommands::DIAG_BAD_SPC_MODE_F);
-            return;
-        }
         if(cmd != command(i)) {
-            qDebug()<<"cmd"<<cmd<<"!="<<command(i);
+            qDebug()<<"Diag error code"<<cmd<<"vs command"<<command(i);
 
-            addResult(false);
+            addResult(false, 0, 0, cmd);
             return;
         }
 
@@ -107,7 +101,7 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
 
         qDebug()<<"QcdmCommand read"<<QString(data.toHex());
 
-        addResult(true, data, 0);
+        addResult(true, data, 0, cmd);
     }
 }
 
