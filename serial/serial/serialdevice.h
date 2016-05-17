@@ -60,6 +60,9 @@ namespace Serial {
         bool isProvisioned() const {
             return mNewMin != 0;
         }
+        bool isProvisioning() const {
+            return mProvisioning;
+        }
         bool isSameDevice(SerialDevice* device);
         bool isValid();
 
@@ -81,6 +84,9 @@ namespace Serial {
             mStopBits = stopBits;
         }
 
+        void setProvisioning(bool f) {
+            mProvisioning = f;
+        }
         void setProvisionData(const QString& mdn, uint64_t min) {
             mNewMdn = mdn;
             mNewMin = min;
@@ -292,6 +298,7 @@ namespace Serial {
         uint64_t mIMEI;
         uint64_t mMEID;
 
+        bool mProvisioning;
         QString mNewMdn;
         uint64_t mNewMin;
     };

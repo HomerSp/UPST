@@ -76,6 +76,13 @@ void UI::SerialDeviceWorker::addDeviceRemove(Serial::SerialDevice* device) {
     mWaitCondition.wakeAll();
 }
 
+void UI::SerialDeviceWorker::addDeviceClose(Serial::SerialDevice* device) {
+    QMutexLocker locker(&mWorkMutex);
+
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceClose, device));
+    mWaitCondition.wakeAll();
+}
+
 void UI::SerialDeviceWorker::addDeviceProvision(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
 
@@ -172,6 +179,7 @@ void UI::SerialDeviceWorker::process() {
             i = size = 0;
             do {
                 Serial::SerialDevice* device = nullptr;
+                bool close = false;
                 {
                     QMutexLocker locker(&mWorkMutex);
                     size = mWorkItems.size();
@@ -179,19 +187,21 @@ void UI::SerialDeviceWorker::process() {
                         break;
                     }
 
-                    if(mWorkItems[i].first != WorkTypeDeviceRemove) {
+                    if(mWorkItems[i].first == WorkTypeDeviceRemove || mWorkItems[i].first == WorkTypeDeviceClose) {
+                        device = static_cast<Serial::SerialDevice*>(mWorkItems[i].second);
+                        close = mWorkItems[i].first == WorkTypeDeviceClose;
+
+                        mWorkItems.erase(mWorkItems.begin() + i);
+
+                        size--;
+                    } else {
                         i++;
                         continue;
                     }
-
-                    device = static_cast<Serial::SerialDevice*>(mWorkItems[i].second);
-                    mWorkItems.erase(mWorkItems.begin() + i);
-
-                    size--;
                 }
 
                 if(device != nullptr) {
-                    processDeviceRemove(device);
+                    processDeviceRemove(device, close);
 
                     waitForNextCommand = false;
                 }
@@ -268,7 +278,7 @@ void UI::SerialDeviceWorker::process() {
     emit finished();
 }
 
-void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
+void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, bool close) {
     // We need to remove any pending commands/provisions that might be attached to a specific device.
     int i = 0, size = 0;
     do {
@@ -293,8 +303,13 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device) {
         }
     } while(i < size);
 
-    delete device;
-    device = nullptr;
+    if(!close) {
+        delete device;
+        device = nullptr;
+    } else {
+        device->close();
+        emit deviceClose(device);
+    }
 }
 
 void UI::SerialDeviceWorker::processDevicesListUpdate() {

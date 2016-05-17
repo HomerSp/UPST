@@ -67,6 +67,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);
     connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
     connect(mWorker, &SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
+    connect(mWorker, &SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
     connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
     connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, mDevicesModel, &ConnectedDevicesModel::setProgress);
@@ -226,13 +227,18 @@ void UI::MainUI::deviceAddReschedule(QString port) {
     }
 }
 
+void UI::MainUI::deviceClose(Serial::SerialDevice *device) {
+    emit deviceUpdate(device);
+
+    viewUpdate();
+}
+
 void UI::MainUI::deviceRemove(const QString& port) {
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
             if(device->isProvisioned()) {
-                device->close();
-                emit deviceUpdate(device);
+                mWorker->addDeviceClose(device);
             } else {
                 emit deviceChanged(device, false);
                 mDevices.removeAt(i);
@@ -404,7 +410,15 @@ void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString
 }
 
 void UI::MainUI::provisionFailedClose() {
-    mDevicesModel->setProgress(mDevices.at(currentIndex()), Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
+    Serial::SerialDevice* device = mDevices.at(currentIndex());
+    if(device == nullptr) {
+        return;
+    }
+
+    device->setProvisioning(false);
+    mDevicesModel->setProgress(device, Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
+
+    viewUpdate();
 }
 
 UI::UISection::UISection(UI::MainUI* ui)

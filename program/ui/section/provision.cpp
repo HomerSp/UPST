@@ -30,10 +30,15 @@ void UI::Section::Provision::beforeDeviceChanged() {
 void UI::Section::Provision::update() {
     UISection::startUpdate();
 
-    if(currentDevice() != nullptr) {
+    Serial::SerialDevice* device = currentDevice();
+    if(device != nullptr) {
         QObject* rootObject = UISection::rootObject();
-        rootObject->findChild<QObject*>("textMDN")->setProperty("text", currentDevice()->newMdnStr());
-        rootObject->findChild<QObject*>("textMIN")->setProperty("text", currentDevice()->newMinStr());
+        rootObject->findChild<QObject*>("textMDN")->setProperty("text", device->newMdnStr());
+        rootObject->findChild<QObject*>("textMIN")->setProperty("text", device->newMinStr());
+
+        rootObject->findChild<QObject*>("textMDN")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
+        rootObject->findChild<QObject*>("textMIN")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
+        rootObject->findChild<QObject*>("provisionButton")->setProperty("enabled", device->isAvailable() && !device->isProvisioning());
     }
 
     UISection::endUpdate();
@@ -52,6 +57,8 @@ void UI::Section::Provision::provision() {
     qDebug()<<"Provision"<<device->name()<<mdn<<min;
 
     device->setProvisionData(mdn, min);
+    device->setProvisioning(true);
+    update();
 
     ui()->worker()->addDeviceProvision(device);
 

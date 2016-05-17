@@ -101,6 +101,7 @@ namespace UI {
         void devicesListChanged(bool success);
         void deviceAdd(Serial::SerialDevice* device);
         void deviceAddReschedule(QString port);
+        void deviceClose(Serial::SerialDevice* device);
         void deviceRemove(const QString& port);
 
         void setStatus(const QString& status);

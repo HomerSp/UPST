@@ -37,6 +37,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mESN(0),
       mIMEI(0),
       mMEID(0),
+      mProvisioning(false),
       mNewMdn(""),
       mNewMin(0)
 
