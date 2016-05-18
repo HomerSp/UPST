@@ -19,5 +19,15 @@ QML_IMPORT_PATH =
 INCLUDEPATH += ../common
 LIBS += -lcommon
 
+CONFIG( debug, debug|release ) {
+    # debug
+    LIBS += -L"../common/debug" -L"../serial/debug"
+    PRE_TARGETDEPS += ../common/debug/libcommon.a ../serial/debug/libserial.a
+} else {
+    # release
+    LIBS += -L"../common/release" -L"../serial/release"
+    PRE_TARGETDEPS += ../common/release/libcommon.a ../serial/release/libserial.a
+}
+
 include(../defines.pri)
 include(ui/ui.pri)
