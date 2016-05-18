@@ -55,11 +55,11 @@ QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     roles[IconRole] = "deviceIcon";
     roles[AvailableRole] = "deviceAvailable";
     roles[ManualRebootRole] = "deviceManualReboot";
-    roles[ProgressMaxRole] = "progressMax";
-    roles[ProgressMinRole] = "progressMin";
-    roles[ProgressCurrentRole] = "progressCurrent";
-    roles[ProgressStatusRole] = "progressStatus";
-    roles[ProgressErrorRole] = "progressError";
+    roles[ProgressMaxRole] = "provisionProgressMax";
+    roles[ProgressMinRole] = "provisionProgressMin";
+    roles[ProgressCurrentRole] = "provisionProgressCurrent";
+    roles[ProgressStatusRole] = "provisionProgressStatus";
+    roles[ProgressErrorRole] = "provisionProgressError";
     return roles;
 }
 

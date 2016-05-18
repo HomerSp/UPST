@@ -292,6 +292,11 @@ ApplicationWindow {
                     Rectangle {
                         property bool isProvisioned
                         property bool haveError
+                        property int progressCurrent
+                        property int progressMax
+                        property int progressMin
+                        property int progressStatus
+                        property string progressError
 
                         objectName: "deviceInfoWrapper"
                         id: deviceInfoWrapper
@@ -304,6 +309,15 @@ ApplicationWindow {
 
                         isProvisioned: progressStatus == 2
                         haveError: progressError.length > 0
+                        progressCurrent: provisionProgressCurrent
+                        progressMax: provisionProgressMax
+                        progressMin: provisionProgressMin
+                        progressStatus: provisionProgressStatus
+                        progressError: provisionProgressError
+
+                        onProgressCurrentChanged: {
+                            deviceInfoStatusProgress.value = progressCurrent;
+                        }
 
                         Behavior on color {
                             ColorAnimation {}
@@ -404,7 +418,7 @@ ApplicationWindow {
 
                             minimumValue: progressMin
                             maximumValue: progressMax
-                            value: progressCurrent
+                            value: 0
 
                             opacity: (progressStatus > 0)?1.0:0.0
 
