@@ -25,17 +25,23 @@ bool Utils::WinUtils::execute(const QString &path, const QStringList &argumentsL
     QString operation = "runas";
     QString tmpPath = path;
 
+    QString adminUser = getAdminUser();
+    bool haveAdminUser = adminUser.length() > 0;
+
     QString arguments = "";
     foreach(const QString& arg, argumentsList) {
         if(arguments.size() > 0) {
             arguments += " ";
         }
 
-        arguments += "\\\"" + arg + "\\\"";
+        if(haveAdminUser) {
+            arguments += "\\\"" + arg + "\\\"";
+        } else {
+            arguments += "\"" + arg + "\"";
+        }
     }
 
-    QString adminUser = getAdminUser();
-    if(adminUser.length() > 0) {
+    if(haveAdminUser) {
         operation = "";
         tmpPath = "runas";
         arguments = "/user:" + adminUser + " /savecred \"\\\"" + path + "\\\" " + arguments + "\"";

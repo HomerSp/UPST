@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
         return 0;
     }
     if(args.size() == 4) {
-        qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate)<<"arg"<<args.at(3);
+        qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate)<<"arg 1"<<args.at(1)<<"arg 2"<<args.at(3);
 
         UI::MainUI mainUI(app, args.at(1), args.at(3));
         return app.exec();
