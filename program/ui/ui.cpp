@@ -19,11 +19,17 @@ void UI::LogObject::addLog(QtMsgType type, const QMessageLogContext &context, QS
 #ifdef QT_DEBUG
     emit log(type, context.file, context.line, msg);
 #else
+    Q_UNUSED(context);
     emit log(type, "", 0, msg);
 #endif
 }
 
 void UI::LogObject::handleLog(int t, QString contextFile, int contextLine, QString msg) {
+#ifndef QT_DEBUG
+    Q_UNUSED(contextFile);
+    Q_UNUSED(contextLine);
+#endif
+
     QtMsgType type = static_cast<QtMsgType>(t);
     // Skip debug messages when not in testing mode
 #ifndef TESTING_MODE
