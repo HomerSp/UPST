@@ -490,10 +490,16 @@ void UI::UISection::startUpdate() {
     QObject* rootObject = this->rootObject();
 
     QObject* currentDeviceLabel = rootObject->findChild<QObject*>("currentDeviceNameLabel");
-    if(devices().size() == 0) {
+
+    Serial::SerialDevice* device = currentDevice();
+    if(device == nullptr) {
         QMetaObject::invokeMethod(currentDeviceLabel, "reset");
     } else {
-        currentDeviceLabel->setProperty("text", currentDevice()->name());
+        if(device->name().length() == 0) {
+            currentDeviceLabel->setProperty("text", "Unknown");
+        } else {
+            currentDeviceLabel->setProperty("text", device->name());
+        }
     }
 
     if(devices().size() == 0) {
