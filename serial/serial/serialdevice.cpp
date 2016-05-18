@@ -413,7 +413,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
-        emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
+        // If we can't communicate with the device anymore, consider it removed.
+        if(!isValid()) {
+            emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRemoved);
+        } else {
+            emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
+        }
     }
 
     return ret;

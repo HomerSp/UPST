@@ -94,6 +94,8 @@ QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError
         return "Failed to download provision data.";
     case Serial::SerialProvisionErrorNv:
         return "Failed to write one or more items.";
+    case Serial::SerialProvisionErrorRemoved:
+        return "The device was removed prematurely.";
     default:
         return "";
     }

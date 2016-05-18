@@ -30,6 +30,7 @@ namespace Serial {
         SerialProvisionErrorDownload,
         SerialProvisionErrorData,
         SerialProvisionErrorNv,
+        SerialProvisionErrorRemoved,
     };
 
     enum SerialDeviceFlags {
