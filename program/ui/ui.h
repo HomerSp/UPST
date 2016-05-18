@@ -38,17 +38,25 @@ namespace UI {
         }
 
         void remove(int i, int len) {
-            QMutexLocker locker(&mLogMutex);
-            mLogData.remove(i, len);
+            QString logData;
+            {
+                QMutexLocker locker(&mLogMutex);
+                mLogData.remove(i, len);
+                logData = mLogData;
+            }
 
-            emit logDataChanged(mLogData);
+            emit logDataChanged(logData);
         }
 
         LogObject& operator+=(const QString& data) {
-            QMutexLocker locker(&mLogMutex);
-            mLogData += data;
+            QString logData;
+            {
+                QMutexLocker locker(&mLogMutex);
+                mLogData += data;
+                logData = mLogData;
+            }
 
-            emit logDataChanged(mLogData);
+            emit logDataChanged(logData);
 
             return *this;
         }
