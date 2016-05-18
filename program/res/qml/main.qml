@@ -489,13 +489,13 @@ ApplicationWindow {
                         }
 
                         function updateProgress() {
-                            if(haveError) {
+                            if(haveError && connectedDevicesList.currentIndex == index) {
                                 provisionFailedContainer.show(progressError);
                             } else {
                                 provisionFailedContainer.hide();
                             }
 
-                            if(isProvisioned) {
+                            if(isProvisioned && connectedDevicesList.currentIndex == index) {
                                 if(deviceManualReboot) {
                                     provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
                                 } else {
