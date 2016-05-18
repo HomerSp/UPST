@@ -22,7 +22,8 @@ namespace UI {
             : QObject(parent),
               mLogData("")
         {
-
+            connect(this, &LogObject::logRemove, this, &LogObject::handleLogRemove);
+            connect(this, &LogObject::logAppend, this, &LogObject::handleLogAppend);
         }
 
         Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
@@ -38,30 +39,29 @@ namespace UI {
         }
 
         void remove(int i, int len) {
-            QString logData;
-            {
-                QMutexLocker locker(&mLogMutex);
-                mLogData.remove(i, len);
-                logData = mLogData;
-            }
-
-            emit logDataChanged(logData);
+            emit logRemove(i, len);
         }
 
         LogObject& operator+=(const QString& data) {
-            QString logData;
-            {
-                QMutexLocker locker(&mLogMutex);
-                mLogData += data;
-                logData = mLogData;
-            }
-
-            emit logDataChanged(logData);
-
+            emit logAppend(data);
             return *this;
         }
 
+    private slots:
+        void handleLogRemove(int i, int len) {
+            mLogData.remove(i, len);
+            emit logDataChanged(mLogData);
+        }
+
+        void handleLogAppend(const QString& data) {
+            mLogData += data;
+            emit logDataChanged(mLogData);
+        }
+
     signals:
+        void logRemove(int i, int len);
+        void logAppend(const QString& data);
+
         void logDataChanged(QString logData);
 
     private:
