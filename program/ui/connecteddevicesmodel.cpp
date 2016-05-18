@@ -131,6 +131,18 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
 }
 
 void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
+    // This may be a provisioned device, which would show up as a new one.
+    if(!mDeviceProgress.contains(device)) {
+        for(int i = 0; i < mDeviceProgress.size(); i++) {
+            Serial::SerialDevice* d = mDeviceProgress.keys().at(i);
+            if(device->isSameDevice(device) && d->isProvisioning()) {
+                mDeviceProgress.insert(device, mDeviceProgress.value(d));
+                mDeviceProgress.remove(d);
+                break;
+            }
+         }
+    }
+
     bool found = false;
     for(int i = 0; i < mDevices.size(); i++) {
         if(*(mDevices[i]) == *(device)) {
