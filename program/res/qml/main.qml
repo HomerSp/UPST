@@ -735,17 +735,23 @@ ApplicationWindow {
                 objectName: 'provisionFailedContainer'
                 id: provisionFailedContainer
 
+                headerColor: '#915858'
+                headerTextColor: '#FFFFFF'
                 header: "Failed to provision device"
                 errorLine1: qsTr("An error has ocurred while provisioning the device:")
                 errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 720-433-3028.")
+                errorTextColor: '#EF9A9A'
             }
 
             UPErrorBox {
                 objectName: 'provisionSuccessContainer'
                 id: provisionSuccessContainer
 
+                headerColor: '#729158'
+                headerTextColor: '#FFFFFF'
                 header: "Device has been provisioned"
                 errorLine1: qsTr("The device was provisioned successfully!")
+                errorTextColor: '#C5E1A5'
             }
 
            Rectangle {

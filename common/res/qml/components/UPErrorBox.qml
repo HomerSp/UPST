@@ -10,6 +10,10 @@ Rectangle {
     property string errorLine2
     property string errorLine3
 
+    property color headerColor
+    property color headerTextColor
+    property color errorTextColor
+
     signal closed()
 
     id: root
@@ -23,6 +27,10 @@ Rectangle {
     errorLine1: ""
     errorLine2: ""
     errorLine3: ""
+
+    headerColor: '#5f92eb'
+    headerTextColor: "#ffffff"
+    errorTextColor: '#ffffff'
 
     function hide() {
         root.opacity = 0.0;
@@ -86,7 +94,7 @@ Rectangle {
            id: headerContainer
            anchors {left: parent.left; right: parent.right}
            height: headerCloseButton.height + unit.dp(16)
-           color: '#5f92eb'
+           color: headerColor
 
            RowLayout {
                anchors.fill: parent
@@ -95,7 +103,7 @@ Rectangle {
                Text {
                    Layout.fillWidth: true
                    id: headerContentText
-                   color: "#ffffff"
+                   color: headerTextColor
                    font.family: openSansBoldFont.name
                    font.pixelSize: unit.em(1.2)
                    text: header
@@ -105,7 +113,8 @@ Rectangle {
                    id: headerCloseButton
                    text: "X"
                    height: headerContentText.height
-                   width: unit.dp(24)
+                   width: height
+                   buttonColor: headerColor
 
                    onClicked: {
                        closed();
@@ -135,9 +144,10 @@ Rectangle {
                }
                Text {
                    anchors {left: parent.left; right: parent.right}
-                   color: "#ffffff"
-                   font.family: openSansRegularFont.name
+                   color: errorTextColor
+                   font.family: openSansBoldFont.name
                    font.pixelSize: unit.em(1.2)
+                   font.weight: Font.Bold
                    text: errorLine2
                    visible: errorLine2.length > 0
                }
