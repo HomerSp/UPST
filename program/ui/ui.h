@@ -27,7 +27,7 @@ namespace UI {
 
         Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
 
-        void addLog(QtMsgType type, QString msg);
+        void addLog(QtMsgType type, const QMessageLogContext& context, QString msg);
 
         QString getLogData() {
             return mLogData;
@@ -38,10 +38,10 @@ namespace UI {
         }
 
     private slots:
-        void handleLog(int t, QString msg);
+        void handleLog(int t, QString file, int line, QString msg);
 
     signals:
-        void log(int type, QString msg);
+        void log(int type, QString file, int line, QString msg);
 
         void logDataChanged(QString logData);
 

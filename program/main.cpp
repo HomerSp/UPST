@@ -22,7 +22,7 @@ static UI::LogObject sLogObject;
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
-    sLogObject.addLog(type, msg);
+    sLogObject.addLog(type, context, msg);
 }
 
 void updateConfigs() {

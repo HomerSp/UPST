@@ -15,11 +15,15 @@
 #include "section/manual.h"
 #include "section/provision.h"
 
-void UI::LogObject::addLog(QtMsgType type, QString msg) {
-    emit log(type, msg);
+void UI::LogObject::addLog(QtMsgType type, const QMessageLogContext &context, QString msg) {
+#ifdef QT_DEBUG
+    emit log(type, context.file, context.line, msg);
+#else
+    emit log(type, "", 0, msg);
+#endif
 }
 
-void UI::LogObject::handleLog(int t, QString msg) {
+void UI::LogObject::handleLog(int t, QString contextFile, int contextLine, QString msg) {
     QtMsgType type = static_cast<QtMsgType>(t);
     // Skip debug messages when not in testing mode
 #ifndef TESTING_MODE
@@ -50,7 +54,7 @@ void UI::LogObject::handleLog(int t, QString msg) {
     }
 
 #ifdef QT_DEBUG
-    data += " " + QString(context.file) + "." + QString::number(context.line) + ":";
+    data += " " + contextFile + "." + QString::number(contextLine) + ":";
 #endif
     data += " " + msg;
 
@@ -81,7 +85,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
       mApp(app),
       mSection(nullptr)
 {
-    mDevicesModel = new UI::ConnectedDevicesModel();
+    mDevicesModel = new UI::ConnectedDevicesModel(this);
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
@@ -376,7 +380,7 @@ void UI::MainUI::logout() {
     emit loggedOut();
 
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        deviceRemove(info.portName());
+        emit deviceRemove(info.portName());
     }
 }
 
@@ -459,7 +463,7 @@ void UI::MainUI::provisionFailedClose() {
     mDevicesModel->setProgress(device, Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
 
     if(!device->isAvailable()) {
-        deviceRemove(device->port());
+        emit deviceRemove(device->port());
     } else {
         viewUpdate();
     }
