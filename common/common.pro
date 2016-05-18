@@ -13,3 +13,9 @@ RESOURCES += \
 include(../defines.pri)
 include(utils/utils.pri)
 include(web/web.pri)
+
+HEADERS += \
+    runguard.h
+
+SOURCES += \
+    runguard.cpp

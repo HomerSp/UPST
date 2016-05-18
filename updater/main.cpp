@@ -7,6 +7,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include "runguard.h"
 #include "utils/fileutils.h"
 #ifdef Q_OS_WIN
 #include "utils/winutils.h"
@@ -62,6 +63,11 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(common);
+
+    RunGuard runGuard("UPST_updater_87f5a82db5098c594efe3b3cefe67cd1b38dcd6c");
+    if(!runGuard.tryToRun()) {
+        return 0;
+    }
 
     qInstallMessageHandler(&logMessageHandler);
 
