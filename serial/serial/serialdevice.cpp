@@ -104,7 +104,20 @@ bool SerialDevice::isAvailable() {
 }
 
 bool SerialDevice::isSameDevice(SerialDevice *device) {
-    return mVid == device->mVid && mPid == device->mPid && ((mMEID != 0 && mMEID == device->mMEID) || (mIMEI != 0 && mIMEI == device->mIMEI));
+    if(mVid == device->mVid && mPid == device->mPid) {
+        if(mMEID != 0 && mMEID == device->mMEID) {
+            return true;
+        }
+        if(mIMEI != 0 && mIMEI == device->mIMEI) {
+            return true;
+        }
+        // We only ever want to check the ESN if both the IMEI and MEID are empty.
+        if(mMEID == 0 && mIMEI == 0 && mESN != 0 && mESN == device->mESN) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool SerialDevice::isValid() {
