@@ -58,6 +58,7 @@ void UI::Section::Provision::provision() {
 
     device->setProvisionData(mdn, min);
     device->setProvisioning(true);
+    ui()->provisionProgressChanged(device, Serial::SerialProvisionStatusQueue, 0, Serial::SerialProvisionErrorNone);
     update();
 
     ui()->worker()->addDeviceProvision(device);
