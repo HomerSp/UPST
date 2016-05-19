@@ -9,46 +9,12 @@
 
 #include "connecteddevicesmodel.h"
 #include "serialdeviceworker.h"
+#include "loghandler.h"
 
 #include "serial/serialdevice.h"
 
 namespace UI {
     class UISection;
-
-    class LogObject : public QObject {
-        Q_OBJECT
-    public:
-        LogObject(QObject* parent = 0)
-            : QObject(parent),
-              mLogData("")
-        {
-            QObject::connect(this, &LogObject::log, this, &LogObject::handleLog, Qt::QueuedConnection);
-        }
-
-        Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
-
-        void addLog(QtMsgType type, const QMessageLogContext& context, QString msg);
-
-        QString getLogData() const {
-            return mLogData;
-        }
-
-        int length() const {
-            return mLogData.length();
-        }
-
-    private slots:
-        void handleLog(int t, QString file, int line, QString msg);
-
-    signals:
-        void log(int type, QString file, int line, QString msg);
-
-        void logDataChanged(QString logData);
-
-    private:
-        QMutex mLogMutex;
-        QString mLogData;
-    };
 
     class WebDownloader: public QObject {
         Q_OBJECT
@@ -60,7 +26,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        MainUI(const QGuiApplication& app, LogObject* logData);
+        MainUI(const QGuiApplication& app, Log::LogHandler* logHandler);
         ~MainUI();
 
         QQmlApplicationEngine* engine() {
@@ -132,7 +98,7 @@ namespace UI {
 
         ConnectedDevicesModel* mDevicesModel;
 
-        LogObject* mLogObject;
+        Log::LogHandler* mLogHandler;
 
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;

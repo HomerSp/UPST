@@ -7,6 +7,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include "loghandler.h"
 #include "runguard.h"
 #include "utils/fileutils.h"
 #ifdef Q_OS_WIN
@@ -14,50 +15,10 @@
 #endif
 #include "ui/ui.h"
 
-void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-    Q_UNUSED(context);
-    // Skip debug messages when not in testing mode
-#ifndef TESTING_MODE
-    if(type == QtDebugMsg) {
-        return;
-    }
-#endif
-    QString data = "";
-    switch(type) {
-    case QtDebugMsg:
-        data += "[Debug]";
-        break;
-    case QtInfoMsg:
-        data += "[Info]";
-        break;
-    case QtWarningMsg:
-        data += "[Warning]";
-        break;
-    case QtCriticalMsg:
-        data += "[Critical]";
-        break;
-    case QtFatalMsg:
-        data += "[Fatal]";
-        break;
-    default:
-        data += "[Error]";
-        break;
-    }
+Log::LogHandler sLogHandler("updater.log");
 
-#ifdef QT_DEBUG
-    data += " " + QString(context.file) + "." + QString::number(context.line) + ": ";
-#endif
-    data += " " + msg + "\n";
-
-    QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/updater.log");
-    file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
-    QTextStream stream(&file);
-    stream << data;
-    stream.flush();
-    file.close();
-
-    QTextStream(stdout) << data;
+void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
+    sLogHandler.addLog(type, context, msg);
 }
 
 int main(int argc, char *argv[])

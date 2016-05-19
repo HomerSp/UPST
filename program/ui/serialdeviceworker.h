@@ -13,8 +13,6 @@
 #include "serial/serialcommand.h"
 
 namespace UI {
-    class LogObject;
-
     struct LoginItem {
         QString username;
         QString password;

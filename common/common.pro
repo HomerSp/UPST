@@ -15,7 +15,9 @@ include(utils/utils.pri)
 include(web/web.pri)
 
 HEADERS += \
-    runguard.h
+	loghandler.h \
+        runguard.h
 
 SOURCES += \
-    runguard.cpp
+        loghandler.cpp \
+        runguard.cpp

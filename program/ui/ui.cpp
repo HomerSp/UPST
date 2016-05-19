@@ -16,77 +16,6 @@
 #include "section/manual.h"
 #include "section/provision.h"
 
-void UI::LogObject::addLog(QtMsgType type, const QMessageLogContext &context, QString msg) {
-#ifdef QT_DEBUG
-    emit log(type, context.file, context.line, msg);
-#else
-    Q_UNUSED(context);
-    emit log(type, "", 0, msg);
-#endif
-}
-
-void UI::LogObject::handleLog(int t, QString contextFile, int contextLine, QString msg) {
-#ifndef QT_DEBUG
-    Q_UNUSED(contextFile);
-    Q_UNUSED(contextLine);
-#endif
-
-    QtMsgType type = static_cast<QtMsgType>(t);
-    // Skip debug messages when not in testing mode
-#ifndef TESTING_MODE
-    if(type == QtDebugMsg) {
-        return;
-    }
-#endif
-    QString data = "";
-    switch(type) {
-    case QtDebugMsg:
-        data += "[Debug]";
-        break;
-    case QtInfoMsg:
-        data += "[Info]";
-        break;
-    case QtWarningMsg:
-        data += "[Warning]";
-        break;
-    case QtCriticalMsg:
-        data += "[Critical]";
-        break;
-    case QtFatalMsg:
-        data += "[Fatal]";
-        break;
-    default:
-        data += "[Error]";
-        break;
-    }
-
-#ifdef QT_DEBUG
-    data += " " + contextFile + "." + QString::number(contextLine) + ":";
-#endif
-    data += " " + msg;
-
-    if(data.length() > 0) {
-        if(data.at(data.length() - 1) != '\n') {
-            data += "\n";
-        }
-    }
-
-    QFile file(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/upst.log");
-    if(file.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text)) {
-        QTextStream stream(&file);
-        stream << data;
-        stream.flush();
-        file.close();
-    }
-
-    QTextStream(stdout) << data;
-
-    mLogData += data;
-    if(LOG_LIMIT > 0 && mLogData.length() > LOG_LIMIT) {
-        mLogData.remove(0, mLogData.length() - LOG_LIMIT);
-    }
-}
-
 QString UI::WebDownloader::download(const QString& url) const {
     QByteArray data;
     if(!Web::WebUtils::download(QUrl(url), data)) {
@@ -96,11 +25,11 @@ QString UI::WebDownloader::download(const QString& url) const {
     return QString(data);
 }
 
-UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
+UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
     : QObject(),
       mApp(app),
       mSection(nullptr),
-      mLogObject(logData)
+      mLogHandler(logHandler)
 {
     mDevicesModel = new UI::ConnectedDevicesModel(this);
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
@@ -110,7 +39,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     buildTime.setTime_t(QString(PROG_BUILDTIME).toULongLong());
 
     mEngine = new QQmlApplicationEngine();
-    mEngine->rootContext()->setContextProperty("logText", logData);
+    mEngine->rootContext()->setContextProperty("logText", logHandler);
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
     mEngine->rootContext()->setContextProperty("programBuildTime", QVariant::fromValue(buildTime));
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
@@ -480,7 +409,7 @@ void UI::MainUI::provisionProgressChanged(Serial::SerialDevice* device, int stat
     if(provisionStatus == Serial::SerialProvisionStatusDone) {
         mWorker->addDeviceProvisionTracking(device, false);
     } else if(provisionStatus == Serial::SerialProvisionStatusError) {
-        mWorker->addDeviceProvisionTracking(device, true, mLogObject->getLogData());
+        mWorker->addDeviceProvisionTracking(device, true, mLogHandler->getLogData());
     }
 
     mDevicesModel->setProgress(device, provisionStatus, current, provisionError);

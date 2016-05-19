@@ -19,12 +19,10 @@
 
 #include "serial/serialdeviceconfig.h"
 
-static UI::LogObject sLogObject;
+static Log::LogHandler sLogHandler("upst.log");
 
-void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-    Q_UNUSED(context);
-    sLogObject.addLog(type, context, msg);
+void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
+    sLogHandler.addLog(type, context, msg);
 }
 
 void updateConfigs() {
@@ -95,7 +93,7 @@ int main(int argc, char *argv[])
 
     updateConfigs();
 
-    UI::MainUI mainUI(app, &sLogObject);
+    UI::MainUI mainUI(app, &sLogHandler);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);
