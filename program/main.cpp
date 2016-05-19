@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
+#include <QIcon>
 #include <QFile>
 #include <QStandardPaths>
 #include <QTextStream>
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/res/images/icon.svg"));
 
     if(app.arguments().size() == 3 && app.arguments().at(1) == "update") {
         QString updatePath = app.arguments().at(2);
