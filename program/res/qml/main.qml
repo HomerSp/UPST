@@ -120,6 +120,26 @@ ApplicationWindow {
             id: helpMenu
             title: qsTr("Help")
             MenuItem {
+                id: helpMenuUserguide
+                text: qsTr("User guide")
+                onTriggered: {
+                    var component = Qt.createComponent("dialog/dialog_userguide.qml");
+                    if (component.status === Component.Ready) {
+                        var url = "http://upst.ultimobile.net/userguide";
+                        var data = downloader.download(url + "/index.html");
+
+                        console.debug(data);
+
+                        var dialog = component.createObject(mainWindow);
+                        dialog.modality = Qt.ApplicationModal;
+                        dialog.setData(data, url + "/index.html");
+                        dialog.open();
+                    } else {
+                        console.error("Could not load user guide dialog: " + component.errorString());
+                    }
+                }
+            }
+            MenuItem {
                 id: helpMenuAbout
                 text: qsTr("About")
                 onTriggered: {

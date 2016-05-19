@@ -50,6 +50,12 @@ namespace UI {
         QString mLogData;
     };
 
+    class WebDownloader: public QObject {
+        Q_OBJECT
+    public:
+        Q_INVOKABLE QString download(const QString& url) const;
+    };
+
     class MainUI : public QObject
     {
         Q_OBJECT
@@ -115,6 +121,8 @@ namespace UI {
         void updateLoginStatus(bool loggedIn);
 
         const QGuiApplication& mApp;
+
+        WebDownloader mDownloader;
 
         UISection* mSection;
 

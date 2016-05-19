@@ -10,6 +10,7 @@
 #include <QThread>
 
 #include "utils/fileutils.h"
+#include "web/webutils.h"
 #include "ui.h"
 #include "section/deviceinfo.h"
 #include "section/manual.h"
@@ -86,6 +87,15 @@ void UI::LogObject::handleLog(int t, QString contextFile, int contextLine, QStri
     }
 }
 
+QString UI::WebDownloader::download(const QString& url) const {
+    QByteArray data;
+    if(!Web::WebUtils::download(QUrl(url), data)) {
+        return "";
+    }
+
+    return QString(data);
+}
+
 UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     : QObject(),
       mApp(app),
@@ -105,6 +115,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
+    mEngine->rootContext()->setContextProperty("downloader", &mDownloader);
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
