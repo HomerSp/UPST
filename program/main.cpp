@@ -19,10 +19,10 @@
 
 #include "serial/serialdeviceconfig.h"
 
-static Log::LogHandler sLogHandler("upst.log");
+static Log::LogHandler *sLogHandler = nullptr;
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-    sLogHandler.addLog(type, context, msg);
+    sLogHandler->addLog(type, context, msg);
 }
 
 void updateConfigs() {
@@ -38,17 +38,19 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    qInstallMessageHandler(&logMessageHandler);
-
-#ifdef Q_OS_WIN
-    Utils::WinUtils::enableIntelHack();
-#endif
-
     QGuiApplication::setApplicationName("UPST");
     QGuiApplication::setOrganizationDomain("ultimobile.net");
     QGuiApplication::setOrganizationName("Ultimobile");
 
     QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+
+    sLogHandler = new Log::LogHandler("upst.log");
+
+    qInstallMessageHandler(&logMessageHandler);
+
+#ifdef Q_OS_WIN
+    Utils::WinUtils::enableIntelHack();
+#endif
 
     QGuiApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/res/images/icon.svg"));
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
 
     updateConfigs();
 
-    UI::MainUI mainUI(app, &sLogHandler);
+    UI::MainUI mainUI(app, sLogHandler);
 
     DeviceFilterEvent deviceFilter;
     QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);
@@ -103,6 +105,10 @@ int main(int argc, char *argv[])
 
     app.installNativeEventFilter(&deviceFilter);
 
-    return app.exec();
+    int ret = app.exec();
+
+    delete sLogHandler;
+
+    return ret;
 }
 

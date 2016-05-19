@@ -10,13 +10,13 @@ Log::LogHandlerWorker::LogHandlerWorker(const QString& name) {
 }
 
 Log::LogHandlerWorker::~LogHandlerWorker() {
+    mFile->flush();
     mFile->close();
     delete mFile;
 }
 
 void Log::LogHandlerWorker::handleLog(const QString& line) {
     QTextStream(stdout) << line;
-
     if(mFile->isOpen()) {
         QTextStream stream(mFile);
         stream << line;

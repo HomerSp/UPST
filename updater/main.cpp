@@ -15,10 +15,10 @@
 #endif
 #include "ui/ui.h"
 
-Log::LogHandler sLogHandler("updater.log");
+static Log::LogHandler *sLogHandler = nullptr;
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-    sLogHandler.addLog(type, context, msg);
+    sLogHandler->addLog(type, context, msg);
 }
 
 int main(int argc, char *argv[])
@@ -30,19 +30,23 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    qInstallMessageHandler(&logMessageHandler);
-
-#ifdef Q_OS_WIN
-    Utils::WinUtils::enableIntelHack();
-#endif
-
     QGuiApplication::setApplicationName("UPST");
     QGuiApplication::setOrganizationDomain("ultimobile.net");
     QGuiApplication::setOrganizationName("Ultimobile");
 
     QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 
+    sLogHandler = new Log::LogHandler("updater.log");
+
+    qInstallMessageHandler(&logMessageHandler);
+
+#ifdef Q_OS_WIN
+    Utils::WinUtils::enableIntelHack();
+#endif
+
     QGuiApplication app(argc, argv);
+
+    int ret = 0;
 
     QStringList args = QCoreApplication::arguments();
     if(args.size() >= 2 && args.at(1) == "create") {
@@ -116,16 +120,16 @@ int main(int argc, char *argv[])
             outputFile.flush();
             outputFile.close();
         }
-
-        return 0;
-    }
-    if(args.size() == 4) {
+    } else if(args.size() == 4) {
         qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate)<<"arg 1"<<args.at(1)<<"arg 2"<<args.at(3);
 
         UI::MainUI mainUI(app, args.at(1), args.at(3));
-        return app.exec();
+        ret = app.exec();
+        delete sLogHandler;
+    } else {
+        ret = -1;
     }
 
-    return -1;
+    return ret;
 }
 
