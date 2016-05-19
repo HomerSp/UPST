@@ -370,7 +370,7 @@ void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device
     bool ret = device->provision(userToken);
     disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
 
-    processDeviceProvisionTracking(device, userToken, ret);
+    processDeviceProvisionTracking(device, userToken, !ret);
 }
 
 void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
