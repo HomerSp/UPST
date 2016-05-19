@@ -12,9 +12,8 @@ Dialog {
     width: unit.dp(1020)
     height: unit.dp(620)
 
-    modality: Qt.ApplicationModal
+    modality: Qt.NonModal
     title: qsTr("User guide")
-    standardButtons: StandardButton.Close
 
     Units {
         id: unit

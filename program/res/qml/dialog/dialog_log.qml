@@ -7,7 +7,7 @@ import "qrc:/res/qml/components"
 Dialog {
     id: logDialog
     visible: false
-    modality: Qt.ApplicationModal
+    modality: Qt.NonModal
     title: qsTr("Log")
     standardButtons: StandardButton.Close
 

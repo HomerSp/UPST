@@ -64,6 +64,8 @@ void Log::LogHandler::handleLog(const QString& data) {
     if(LOG_LIMIT > 0 && mLogData.length() > LOG_LIMIT) {
         mLogData.remove(0, mLogData.length() - LOG_LIMIT);
     }
+
+    emit logDataChanged(mLogData);
 }
 
 QString Log::LogHandler::formatLog(QtMsgType type, const QMessageLogContext& context, QString msg) {

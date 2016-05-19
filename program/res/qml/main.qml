@@ -107,7 +107,6 @@ ApplicationWindow {
                     var component = Qt.createComponent("dialog/dialog_log.qml");
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(mainWindow);
-                        dialog.modality = Qt.ApplicationModal;
                         dialog.open();
                     } else {
                         console.error("Could not load log dialog: " + component.errorString());
@@ -128,7 +127,6 @@ ApplicationWindow {
                         var url = "http://upst.ultimobile.net/userguide/";
                         var data = downloader.download(url + "/index.html");
                         var dialog = component.createObject(mainWindow, {"guideData": data, "guideUrl": url});
-                        dialog.modality = Qt.ApplicationModal;
                         dialog.open();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
