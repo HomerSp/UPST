@@ -179,7 +179,7 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     }
 }
 
-void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int status, int current, int error) {
+void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error) {
     if(mDeviceProgress.find(device) == mDeviceProgress.end()) {
         return;
     }
@@ -191,8 +191,8 @@ void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, int st
         return;
     }
 
-    progress->status = static_cast<Serial::SerialProvisionStatus>(status);
-    progress->error = static_cast<Serial::SerialProvisionError>(error);
+    progress->status = status;
+    progress->error = error;
     progress->current = current;
 
     deviceUpdate(device);

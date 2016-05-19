@@ -42,11 +42,11 @@ namespace UI {
 
         void addDevice(Serial::SerialDevice* device);
 
+        void setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error);
+
     public slots:
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
-
-        void setProgress(Serial::SerialDevice* device, int status, int current, int error);
 
     private:
         QString getDeviceIcon(Serial::SerialDevice* device) const;

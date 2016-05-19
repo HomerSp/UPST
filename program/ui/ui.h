@@ -29,11 +29,11 @@ namespace UI {
 
         void addLog(QtMsgType type, const QMessageLogContext& context, QString msg);
 
-        QString getLogData() {
+        QString getLogData() const {
             return mLogData;
         }
 
-        int length() {
+        int length() const {
             return mLogData.length();
         }
 
@@ -106,6 +106,8 @@ namespace UI {
         void versionUpdateCheck();
         void versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
 
+        void provisionProgressChanged(Serial::SerialDevice* device, int status, int current, int error);
+
         void provisionFailedClose();
 
     protected slots:
@@ -129,6 +131,8 @@ namespace UI {
         QQmlApplicationEngine *mEngine;
 
         ConnectedDevicesModel* mDevicesModel;
+
+        LogObject* mLogObject;
 
         SerialDeviceWorker* mWorker;
         QList<Serial::SerialDevice*> mDevices;

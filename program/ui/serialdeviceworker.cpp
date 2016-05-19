@@ -32,9 +32,8 @@ void UI::SerialCommandItem::process() {
     emit finished();
 }
 
-UI::SerialDeviceWorker::SerialDeviceWorker(UI::LogObject* logObject)
-    : mLogObject(logObject),
-      mRunning(true)
+UI::SerialDeviceWorker::SerialDeviceWorker()
+    :   mRunning(true)
 {
     mDeviceConfig = new Serial::SerialDeviceConfig();
 }
@@ -71,28 +70,37 @@ void UI::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
 
 void UI::SerialDeviceWorker::addDeviceRemove(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
-
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceRemove, device));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addDeviceClose(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
-
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceClose, device));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addDeviceProvision(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
-
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceProvision, device));
+    mWaitCondition.wakeAll();
+}
+
+void UI::SerialDeviceWorker::addDeviceProvisionTracking(Serial::SerialDevice* device, bool error, const QString& log) {
+    qDebug()<<"addDeviceProvisionTracking";
+
+    ProvisionTrackingItem* item = new ProvisionTrackingItem();
+    item->device = device;
+    item->error = error;
+    item->log = log;
+
+    QMutexLocker lock(&mWorkMutex);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceProvisionTracking, item));
     mWaitCondition.wakeAll();
 }
 
 void UI::SerialDeviceWorker::addCommand(SerialCommandItem *cmd) {
     QMutexLocker lock(&mWorkMutex);
-
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeCommand, cmd));
     mWaitCondition.wakeAll();
 }
@@ -103,6 +111,7 @@ void UI::SerialDeviceWorker::addLogin(const QString &username, const QString &pa
     item->password = password;
     item->token = "";
 
+    QMutexLocker lock(&mWorkMutex);
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeLogin, item));
     mWaitCondition.wakeAll();
 }
@@ -113,6 +122,7 @@ void UI::SerialDeviceWorker::addLoginCheck(const QString& token) {
     item->password = "";
     item->token = token;
 
+    QMutexLocker lock(&mWorkMutex);
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeLogin, item));
     mWaitCondition.wakeAll();
 }
@@ -134,6 +144,8 @@ void UI::SerialDeviceWorker::stop() {
             delete static_cast<QSerialPortInfo*>((*i).second);
         } else if((*i).first == WorkTypeCommand) {
             delete static_cast<SerialCommandItem*>((*i).second);
+        } else if((*i).first == WorkTypeDeviceProvisionTracking) {
+            delete static_cast<ProvisionTrackingItem*>((*i).second);
         } else if((*i).first == WorkTypeLogin) {
             delete static_cast<LoginItem*>((*i).second);
         }
@@ -233,6 +245,10 @@ void UI::SerialDeviceWorker::process() {
                     processDeviceProvision(static_cast<Serial::SerialDevice*>(data));
                     break;
                 }
+                case WorkTypeDeviceProvisionTracking: {
+                    processDeviceProvisionTracking(static_cast<ProvisionTrackingItem*>(data));
+                    break;
+                }
                 case WorkTypeCommand: {
                     processCommand(static_cast<SerialCommandItem*>(data));
                     break;
@@ -298,6 +314,12 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, b
             if(d == device) {
                 mWorkItems.erase(mWorkItems.begin() + i);
             }
+        } else if(mWorkItems[i].first == WorkTypeDeviceProvision) {
+           ProvisionTrackingItem* item = static_cast<ProvisionTrackingItem*>(mWorkItems[i].second);
+           if(item->device == device) {
+               delete item;
+               mWorkItems.erase(mWorkItems.begin() + i);
+           }
         } else {
             i++;
         }
@@ -369,8 +391,35 @@ void UI::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device
     connect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
     bool ret = device->provision(userToken);
     disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::SerialDeviceWorker::deviceProvisionProgressChanged);
+}
 
-    processDeviceProvisionTracking(device, userToken, !ret);
+bool UI::SerialDeviceWorker::processDeviceProvisionTracking(ProvisionTrackingItem* item) {
+    QString userToken = QSettings().value("user/token").toString();
+
+    QByteArray output;
+    QHash<QString, QString> headers;
+    headers.insert("U-Token", userToken);
+
+    QJsonObject deviceObj;
+    deviceObj.insert("id", item->device->id());
+    deviceObj.insert("min", item->device->newMinStr());
+    deviceObj.insert("mdn", item->device->newMdnStr());
+    deviceObj.insert("uniqueID", QString(QCryptographicHash::hash(item->device->imeiStr().toLatin1(), QCryptographicHash::Sha256).toHex()));
+
+    QJsonObject obj;
+    obj.insert("device", QJsonValue(deviceObj));
+
+    if(item->error) {
+        obj.insert("log", item->log);
+    }
+
+    QJsonDocument doc(obj);
+    QString postData = doc.toJson();
+
+    bool ret = Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/tracking.php"), output, headers, postData);
+
+    delete item;
+    return ret;
 }
 
 void UI::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
@@ -458,30 +507,6 @@ bool UI::SerialDeviceWorker::processLoginCheckUpdate(const QString& token) {
     }
 
     return false;
-}
-
-bool UI::SerialDeviceWorker::processDeviceProvisionTracking(Serial::SerialDevice* device, const QString& userToken, bool error) {
-    QByteArray output;
-    QHash<QString, QString> headers;
-    headers.insert("U-Token", userToken);
-
-    QJsonObject deviceObj;
-    deviceObj.insert("id", device->id());
-    deviceObj.insert("min", device->newMinStr());
-    deviceObj.insert("mdn", device->newMdnStr());
-    deviceObj.insert("uniqueID", QString(QCryptographicHash::hash(device->imeiStr().toLatin1(), QCryptographicHash::Sha256).toHex()));
-
-    QJsonObject obj;
-    obj.insert("device", QJsonValue(deviceObj));
-
-    if(error) {
-        obj.insert("log", mLogObject->getLogData());
-    }
-
-    QJsonDocument doc(obj);
-    QString postData = doc.toJson();
-
-    return Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/tracking.php"), output, headers, postData);
 }
 
 void UI::SerialDeviceWorker::deviceProvisionProgressChanged(int status, int progress, int error) {

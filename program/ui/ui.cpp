@@ -99,7 +99,8 @@ QString UI::WebDownloader::download(const QString& url) const {
 UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     : QObject(),
       mApp(app),
-      mSection(nullptr)
+      mSection(nullptr),
+      mLogObject(logData)
 {
     mDevicesModel = new UI::ConnectedDevicesModel(this);
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
@@ -146,7 +147,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
 
     QThread* thread = new QThread;
 
-    mWorker = new SerialDeviceWorker(logData);
+    mWorker = new SerialDeviceWorker();
     mWorker->moveToThread(thread);
 
     connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);
@@ -155,7 +156,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, LogObject* logData)
     connect(mWorker, &SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
     connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
-    connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, mDevicesModel, &ConnectedDevicesModel::setProgress);
+    connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, this, &MainUI::provisionProgressChanged);
     connect(mWorker, &SerialDeviceWorker::updateCheck, this, &MainUI::versionUpdateCheck);
     connect(mWorker, &SerialDeviceWorker::updateAvailable, this, &MainUI::versionUpdateAvailable);
 
@@ -468,6 +469,19 @@ void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString
     Utils::FileUtils::execute(updaterPath, argumentsList, updaterDir);
 
     mApp.quit();
+}
+
+void UI::MainUI::provisionProgressChanged(Serial::SerialDevice* device, int status, int current, int error) {
+    Serial::SerialProvisionStatus provisionStatus = static_cast<Serial::SerialProvisionStatus>(status);
+    Serial::SerialProvisionError provisionError = static_cast<Serial::SerialProvisionError>(error);
+
+    if(provisionStatus == Serial::SerialProvisionStatusDone) {
+        mWorker->addDeviceProvisionTracking(device, false);
+    } else if(provisionStatus == Serial::SerialProvisionStatusError) {
+        mWorker->addDeviceProvisionTracking(device, true, mLogObject->getLogData());
+    }
+
+    mDevicesModel->setProgress(device, provisionStatus, current, provisionError);
 }
 
 void UI::MainUI::provisionFailedClose() {

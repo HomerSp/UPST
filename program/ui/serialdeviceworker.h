@@ -21,6 +21,12 @@ namespace UI {
         QString token;
     };
 
+    struct ProvisionTrackingItem {
+        Serial::SerialDevice* device;
+        bool error;
+        QString log;
+    };
+
     class SerialCommandItem : public QObject {
         Q_OBJECT
     public:
@@ -51,7 +57,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        SerialDeviceWorker(UI::LogObject* logOject);
+        SerialDeviceWorker();
         ~SerialDeviceWorker();
 
         void addDevicesListUpdate();
@@ -61,6 +67,7 @@ namespace UI {
         void addDeviceClose(Serial::SerialDevice* device);
 
         void addDeviceProvision(Serial::SerialDevice* device);
+        void addDeviceProvisionTracking(Serial::SerialDevice* device, bool error, const QString& log = QString());
 
         void addCommand(SerialCommandItem* cmd);
 
@@ -100,6 +107,7 @@ namespace UI {
             WorkTypeDeviceClose,
             WorkTypeCommand,
             WorkTypeDeviceProvision,
+            WorkTypeDeviceProvisionTracking,
             WorkTypeLogin,
         };
 
@@ -107,13 +115,11 @@ namespace UI {
         void processDevicesListUpdate();
         void processDeviceCheck(QSerialPortInfo* portInfo);
         void processDeviceProvision(Serial::SerialDevice* device);
+        bool processDeviceProvisionTracking(ProvisionTrackingItem* item);
         void processCommand(SerialCommandItem* command);
         void processLogin(LoginItem* item);
 
         bool processLoginCheckUpdate(const QString& token);
-        bool processDeviceProvisionTracking(Serial::SerialDevice* device, const QString& token, bool error);
-
-        UI::LogObject* mLogObject;
 
         Serial::SerialDeviceConfig* mDeviceConfig;
 
