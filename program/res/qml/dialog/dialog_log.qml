@@ -35,7 +35,7 @@ Dialog {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 id: logDialogText
-                text: logText.logData
+                text: logText.getLogData()
                 font.family: openSansRegularFont.name
                 font.pixelSize: unit.em(1.1)
                 wrapMode: TextEdit.Wrap
@@ -59,7 +59,7 @@ Dialog {
     Connections {
         target: logText
         onLogDataChanged: {
-            logDialogText.text = logData
+            logDialogText.text = logText.getLogData()
         }
     }
 }

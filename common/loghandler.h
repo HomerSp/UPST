@@ -31,11 +31,9 @@ namespace Log {
         LogHandler(const QString& name, QObject* parent = 0);
         ~LogHandler();
 
-        Q_PROPERTY(QString logData READ getLogData NOTIFY logDataChanged)
-
         void addLog(QtMsgType type, const QMessageLogContext& context, QString msg);
 
-        QString getLogData() const {
+        Q_INVOKABLE QString getLogData() const {
             return mLogData;
         }
 
@@ -49,7 +47,7 @@ namespace Log {
     signals:
         void log(const QString& line);
 
-        void logDataChanged(QString logData);
+        void logDataChanged();
 
     private:
         QString formatLog(QtMsgType type, const QMessageLogContext& context, QString msg);
