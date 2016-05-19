@@ -11,10 +11,6 @@ namespace Log {
         LogHandlerWorker(const QString& name);
         ~LogHandlerWorker();
 
-        void quit() {
-            emit finished();
-        }
-
     signals:
         void finished();
 
@@ -52,6 +48,7 @@ namespace Log {
     private:
         QString formatLog(QtMsgType type, const QMessageLogContext& context, QString msg);
 
+        QThread* mWorkerThread;
         LogHandlerWorker* mWorker;
 
         QString mLogData;

@@ -29,24 +29,21 @@ Log::LogHandler::LogHandler(const QString& name, QObject* parent)
     : QObject(parent),
       mLogData("")
 {
-    QThread* thread = new QThread;
+    mWorkerThread = new QThread;
 
     mWorker = new LogHandlerWorker(name);
-    mWorker->moveToThread(thread);
+    mWorker->moveToThread(mWorkerThread);
 
     QObject::connect(this, &LogHandler::log, mWorker, &LogHandlerWorker::handleLog);
 
-    connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-
-    thread->start();
+    mWorkerThread->start();
 
     QObject::connect(this, &LogHandler::log, this, &LogHandler::handleLog);
 }
 
 Log::LogHandler::~LogHandler() {
-    mWorker->quit();
+    delete mWorker;
+    delete mWorkerThread;
 }
 
 void Log::LogHandler::addLog(QtMsgType type, const QMessageLogContext &context, QString msg) {
