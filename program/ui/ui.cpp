@@ -307,6 +307,8 @@ void UI::MainUI::deviceClose(Serial::SerialDevice *device) {
 }
 
 void UI::MainUI::deviceRemove(const QString& port) {
+    qInfo()<<"deviceRemove"<<port;
+
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
