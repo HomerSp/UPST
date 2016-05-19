@@ -23,6 +23,7 @@ namespace Serial {
         SerialProvisionStatusProgress,
         SerialProvisionStatusDone,
         SerialProvisionStatusError,
+        SerialProvisionStatusQueue,
     };
 
     enum SerialProvisionError {

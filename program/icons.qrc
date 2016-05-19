@@ -10,5 +10,6 @@
         <file>res/images/icons/done.svg</file>
         <file>res/images/icons/failed.svg</file>
         <file>res/images/icons/restart.svg</file>
+        <file>res/images/icons/queued.svg</file>
     </qresource>
 </RCC>

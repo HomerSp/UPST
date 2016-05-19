@@ -125,11 +125,10 @@ ApplicationWindow {
                 onTriggered: {
                     var component = Qt.createComponent("dialog/dialog_userguide.qml");
                     if (component.status === Component.Ready) {
-                        var url = "http://upst.ultimobile.net/userguide";
+                        var url = "http://upst.ultimobile.net/userguide/";
                         var data = downloader.download(url + "/index.html");
-                        var dialog = component.createObject(mainWindow);
+                        var dialog = component.createObject(mainWindow, {"guideData": data, "guideUrl": url});
                         dialog.modality = Qt.ApplicationModal;
-                        dialog.setData(data, url + "/index.html");
                         dialog.open();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
@@ -417,7 +416,7 @@ ApplicationWindow {
 
                             opacity: (progressStatus > 0)?1.0:0.0
 
-                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
+                            source: "qrc:/res/images/icons/" + ((progressStatus == 4)?"queued":(progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
                             fillMode: Image.PreserveAspectFit
                             mipmap: true
                             sourceSize.height: deviceInfoText.height / 2

@@ -89,7 +89,9 @@ bool SerialDevice::close() {
     }
 
     foreach(Serial::SerialDevice* c, mChildren) {
-        ret = ret || c->close();
+        if(!c->close()) {
+            ret = false;
+        }
     }
 
     return ret;
