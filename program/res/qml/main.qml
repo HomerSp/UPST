@@ -127,9 +127,6 @@ ApplicationWindow {
                     if (component.status === Component.Ready) {
                         var url = "http://upst.ultimobile.net/userguide";
                         var data = downloader.download(url + "/index.html");
-
-                        console.debug(data);
-
                         var dialog = component.createObject(mainWindow);
                         dialog.modality = Qt.ApplicationModal;
                         dialog.setData(data, url + "/index.html");
