@@ -292,6 +292,7 @@ ApplicationWindow {
                     Rectangle {
                         property bool isProvisioned
                         property bool haveError
+                        property bool haveChildren
                         property int progressCurrent
                         property int progressMax
                         property int progressMin
@@ -309,6 +310,7 @@ ApplicationWindow {
 
                         isProvisioned: progressStatus == 2
                         haveError: progressError.length > 0
+                        haveChildren: deviceChildrenSize > 0
                         progressCurrent: provisionProgressCurrent
                         progressMax: provisionProgressMax
                         progressMin: provisionProgressMin
@@ -398,7 +400,7 @@ ApplicationWindow {
 
                             opacity: (progressStatus > 0)?1.0:0.0
 
-                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":(progressStatus == 2)?(deviceManualReboot?"restart":"done"):"download") + ".svg"
+                            source: "qrc:/res/images/icons/" + ((progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
                             fillMode: Image.PreserveAspectFit
                             mipmap: true
                             sourceSize.height: deviceInfoText.height / 2
@@ -483,26 +485,37 @@ ApplicationWindow {
                         onIsProvisionedChanged: {
                             updateProgress();
                         }
-
                         onHaveErrorChanged: {
+                            updateProgress();
+                        }
+                        onHaveChildrenChanged: {
                             updateProgress();
                         }
 
                         function updateProgress() {
                             if(haveError && connectedDevicesList.currentIndex == index) {
                                 provisionFailedContainer.show(progressError);
+                                return;
                             } else {
                                 provisionFailedContainer.hide();
                             }
 
                             if(isProvisioned && connectedDevicesList.currentIndex == index) {
-                                if(deviceManualReboot) {
+                                if(deviceFlagManualReboot) {
                                     provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
                                 } else {
                                     provisionSuccessContainer.show();
                                 }
+                                return;
                             } else {
                                 provisionSuccessContainer.hide();
+                            }
+
+                            if(deviceFlagMultiPort && connectedDevicesList.currentIndex == index && !haveChildren) {
+                                deviceWaitingPortContainer.show();
+                                return;
+                            } else {
+                                deviceWaitingPortContainer.hide();
                             }
                         }
                     }
@@ -752,6 +765,16 @@ ApplicationWindow {
                 header: "Device has been provisioned"
                 errorLine1: qsTr("The device was provisioned successfully!")
                 errorTextColor: '#C5E1A5'
+            }
+
+            UPErrorBox {
+                id: deviceWaitingPortContainer
+
+                closeable: false
+                headerColor: '#a78b4e'
+                headerTextColor: '#FFFFFF'
+                header: "Please wait"
+                errorLine1: qsTr("Awaiting connection...")
             }
 
            Rectangle {

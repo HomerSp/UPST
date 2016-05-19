@@ -130,7 +130,7 @@ bool SerialDevice::isValid() {
 }
 
 bool SerialDevice::canProvision() {
-    return isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning();
+    return isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning() && (!flagMultiPort() || (flagMultiPort() && mChildren.size() > 0));
 }
 
 bool SerialDevice::provision(const QString& userToken) {

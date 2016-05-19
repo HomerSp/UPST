@@ -36,6 +36,7 @@ namespace Serial {
     enum SerialDeviceFlags {
         SerialDeviceFlagNone = 0x0,
         SerialDeviceFlagManualReboot = 0x1,
+        SerialDeviceFlagMultiPort = 0x2,
     };
 
     class SerialDevice : public QObject
@@ -136,6 +137,9 @@ namespace Serial {
 
         bool flagManualReboot() const {
             return (mFlags & SerialDeviceFlagManualReboot) != 0;
+        }
+        bool flagMultiPort() const {
+            return (mFlags & SerialDeviceFlagMultiPort) != 0;
         }
 
 

@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 
 Rectangle {
+    property bool closeable
     property string header
     property string errorLine1
     property string errorLine2
@@ -24,6 +25,9 @@ Rectangle {
     visible: false
     opacity: (errorLine2.length > 0)?1.0:0.0
 
+    closeable: true
+
+    header: ""
     errorLine1: ""
     errorLine2: ""
     errorLine3: ""
@@ -115,6 +119,7 @@ Rectangle {
                    height: headerContentText.height
                    width: height
                    buttonColor: headerColor
+                   visible: closeable?true:false
 
                    onClicked: {
                        closed();
