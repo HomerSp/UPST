@@ -5,10 +5,13 @@ import QtWebKit 3.0
 import "qrc:/res/qml/components"
 
 Dialog {
+    property string guideUrl
+    property string guideData
+
     id: userguideDialog
     visible: false
+    width: unit.dp(1020)
     height: unit.dp(620)
-    width: unit.dp(990)
 
     modality: Qt.ApplicationModal
     title: qsTr("User guide")
@@ -23,24 +26,19 @@ Dialog {
         source: "qrc:/res/fonts/OpenSans-Regular.ttf"
     }
 
-    contentItem: Rectangle {
-        color: '#FFFFFF'
+    contentItem: TextArea {
+        anchors.fill: parent
 
-        ScrollView {
-            anchors {left: parent.left; top: parent.top; bottom: parent.bottom}
-            implicitWidth: unit.dp(990)
+        verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
 
-            WebView {
-                id: userguideDialogContent
-                anchors.fill: parent
-            }
-        }
-    }
+        textFormat: TextEdit.RichText
+        wrapMode: TextEdit.Wrap
 
-    function setData(data, url) {
-        userguideDialogContent.loadHtml(data, url);
-        /*userguideDialogContent.baseUrl = url;
-        userguideDialogContent.text = data;*/
+        text: guideData
+        baseUrl: guideUrl
+
+        font.family: openSansRegularFont.name
+        font.pixelSize: unit.em(1.2)
     }
 
     onRejected: {
