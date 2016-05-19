@@ -1,7 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
-import QtWebKit 3.0
 import "qrc:/res/qml/components"
 
 Dialog {
@@ -33,6 +32,7 @@ Dialog {
 
         textFormat: TextEdit.RichText
         wrapMode: TextEdit.Wrap
+        readOnly: true
 
         text: guideData
         baseUrl: guideUrl
