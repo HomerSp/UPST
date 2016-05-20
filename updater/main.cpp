@@ -18,7 +18,9 @@
 static Log::LogHandler *sLogHandler = nullptr;
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-    sLogHandler->addLog(type, context, msg);
+    if(sLogHandler != nullptr) {
+        sLogHandler->addLog(type, context, msg);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -44,7 +46,7 @@ int main(int argc, char *argv[])
     Utils::WinUtils::enableIntelHack();
 #endif
 
-    QGuiApplication app(argc, argv);
+    QGuiApplication *app = new QGuiApplication(argc, argv);
 
     int ret = 0;
 
@@ -123,12 +125,16 @@ int main(int argc, char *argv[])
     } else if(args.size() == 4) {
         qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate)<<"arg 1"<<args.at(1)<<"arg 2"<<args.at(3);
 
-        UI::MainUI mainUI(app, args.at(1), args.at(3));
-        ret = app.exec();
-        delete sLogHandler;
+        UI::MainUI *mainUI = new UI::MainUI(*app, args.at(1), args.at(3));
+        ret = app->exec();
+        delete mainUI;
     } else {
         ret = -1;
     }
+
+    delete app;
+    delete sLogHandler;
+    sLogHandler = nullptr;
 
     return ret;
 }

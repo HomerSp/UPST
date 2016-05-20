@@ -22,7 +22,9 @@
 static Log::LogHandler *sLogHandler = nullptr;
 
 void logMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
-    sLogHandler->addLog(type, context, msg);
+    if(sLogHandler != nullptr) {
+        sLogHandler->addLog(type, context, msg);
+    }
 }
 
 void updateConfigs() {
@@ -52,11 +54,11 @@ int main(int argc, char *argv[])
     Utils::WinUtils::enableIntelHack();
 #endif
 
-    QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/res/images/icon.svg"));
+    QGuiApplication *app = new QGuiApplication(argc, argv);
+    app->setWindowIcon(QIcon(":/res/images/icon.svg"));
 
-    if(app.arguments().size() == 3 && app.arguments().at(1) == "update") {
-        QString updatePath = app.arguments().at(2);
+    if(app->arguments().size() == 3 && app->arguments().at(1) == "update") {
+        QString updatePath = app->arguments().at(2);
 
         qDebug()<<"Deleting temporary files from"<<updatePath;
 
@@ -95,19 +97,22 @@ int main(int argc, char *argv[])
 
     updateConfigs();
 
-    UI::MainUI mainUI(app, sLogHandler);
+    UI::MainUI* mainUI = new UI::MainUI(*app, sLogHandler);
 
     DeviceFilterEvent deviceFilter;
-    QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, &mainUI, &UI::MainUI::devicesChanged);
-    QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceRemove, &mainUI, &UI::MainUI::deviceRemove);
-    QObject::connect(&mainUI, &UI::MainUI::loggedIn, &deviceFilter, &DeviceFilterEvent::enable);
-    QObject::connect(&mainUI, &UI::MainUI::loggedOut, &deviceFilter, &DeviceFilterEvent::disable);
+    QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, mainUI, &UI::MainUI::devicesChanged);
+    QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceRemove, mainUI, &UI::MainUI::deviceRemove);
+    QObject::connect(mainUI, &UI::MainUI::loggedIn, &deviceFilter, &DeviceFilterEvent::enable);
+    QObject::connect(mainUI, &UI::MainUI::loggedOut, &deviceFilter, &DeviceFilterEvent::disable);
 
-    app.installNativeEventFilter(&deviceFilter);
+    app->installNativeEventFilter(&deviceFilter);
 
-    int ret = app.exec();
+    int ret = app->exec();
 
+    delete mainUI;
+    delete app;
     delete sLogHandler;
+    sLogHandler = nullptr;
 
     return ret;
 }
