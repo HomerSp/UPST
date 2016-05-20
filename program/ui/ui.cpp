@@ -165,10 +165,10 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         mRescheduleTimer->start();
     }
 
-    // Do we already have this device?
+    // Is this a device that's been provisioned that has reappared?
     for(int i = 0; i < mDevices.size(); i++) {
         Serial::SerialDevice* d = mDevices.at(i);
-        if(d->isSameDevice(device) && d->isProvisioning()) {
+        if(d->isSameDevice(device) && d->isProvisioning() && !d->isAvailable()) {
             qDebug()<<"Devices are identical, replacing"<<d<<"with"<<device;
             device->setProvisioning(true);
             mDevices.replace(i, device);
@@ -182,6 +182,7 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
         }
     }
 
+    // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
         if(*d == *device) {
             delete device;
