@@ -333,8 +333,13 @@ void UI::MainUI::logout() {
 
     emit loggedOut();
 
-    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        emit deviceRemove(info.portName());
+    for(int i = 0; i < mDevices.size(); i++) {
+        Serial::SerialDevice* device = mDevices[i];
+
+        emit deviceChanged(device, false);
+        mDevices.removeAt(i);
+
+        mWorker->addDeviceRemove(device);
     }
 }
 
