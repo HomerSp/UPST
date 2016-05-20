@@ -837,6 +837,10 @@ ApplicationWindow {
                                noDeviceOverlay.visible = true;
                            } else if(!running && noDeviceOverlay.opacity === 0.0) {
                                noDeviceOverlay.visible = false;
+
+                               provisionSuccessContainer.hide();
+                               deviceWaitingPortContainer.hide()
+                               provisionFailedContainer.hide();
                            }
                        }
                    }
