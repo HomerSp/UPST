@@ -153,7 +153,7 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
     if(!mDeviceProgress.contains(device)) {
         for(int i = 0; i < mDeviceProgress.size(); i++) {
             Serial::SerialDevice* d = mDeviceProgress.keys().at(i);
-            if(device->isSameDevice(device) && d->isProvisioning()) {
+            if(d->isSameDevice(device) && d->isProvisioning() && !d->isAvailable()) {
                 mDeviceProgress.insert(device, mDeviceProgress.value(d));
                 mDeviceProgress.remove(d);
                 break;
