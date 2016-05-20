@@ -126,8 +126,8 @@ ApplicationWindow {
                     if (component.status === Component.Ready) {
                         var url = "http://upst.ultimobile.net/userguide/";
                         var data = downloader.download(url + "/index.html");
-                        var dialog = component.createObject(mainWindow, {"guideData": data, "guideUrl": url});
-                        dialog.open();
+                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url});
+                        dialog.show();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
                     }
