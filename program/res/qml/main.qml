@@ -22,12 +22,16 @@ ApplicationWindow {
     function updateTitle() {
         var t = qsTr("UPST") + " v" + programVersion;
         if(mainPageLoader.currentView == "manual") {
-            this.title = t + qsTr(" - Manual mode")
+            t += qsTr(" - Manual mode")
         } else if(mainPageLoader.currentView == "deviceinfo") {
-            this.title = t + qsTr(" - Device info");
-        } else {
-            this.title = t
+            t += qsTr(" - Device info");
         }
+
+        if(programTestingMode) {
+            t += " (TESTING MODE)";
+        }
+
+        this.title = t;
     }
 
     Component.onCompleted: {

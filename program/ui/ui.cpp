@@ -42,6 +42,11 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
     mEngine->rootContext()->setContextProperty("logText", logHandler);
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
     mEngine->rootContext()->setContextProperty("programBuildTime", QVariant::fromValue(buildTime));
+#ifdef TESTING_MODE
+    mEngine->rootContext()->setContextProperty("programTestingMode", true);
+#else
+    mEngine->rootContext()->setContextProperty("programTestingMode", false);
+#endif
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
