@@ -468,6 +468,9 @@ bool UI::SerialDeviceWorker::processLoginCheckUpdate(const QString& token) {
     headers.insert("U-Token", token);
 
     QString postData = "t=" + QString(PROG_BUILDTIME);
+#ifdef TESTING_MODE
+    postData += "&d=1";
+#endif
 
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/check_update.php"), output, headers, postData)) {
         return false;
