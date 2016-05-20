@@ -519,7 +519,7 @@ ApplicationWindow {
                                 provisionSuccessContainer.hide();
                                 deviceWaitingPortContainer.hide()
 
-                                provisionFailedContainer.show(progressError);
+                                provisionFailedContainer.showError(progressError);
                             } else {
                                 provisionFailedContainer.hide();
 
@@ -528,9 +528,9 @@ ApplicationWindow {
                                     deviceWaitingPortContainer.hide()
 
                                     if(deviceFlagManualReboot) {
-                                        provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
+                                        provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
                                     } else {
-                                        provisionSuccessContainer.show();
+                                        provisionSuccessContainer.showError("");
                                     }
                                 } else {
                                     provisionSuccessContainer.hide();
@@ -988,7 +988,11 @@ ApplicationWindow {
         id: loginFailedContainer
         objectName: 'loginFailedContainer'
 
+        headerColor: '#915858'
+        headerTextColor: '#FFFFFF'
         header: qsTr("Could not login")
+        errorLine1: "Please check your username or password."
+        errorTextColor: '#EF9A9A'
     }
 
 }

@@ -344,7 +344,7 @@ void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
         updateLoginStatus(false);
 
         QObject* rootObject = mEngine->rootObjects().first();
-        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginFailedContainer"), "show", Q_ARG(QVariant, "Please check your username or password."));
+        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginFailedContainer"), "show");
 
         return;
     }

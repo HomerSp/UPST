@@ -40,8 +40,12 @@ Rectangle {
         root.opacity = 0.0;
     }
 
-    function show(error) {
-        root.errorLine2 = (error !== undefined)?error:"";
+    function show() {
+        root.opacity = 1.0;
+    }
+
+    function showError(error) {
+        root.errorLine2 = (error.length > 0)?error:"";
         root.opacity = 1.0;
     }
 
