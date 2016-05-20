@@ -507,29 +507,39 @@ ApplicationWindow {
                         }
 
                         function updateProgress() {
-                            if(haveError && connectedDevicesList.currentIndex == index) {
-                                provisionFailedContainer.show(progressError);
+                            if(connectedDevicesList.currentIndex != index) {
                                 return;
+                            }
+
+                            if(haveError) {
+                                provisionSuccessContainer.hide();
+                                deviceWaitingPortContainer.hide()
+
+                                provisionFailedContainer.show(progressError);
                             } else {
                                 provisionFailedContainer.hide();
-                            }
 
-                            if(isProvisioned && connectedDevicesList.currentIndex == index) {
-                                if(deviceFlagManualReboot) {
-                                    provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
+                                if(isProvisioned) {
+                                    provisionFailedContainer.hide();
+                                    deviceWaitingPortContainer.hide()
+
+                                    if(deviceFlagManualReboot) {
+                                        provisionSuccessContainer.show(qsTr("Please reboot the phone manually to finish the process."));
+                                    } else {
+                                        provisionSuccessContainer.show();
+                                    }
                                 } else {
-                                    provisionSuccessContainer.show();
-                                }
-                                return;
-                            } else {
-                                provisionSuccessContainer.hide();
-                            }
+                                    provisionSuccessContainer.hide();
 
-                            if(deviceFlagMultiPort && connectedDevicesList.currentIndex == index && !haveChildren) {
-                                deviceWaitingPortContainer.show();
-                                return;
-                            } else {
-                                deviceWaitingPortContainer.hide();
+                                    if(deviceFlagMultiPort && !haveChildren) {
+                                        provisionFailedContainer.hide();
+                                        provisionSuccessContainer.hide();
+
+                                        deviceWaitingPortContainer.show();
+                                    } else {
+                                        deviceWaitingPortContainer.hide();
+                                    }
+                                }
                             }
                         }
                     }
