@@ -109,6 +109,11 @@ QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError
 
 void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool added) {
     if(added) {
+        if(mDevices.contains(device)) {
+            qWarning()<<"Trying to add a device that's already in the list!!!";
+            return;
+        }
+
         QAbstractListModel::beginInsertRows(QModelIndex(), mDevices.size(), mDevices.size());
         mDevices.append(device);
 
@@ -122,6 +127,11 @@ void UI::ConnectedDevicesModel::deviceChanged(Serial::SerialDevice* device, bool
 
         QAbstractListModel::endInsertRows();
     } else {
+        if(!mDevices.contains(device)) {
+            qWarning()<<"Trying to remove a device that's NOT in the list!!!";
+            return;
+        }
+
         for(int i = 0; i< mDevices.size(); i++) {
             if(mDevices[i] == device) {
                 QAbstractListModel::beginRemoveRows(QModelIndex(), i, i);
@@ -153,7 +163,7 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
 
     bool found = false;
     for(int i = 0; i < mDevices.size(); i++) {
-        if(*(mDevices[i]) == *(device)) {
+        if(mDevices[i]->isSameDevice(device)) {
             found = true;
             mDevices.replace(i, device);
 
