@@ -946,7 +946,9 @@ ApplicationWindow {
             if(opacity == 1.0) {
                 loginOverlay.hide();
             } else if(opacity == 0.0) {
-                loggingInLoader.item.setCheckForUpdates(false);
+                if(loggingInLoader.item !== null) {
+                    loggingInLoader.item.setCheckForUpdates(false);
+                }
             }
         }
 
