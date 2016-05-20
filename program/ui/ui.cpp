@@ -111,6 +111,15 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
 }
 
 UI::MainUI::~MainUI() {
+    while(mDevices.size() > 0) {
+        Serial::SerialDevice* device = mDevices.first();
+
+        emit deviceChanged(device, false);
+        mDevices.removeAt(0);
+
+        mWorker->addDeviceRemove(device);
+    }
+
     if(mSection != nullptr) {
         delete mSection;
     }
