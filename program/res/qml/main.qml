@@ -335,6 +335,12 @@ ApplicationWindow {
                         progressStatus: provisionProgressStatus
                         progressError: provisionProgressError
 
+                        onWidthChanged: {
+                            if(width != connectedDevicesList.width) {
+                                connectedDevicesList.updateWidth();
+                            }
+                        }
+
                         onProgressCurrentChanged: {
                             deviceInfoStatusProgress.value = progressCurrent;
                         }
