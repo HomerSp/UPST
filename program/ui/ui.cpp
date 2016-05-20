@@ -334,14 +334,16 @@ void UI::MainUI::logout() {
 
     emit loggedOut();
 
-    for(int i = 0; i < mDevices.size(); i++) {
-        Serial::SerialDevice* device = mDevices[i];
+    while(mDevices.size() > 0) {
+        Serial::SerialDevice* device = mDevices.first();
 
         emit deviceChanged(device, false);
-        mDevices.removeAt(i);
+        mDevices.removeAt(0);
 
         mWorker->addDeviceRemove(device);
     }
+
+    viewUpdate();
 }
 
 void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
