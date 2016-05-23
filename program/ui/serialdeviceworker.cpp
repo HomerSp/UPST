@@ -314,7 +314,7 @@ void UI::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, b
             if(d == device) {
                 mWorkItems.erase(mWorkItems.begin() + i);
             }
-        } else if(mWorkItems[i].first == WorkTypeDeviceProvision) {
+        } else if(mWorkItems[i].first == WorkTypeDeviceProvisionTracking) {
            ProvisionTrackingItem* item = static_cast<ProvisionTrackingItem*>(mWorkItems[i].second);
            if(item->device == device) {
                delete item;
