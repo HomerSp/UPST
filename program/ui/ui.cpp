@@ -392,6 +392,7 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
         rootObject->findChild<QObject*>("usernameText")->setProperty("text", "");
         rootObject->findChild<QObject*>("passwordText")->setProperty("text", "");
 
+        QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "hide");
         rootObject->findChild<QObject*>("loggingInOverlay")->setProperty("opacity", 0.0f);
     } else {
         QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "show");
