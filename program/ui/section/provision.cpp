@@ -61,6 +61,6 @@ void UI::Section::Provision::provision() {
     ui()->provisionProgressChanged(device, Serial::SerialProvisionStatusQueue, 0, Serial::SerialProvisionErrorNone);
     update();
 
-    ui()->worker()->addDeviceProvision(device);
+    ui()->deviceWorker()->addDeviceProvision(device);
 
 }

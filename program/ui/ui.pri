@@ -1,8 +1,6 @@
 HEADERS += \ 
     $$PWD/ui.h \
-    $$PWD/connecteddevicesmodel.h \
-    $$PWD/serialdeviceworker.h
+    $$PWD/connecteddevicesmodel.h
 SOURCES += \ 
     $$PWD/ui.cpp \
-    $$PWD/connecteddevicesmodel.cpp \
-    $$PWD/serialdeviceworker.cpp
+    $$PWD/connecteddevicesmodel.cpp

@@ -32,19 +32,19 @@ void UI::Section::Manual::rawSend() {
 
     Serial::SerialDevice* currentDevice = UISection::currentDevice();
     if(currentDevice != nullptr) {
-        SerialCommandItem* cmdItem = new SerialCommandItem(currentDevice);
-        connect(cmdItem, &SerialCommandItem::finished, this, &UI::Section::Manual::rawCommandFinished);
+        UI::Worker::SerialCommandItem* cmdItem = new UI::Worker::SerialCommandItem(currentDevice);
+        connect(cmdItem, &UI::Worker::SerialCommandItem::finished, this, &UI::Section::Manual::rawCommandFinished);
 
         cmdItem->addItem(new Serial::QCDM::Commands::QcdmCommand(currentDevice, (Serial::QCDM::DiagCommands)inputData.at(0), inputData.mid(1)));
 
-        ui()->worker()->addCommand(cmdItem);
+        ui()->deviceWorker()->addCommand(cmdItem);
     }
 }
 
 void UI::Section::Manual::rawCommandFinished() {
     QObject* outputText = rootObject()->findChild<QObject*>("manualRawOutput");
 
-    SerialCommandItem* item = static_cast<SerialCommandItem*>(sender());
+    UI::Worker::SerialCommandItem* item = static_cast<UI::Worker::SerialCommandItem*>(sender());
     Serial::QCDM::Commands::QcdmCommand *cmd = static_cast<Serial::QCDM::Commands::QcdmCommand*>(item->cmds().at(0));
     outputText->setProperty("text", QString(cmd->result()->data().toByteArray().toHex()));
 }

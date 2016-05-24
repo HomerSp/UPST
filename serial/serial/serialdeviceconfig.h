@@ -9,16 +9,21 @@ namespace Serial {
     class SerialDeviceConfig
     {
     public:
-        SerialDeviceConfig();
+        SerialDeviceConfig(const QString& data);
         ~SerialDeviceConfig();
 
-        bool update(const QString& data);
+        bool isValid() const {
+            return mIsValid;
+        }
 
         bool updateDevice(SerialDevice* device);
 
         static void updateConfig();
 
     private:
+        bool update(const QString& data);
+
+        bool mIsValid;
         QJsonDocument mDevices;
     };
 }

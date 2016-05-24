@@ -18,8 +18,8 @@ void UI::Section::DeviceInfo::update() {
 
     Serial::SerialDevice* currentDevice = UISection::currentDevice();
     if(currentDevice != nullptr) {
-        SerialCommandItem* cmdItem = new SerialCommandItem(currentDevice);
-        connect(cmdItem, &SerialCommandItem::finished, this, &UI::Section::DeviceInfo::infoCommandFinished);
+        UI::Worker::SerialCommandItem* cmdItem = new UI::Worker::SerialCommandItem(currentDevice);
+        connect(cmdItem, &UI::Worker::SerialCommandItem::finished, this, &UI::Section::DeviceInfo::infoCommandFinished);
 
         cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, true, Serial::QCDM::NV_MOB_FIRM_REV_I));
         cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommand16Bit(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_MOB_MODEL_I));
@@ -29,14 +29,14 @@ void UI::Section::DeviceInfo::update() {
             cmdItem->addItem(new Serial::QCDM::Commands::Nv::NvCommandString(currentDevice, Serial::QCDM::DIAG_NV_READ_F, Serial::QCDM::NV_OEM_SAMSUNG_MODEL));
         }
 
-        ui()->worker()->addCommand(cmdItem);
+        ui()->deviceWorker()->addCommand(cmdItem);
     }
 
     UISection::endUpdate();
 }
 
 void UI::Section::DeviceInfo::infoCommandFinished() {
-    SerialCommandItem* item = static_cast<SerialCommandItem*>(sender());
+    UI::Worker::SerialCommandItem* item = static_cast<UI::Worker::SerialCommandItem*>(sender());
     QString data = "VID = " + item->device()->vidStr() + "\nPID = " + item->device()->pidStr();
     {
         Serial::QCDM::Commands::Nv::NvCommand16Bit *cmd = static_cast<Serial::QCDM::Commands::Nv::NvCommand16Bit*>(item->cmds().at(0));

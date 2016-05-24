@@ -42,3 +42,4 @@ CONFIG( debug, debug|release ) {
 include(../defines.pri)
 include(ui/ui.pri)
 include(ui/section/section.pri)
+include(ui/worker/worker.pri)

@@ -270,6 +270,10 @@ namespace Serial {
             return QString("%1").arg(mNewMin, 10, 10, QChar('0'));
         }
 
+        void stopProvision() {
+            mProvisionStop = true;
+        }
+
     signals:
         void provisionProgressChanged(int status, int progress, int error = Serial::SerialProvisionErrorNone);
 
@@ -304,6 +308,7 @@ namespace Serial {
         uint64_t mMEID;
 
         bool mProvisioning;
+        bool mProvisionStop;
         QString mNewMdn;
         uint64_t mNewMin;
     };

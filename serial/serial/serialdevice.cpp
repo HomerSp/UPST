@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QList>
 #include <QDataStream>
+#include <QThread>
 
 #include "web/webutils.h"
 #include "serialcommunicator.h"
@@ -38,6 +39,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mIMEI(0),
       mMEID(0),
       mProvisioning(false),
+      mProvisionStop(false),
       mNewMdn(""),
       mNewMin(0)
 
@@ -136,6 +138,8 @@ bool SerialDevice::canProvision() {
 }
 
 bool SerialDevice::provision(const QString& userToken) {
+    mProvisionStop = false;
+
     qInfo()<<"Provisioning"<<name();
 
     emit provisionProgressChanged(SerialProvisionStatusProgress, 0);
@@ -314,6 +318,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
+        if(mProvisionStop) {
+            break;
+        }
+
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
             Serial::QCDM::Commands::PasswordCommand passwordCmd(device, data->password16());
@@ -326,6 +334,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
                 ret = false;
                 break;
             }
+        }
+
+        if(mProvisionStop) {
+            break;
         }
 
         qDebug()<<"===== Writing SPC =====";
@@ -343,6 +355,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
+        if(mProvisionStop) {
+            break;
+        }
+
         qDebug()<<"===== WRITING MDN =====";
         Serial::QCDM::Commands::Nv::MDNCommand mdnCmd(device, false, mNewMdn);
         mdnCmd.setTimeout(10000);
@@ -357,6 +373,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+
+        if(mProvisionStop) {
+            break;
+        }
 
         qDebug()<<"===== WRITING MIN =====";
         Serial::QCDM::Commands::Nv::MINCommand minCmd(device, false, mNewMin);
@@ -373,6 +393,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
+        if(mProvisionStop) {
+            break;
+        }
+
         qDebug()<<"Provision items"<<data->constCommands().size();
 
         foreach(Serial::SerialCommand* cmd, data->constCommands()) {
@@ -383,9 +407,13 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
             i += mod;
             emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+
+            if(mProvisionStop) {
+                break;
+            }
         }
 
-        if(!ret) {
+        if(!ret || mProvisionStop) {
             break;
         }
 
@@ -398,19 +426,25 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+
+        if(mProvisionStop) {
+            break;
+        }
     }
 
-    qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
+    if(!mProvisionStop) {
+        qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
-    qDebug()<<"===== RESETTING DEVICE AFTER =====";
-    Serial::QCDM::Commands::RadioModeCommand radioResetAfter(this, Serial::QCDM::MODE_RADIO_RESET);
-    radioResetAfter.setTimeout(0);
-    radioResetAfter.execute();
-    if(!radioResetAfter.resultSuccess()) {
-        qWarning()<<"Could not reset device";
+        qDebug()<<"===== RESETTING DEVICE AFTER =====";
+        Serial::QCDM::Commands::RadioModeCommand radioResetAfter(this, Serial::QCDM::MODE_RADIO_RESET);
+        radioResetAfter.setTimeout(0);
+        radioResetAfter.execute();
+        if(!radioResetAfter.resultSuccess()) {
+            qWarning()<<"Could not reset device";
+        }
+
+        qDebug()<<"Reset device finished at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
     }
-
-    qDebug()<<"Reset device finished at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);

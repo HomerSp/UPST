@@ -79,30 +79,25 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
     QObject::connect(rootObject->findChild<QObject*>("provisionSuccessContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
 
-    QThread* thread = new QThread;
+    mWorker = new UI::Worker::UIWorker();
+    connect(mWorker, &UI::Worker::UIWorker::devicesListChanged, this, &MainUI::devicesListChanged);
+    connect(mWorker, &UI::Worker::UIWorker::loginStatus, this, &MainUI::loginStatusChanged);
+    connect(mWorker, &UI::Worker::UIWorker::updateCheck, this, &MainUI::versionUpdateCheck);
+    connect(mWorker, &UI::Worker::UIWorker::updateAvailable, this, &MainUI::versionUpdateAvailable);
+    connect(mWorker, &UI::Worker::UIWorker::statusChange, this, &MainUI::setStatus);
 
-    mWorker = new SerialDeviceWorker();
-    mWorker->moveToThread(thread);
-
-    connect(mWorker, &SerialDeviceWorker::devicesListChanged, this, &MainUI::devicesListChanged);
-    connect(mWorker, &SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
-    connect(mWorker, &SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
-    connect(mWorker, &SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
-    connect(mWorker, &SerialDeviceWorker::loginStatus, this, &MainUI::loginStatusChanged);
-    connect(mWorker, &SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
-    connect(mWorker, &SerialDeviceWorker::provisionProgressChanged, this, &MainUI::provisionProgressChanged);
-    connect(mWorker, &SerialDeviceWorker::updateCheck, this, &MainUI::versionUpdateCheck);
-    connect(mWorker, &SerialDeviceWorker::updateAvailable, this, &MainUI::versionUpdateAvailable);
-
-    connect(thread, SIGNAL(started()), mWorker, SLOT(process()));
-    connect(mWorker, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+    mDeviceWorker = new UI::Worker::SerialDeviceWorker();
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::provisionProgressChanged, this, &MainUI::provisionProgressChanged);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
 
     viewChanged();
     currentDeviceChanged(connectedDevicesList->property("currentIndex").toInt());
 
-    thread->start();
+    mWorker->start();
+    mDeviceWorker->start();
 
     QSettings settings;
     if(settings.contains("user/token")) {
@@ -117,13 +112,14 @@ UI::MainUI::~MainUI() {
         emit deviceChanged(device, false);
         mDevices.removeAt(0);
 
-        mWorker->addDeviceRemove(device);
+        mDeviceWorker->addDeviceRemove(device);
     }
 
     if(mSection != nullptr) {
         delete mSection;
     }
 
+    mDeviceWorker->stop();
     mWorker->stop();
 
     delete mEngine;
@@ -131,8 +127,12 @@ UI::MainUI::~MainUI() {
     delete mRescheduleTimer;
 }
 
-void UI::MainUI::devicesListChanged(bool success) {
-    qDebug()<<"devicesListChanged"<<success;
+void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* config) {
+    qDebug()<<"devicesListChanged main"<<success;
+    if(success) {
+        mDeviceWorker->setDeviceConfig(config);
+    }
+
     emit loggedIn();
 }
 
@@ -152,7 +152,7 @@ void UI::MainUI::devicesChanged() {
         }
 
         if(shouldAdd) {
-            mWorker->addDeviceCheck(info);
+            mDeviceWorker->addDeviceCheck(info);
         } else {
             qDebug()<<"Not checking port"<<port;
         }
@@ -185,7 +185,7 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
             emit deviceUpdate(device);
             viewUpdate();
 
-            mWorker->addDeviceRemove(d);
+            mDeviceWorker->addDeviceRemove(d);
 
             return;
         }
@@ -257,12 +257,12 @@ void UI::MainUI::deviceRemove(const QString& port) {
         if(*mDevices.at(i) == port) {
             Serial::SerialDevice* device = mDevices[i];
             if(device->isProvisioning()) {
-                mWorker->addDeviceClose(device);
+                mDeviceWorker->addDeviceClose(device);
             } else {
                 emit deviceChanged(device, false);
                 mDevices.removeAt(i);
 
-                mWorker->addDeviceRemove(device);
+                mDeviceWorker->addDeviceRemove(device);
             }
 
             break;
@@ -349,7 +349,7 @@ void UI::MainUI::logout() {
         emit deviceChanged(device, false);
         mDevices.removeAt(0);
 
-        mWorker->addDeviceRemove(device);
+        mDeviceWorker->addDeviceRemove(device);
     }
 
     viewUpdate();

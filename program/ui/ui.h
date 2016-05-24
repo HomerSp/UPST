@@ -8,8 +8,9 @@
 #include <QSet>
 
 #include "connecteddevicesmodel.h"
-#include "serialdeviceworker.h"
 #include "loghandler.h"
+#include "worker/uiworker.h"
+#include "worker/serialdeviceworker.h"
 
 #include "serial/serialdevice.h"
 
@@ -37,8 +38,12 @@ namespace UI {
             return mDevices;
         }
 
-        SerialDeviceWorker* worker() {
+        UI::Worker::UIWorker* worker() {
             return mWorker;
+        }
+
+        UI::Worker::SerialDeviceWorker* deviceWorker() {
+            return mDeviceWorker;
         }
 
         ConnectedDevicesModel* devicesModel() {
@@ -59,7 +64,7 @@ namespace UI {
     public slots:
         void devicesChanged();
 
-        void devicesListChanged(bool success);
+        void devicesListChanged(bool success, Serial::SerialDeviceConfig* config);
         void deviceAdd(Serial::SerialDevice* device);
         void deviceAddReschedule(QString port);
         void deviceClose(Serial::SerialDevice* device);
@@ -100,7 +105,9 @@ namespace UI {
 
         Log::LogHandler* mLogHandler;
 
-        SerialDeviceWorker* mWorker;
+        UI::Worker::UIWorker* mWorker;
+        UI::Worker::SerialDeviceWorker* mDeviceWorker;
+
         QList<Serial::SerialDevice*> mDevices;
 
         QTimer* mRescheduleTimer;

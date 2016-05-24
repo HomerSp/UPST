@@ -16,16 +16,18 @@
 
 using namespace Serial;
 
-SerialDeviceConfig::SerialDeviceConfig()
+SerialDeviceConfig::SerialDeviceConfig(const QString& data)
+    : mIsValid(false)
 {
-    QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
-    if(!targetFile.open(QFile::ReadOnly)) {
-        return;
-    }
+    mIsValid = update(data);
+    if(!mIsValid) {
+        QFile targetFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.bin");
+        if(!targetFile.open(QFile::ReadOnly)) {
+            return;
+        }
 
-    mDevices = QJsonDocument::fromBinaryData(targetFile.readAll());
-    if(!mDevices.isObject()) {
-        return;
+        mDevices = QJsonDocument::fromBinaryData(targetFile.readAll());
+        mIsValid = mDevices.isObject();
     }
 }
 
