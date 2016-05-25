@@ -8,7 +8,7 @@ AOCCommand::AOCCommand(SerialDevice* device, bool read)
     if(read) {
         addItem(new NvCommandItem(QCDM::DIAG_NV_READ_F, QCDM::NV_ACCOLC_I));
     } else {
-        char m = device->newMinStr().mid(device->newMinStr().size() - 1, 1).at(0).toLatin1();
+        char m = device->newMinStr().mid(device->newMinStr().size() - 1, 1).at(0).toLatin1() - 0x30;
 
         QByteArray data;
         data.append((char)0x0);
