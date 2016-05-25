@@ -48,9 +48,9 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
     }
 
     QList<QByteArray> requests;
-    getRequest(requests);
+    bool r = getRequest(requests);
 
-    if(requests.size() == 0) {
+    if(!r || requests.size() == 0) {
         addResult(false);
         return;
     }

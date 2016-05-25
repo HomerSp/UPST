@@ -77,8 +77,14 @@ bool NvCommand::getRequest(QList<QByteArray> &request) {
         reqData.append(nvByte2);
         reqData.append(data(i));
 
+        // 133 = Code (1) + Nv (2) + Data (128) + Status (2)
         while(reqData.size() < 133) {
             reqData.append(static_cast<char>(0x00));
+        }
+
+        if(reqData.size() > 133) {
+            qCritical()<<"Item"<<nvItem(i)<<"is too BIG! - Found"<<reqData.size()<<"bytes, expected 133 bytes";
+            return false;
         }
 
         Serial::CRCUtils::addCRC(reqData);
