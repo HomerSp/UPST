@@ -15,7 +15,12 @@
 #include "utils/winutils.h"
 #endif
 #include "ui/ui.h"
+
+#ifdef Q_OS_WIN
+#include "devicefilterevent_win.h"
+#else
 #include "devicefilterevent.h"
+#endif
 
 #include "serial/serialdeviceconfig.h"
 
@@ -99,11 +104,16 @@ int main(int argc, char *argv[])
 
     UI::MainUI* mainUI = new UI::MainUI(*app, sLogHandler);
 
+#ifdef Q_OS_WIN
+    DeviceFilterEventWin deviceFilter;
+#else
     DeviceFilterEvent deviceFilter;
-    QObject::connect(&deviceFilter, &DeviceFilterEvent::devicesChanged, mainUI, &UI::MainUI::devicesChanged);
+#endif
+    QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceAdd, mainUI, &UI::MainUI::deviceAdd);
     QObject::connect(&deviceFilter, &DeviceFilterEvent::deviceRemove, mainUI, &UI::MainUI::deviceRemove);
     QObject::connect(mainUI, &UI::MainUI::loggedIn, &deviceFilter, &DeviceFilterEvent::enable);
     QObject::connect(mainUI, &UI::MainUI::loggedOut, &deviceFilter, &DeviceFilterEvent::disable);
+    QObject::connect(mainUI, &UI::MainUI::devicesRefresh, &deviceFilter, &DeviceFilterEvent::refresh);
 
     app->installNativeEventFilter(&deviceFilter);
 

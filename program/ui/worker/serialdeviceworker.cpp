@@ -202,6 +202,10 @@ void UI::Worker::SerialDeviceWorker::process() {
 }
 
 void UI::Worker::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, bool close) {
+    if(device == nullptr) {
+        return;
+    }
+
     if(!close) {
         delete device;
         device = nullptr;
@@ -240,6 +244,10 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
 }
 
 void UI::Worker::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device) {
+    if(device == nullptr) {
+        return;
+    }
+
     emit statusChange("Provisioning " + device->name());
 
     QString userToken = QSettings().value("user/token").toString();
@@ -250,7 +258,10 @@ void UI::Worker::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice
 }
 
 void UI::Worker::SerialDeviceWorker::processCommand(SerialCommandItem* item) {
-    item->process();
+    if(item->device() != nullptr) {
+        item->process();
+    }
+
     item->deleteLater();
 }
 

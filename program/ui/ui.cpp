@@ -56,13 +56,6 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
 
     mEngine->load(QUrl(QStringLiteral("qrc:/res/qml/main.qml")));
 
-    mRescheduleTimer = new QTimer(this);
-    mRescheduleTimer->moveToThread(thread());
-    mRescheduleTimer->setSingleShot(true);
-    mRescheduleTimer->setInterval(5000);
-    mRescheduleTimer->setTimerType(Qt::TimerType::VeryCoarseTimer);
-    QObject::connect(mRescheduleTimer, &QTimer::timeout, this, &UI::MainUI::devicesChanged);
-
     /* Set up signals */
     QObject* rootObject = mEngine->rootObjects().first();
 
@@ -71,7 +64,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
 
     QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
     QObject::connect(connectedDevicesList, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDeviceChanged(int)));
-    QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(devicesChanged()));
+    QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(devicesRefresh()));
 
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
     QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
@@ -87,7 +80,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
     connect(mWorker, &UI::Worker::UIWorker::statusChange, this, &MainUI::setStatus);
 
     mDeviceWorker = new UI::Worker::SerialDeviceWorker();
-    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAdd);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAddChecked);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::provisionProgressChanged, this, &MainUI::provisionProgressChanged);
@@ -124,7 +117,6 @@ UI::MainUI::~MainUI() {
 
     delete mEngine;
     delete mDevicesModel;
-    delete mRescheduleTimer;
 }
 
 void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* config) {
@@ -136,43 +128,28 @@ void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* co
     emit loggedIn();
 }
 
-void UI::MainUI::devicesChanged() {
-    mRescheduleTimer->stop();
+void UI::MainUI::deviceAdd(const QString& port) {
+    qDebug()<<"deviceAdd"<<port;
 
-    qDebug()<<"handleDeviceAdded availablePorts"<<QSerialPortInfo::availablePorts().size();
-    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        QString port = info.portName();
-
-        bool shouldAdd = true;
-        foreach(Serial::SerialDevice* d, mDevices) {
-            if(*d == port && !d->isProvisioning()) {
-                shouldAdd = false;
-                break;
-            }
-        }
-
-        if(shouldAdd) {
-            mDeviceWorker->addDeviceCheck(info);
-        } else {
-            qDebug()<<"Not checking port"<<port;
+    bool shouldAdd = true;
+    foreach(Serial::SerialDevice* d, mDevices) {
+        if(*d == port && !d->isProvisioning()) {
+            shouldAdd = false;
+            break;
         }
     }
 
-    if(mRescheduledDevices.size() > 0) {
-        mRescheduleTimer->start();
+    if(shouldAdd) {
+        mDeviceWorker->addDeviceCheck(QSerialPortInfo(port));
+    } else {
+        qDebug()<<"Not checking port"<<port;
     }
 }
 
-void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
-    qDebug()<<"deviceAdd"<<device->port();
+void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
+    qDebug()<<"deviceAddChecked"<<device->port();
 
-    mRescheduleTimer->stop();
-    if(mRescheduledDevices.contains(device->port())) {
-        mRescheduledDevices.remove(device->port());
-    }
-    if(mRescheduledDevices.size() > 0) {
-        mRescheduleTimer->start();
-    }
+    mDeviceRechecks.remove(device->port());
 
     // Is this a device that's been provisioned that has reappared?
     for(int i = 0; i < mDevices.size(); i++) {
@@ -202,7 +179,7 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
     // Check if this device is a child to another device.
     for(int i = 0; i < mDevices.size(); i++) {
         Serial::SerialDevice* d = mDevices.at(i);
-        qDebug()<<"deviceAdd"<<d->vidStr()<<device->vidStr()<<d->pidStr()<<device->pidStr()<<d->meidStr()<<device->meidStr();
+        qDebug()<<"deviceAddChecked"<<d->vidStr()<<device->vidStr()<<d->pidStr()<<device->pidStr()<<d->meidStr()<<device->meidStr();
 
         if(device->isSameDevice(d)) {
             // If the new device has a type, use it as the parent. Otherwise we add this one as a child.
@@ -230,22 +207,29 @@ void UI::MainUI::deviceAdd(Serial::SerialDevice* device) {
 }
 
 void UI::MainUI::deviceAddReschedule(QString port) {
-    qWarning()<<"Rescheduling check for"<<port;
-
-    mRescheduleTimer->stop();
-    if(mRescheduledDevices.contains(port)) {
-        mRescheduledDevices.remove(port);
-    } else {
-        mRescheduledDevices.insert(port);
+    if(mDeviceRechecks.contains(port) && mDeviceRechecks.value(port) >= 3) {
+        qCritical()<<"Failed to check device"<<port<<"not checking again.";
+        mDeviceRechecks.remove(port);
+        return;
     }
 
-    if(mRescheduledDevices.size() > 0) {
-        mRescheduleTimer->start();
-    }
+    qWarning()<<"Rescheduling check for"<<port<<"in 5 secs";
+
+    mDeviceRechecks.insert(port, 1);
+
+    QTimer* timer = new QTimer(this);
+    timer->setInterval(5000);
+    timer->setSingleShot(true);
+    timer->setProperty("port", port);
+    timer->start();
 }
 
 void UI::MainUI::deviceClose(Serial::SerialDevice *device) {
-    emit deviceUpdate(device);
+    if(device != nullptr) {
+        qDebug()<<"deviceClose"<<device->port();
+
+        emit deviceUpdate(device);
+    }
 
     viewUpdate();
 }
@@ -253,9 +237,11 @@ void UI::MainUI::deviceClose(Serial::SerialDevice *device) {
 void UI::MainUI::deviceRemove(const QString& port) {
     qInfo()<<"deviceRemove"<<port;
 
+    mDeviceRechecks.remove(port);
+
     for(int i = 0; i < mDevices.size(); i++) {
         if(*mDevices.at(i) == port) {
-            Serial::SerialDevice* device = mDevices[i];
+            Serial::SerialDevice* device = mDevices.at(i);
             if(device->isProvisioning()) {
                 mDeviceWorker->addDeviceClose(device);
             } else {
@@ -270,6 +256,20 @@ void UI::MainUI::deviceRemove(const QString& port) {
     }
 
     viewUpdate();
+}
+
+void UI::MainUI::deviceRescheduleTimeout() {
+    QTimer* timer = static_cast<QTimer*>(sender());
+    if(timer == nullptr) {
+        return;
+    }
+
+    QString port = timer->property("port").toString();
+    if(mDeviceRechecks.contains(port)) {
+        deviceAdd(port);
+    }
+
+    timer->deleteLater();
 }
 
 void UI::MainUI::currentDeviceChanged(int index) {
@@ -448,7 +448,7 @@ void UI::MainUI::provisionFailedClose() {
     mDevicesModel->setProgress(device, Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
 
     if(!device->isAvailable()) {
-        emit deviceRemove(device->port());
+        deviceRemove(device->port());
     } else {
         viewUpdate();
     }

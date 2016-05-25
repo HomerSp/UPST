@@ -55,6 +55,7 @@ namespace UI {
         }
 
     signals:
+        void devicesRefresh();
         void deviceChanged(Serial::SerialDevice* device, bool added);
         void deviceUpdate(Serial::SerialDevice* device);
 
@@ -62,22 +63,24 @@ namespace UI {
         void loggedOut();
 
     public slots:
-        void devicesChanged();
-
         void devicesListChanged(bool success, Serial::SerialDeviceConfig* config);
-        void deviceAdd(Serial::SerialDevice* device);
-        void deviceAddReschedule(QString port);
-        void deviceClose(Serial::SerialDevice* device);
-        void deviceRemove(const QString& port);
-
-        void setStatus(const QString& status);
 
         void loginStatusChanged(bool success, const QString &token);
 
         void versionUpdateCheck();
         void versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
 
+        void deviceAddChecked(Serial::SerialDevice* device);
+        void deviceAddReschedule(QString port);
+        void deviceClose(Serial::SerialDevice* device);
+        void deviceRescheduleTimeout();
+
         void provisionProgressChanged(Serial::SerialDevice* device, int status, int current, int error);
+
+        void deviceAdd(const QString& port);
+        void deviceRemove(const QString& port);
+
+        void setStatus(const QString& status);
 
         void provisionFailedClose();
 
@@ -108,10 +111,9 @@ namespace UI {
         UI::Worker::UIWorker* mWorker;
         UI::Worker::SerialDeviceWorker* mDeviceWorker;
 
+        QTimer* mDevicesChangedTimer;
         QList<Serial::SerialDevice*> mDevices;
-
-        QTimer* mRescheduleTimer;
-        QSet<QString> mRescheduledDevices;
+        QMap<QString, int> mDeviceRechecks;
 
         int mCurrentIndex;
     };

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QAbstractNativeEventFilter>
+#include <QSet>
 
 #include "serial/serialdevice.h"
 
@@ -14,26 +15,29 @@ public:
 
     virtual bool nativeEventFilter(const QByteArray &eventType, void* message, long*) Q_DECL_OVERRIDE;
 
-    void refresh();
-
 public slots:
     void enable();
     void disable();
 
+    void refresh();
+
 signals:
-    void devicesChanged();
+    void deviceAdd(const QString& port);
     void deviceRemove(const QString& port);
 
 protected:
-    void handleDeviceAdded();
-    void handleDeviceRemoved(const QString& port);
+    bool enabled() {
+        return mEnabled;
+    }
 
-    bool checkAndroidDevice(const QString& port, const QString& vid, const QString& pid);
+    virtual QSet<QString> getDevices() = 0;
+
+    virtual void process();
 
 private:
-    bool getVidPid(const QString& port, QString& vid, QString& pid);
-
     bool mEnabled;
+
+    QSet<QString> mConnectedDevices;
 
 };
 

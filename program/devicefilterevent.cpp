@@ -18,30 +18,56 @@ void DeviceFilterEvent::enable() {
 
 void DeviceFilterEvent::disable() {
     mEnabled = false;
+    mConnectedDevices.clear();
 }
 
-#ifdef NATIVEFILTER_MISSING
 bool DeviceFilterEvent::nativeEventFilter(const QByteArray &, void*, long*) {
     return false;
 }
-#endif
-
-void DeviceFilterEvent::handleDeviceAdded() {
-    if(!mEnabled) {
-        return;
-    }
-
-    emit devicesChanged();
-}
-
-void DeviceFilterEvent::handleDeviceRemoved(const QString& port) {
-    if(!mEnabled) {
-        return;
-    }
-
-    emit deviceRemove(port);
-}
 
 void DeviceFilterEvent::refresh() {
-    handleDeviceAdded();
+    process();
+}
+
+void DeviceFilterEvent::process() {
+    if(!enabled()) {
+        return;
+    }
+
+    QSet<QString> devices = getDevices();
+    if(mConnectedDevices.size() > 0) {
+        for(int i = 0; i < mConnectedDevices.size(); i++) {
+            QString port = *(mConnectedDevices.begin() + i);
+
+            bool found = false;
+            foreach(QString d, devices) {
+                if(port == d) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found) {
+                mConnectedDevices.remove(port);
+                emit deviceRemove(port);
+                i--;
+            }
+        }
+    }
+
+    foreach(QString d, devices) {
+        bool found = false;
+        for(int i = 0; i < mConnectedDevices.size(); i++) {
+            QString port = *(mConnectedDevices.begin() + i);
+            if(port == d) {
+                found = true;
+                break;
+            }
+        }
+
+        if(!found) {
+            emit deviceAdd(d);
+            mConnectedDevices.insert(d);
+        }
+    }
 }
