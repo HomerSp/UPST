@@ -253,7 +253,7 @@ void UI::Worker::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice
     QString userToken = QSettings().value("user/token").toString();
 
     connect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::Worker::SerialDeviceWorker::deviceProvisionProgressChanged);
-    bool ret = device->provision(userToken);
+    device->provision(userToken);
     disconnect(device, &Serial::SerialDevice::provisionProgressChanged, this, &UI::Worker::SerialDeviceWorker::deviceProvisionProgressChanged);
 }
 
