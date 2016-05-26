@@ -72,6 +72,9 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
                 return;
             }
 
+            qDebug()<<"QcdmCommand raw read"<<QString(buf.toHex());
+
+            bool foundReport = false;
             int end = 0;
             while(end < buf.size()) {
                 while(buf.at(end) != 0x7e && end < buf.size()) {
@@ -84,6 +87,7 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
                 }
 
                 if(buf.at(0) == Serial::QCDM::DIAG_EVENT_REPORT_F && request.at(0) != Serial::QCDM::DIAG_EVENT_REPORT_F) {
+                    foundReport = true;
                     device->handleEventReport(buf.mid(0, end + 1));
                     buf = buf.mid(end + 1);
                     end = 0;
@@ -92,6 +96,10 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
                 }
 
                 break;
+            }
+
+            if(foundReport && end < 1) {
+                continue;
             }
 
             data = buf.mid(0, end + 1);
