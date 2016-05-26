@@ -237,11 +237,9 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
         qWarning()<<"Could not find a handler for"<<parent<<"/"<<name;
     }
 
-#ifdef TESTING_MODE
     if(cmd != nullptr) {
         cmd->setDebuggingName(parent + ((parent.size() > 0)?"/":"") + name);
     }
-#endif
 
     return cmd;
 }

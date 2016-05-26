@@ -100,7 +100,6 @@ namespace Serial {
             mOffset = offset;
         }
 
-#ifdef TESTING_MODE
         const QString& debuggingName() {
             return mDebuggingName;
         }
@@ -108,7 +107,6 @@ namespace Serial {
         void setDebuggingName(const QString& name) {
             mDebuggingName = name;
         }
-#endif
 
     protected:
         SerialCommand(SerialDevice *device);
@@ -134,9 +132,7 @@ namespace Serial {
 
         QList<SerialCommandResult*> mResults;
 
-#ifdef TESTING_MODE
         QString mDebuggingName;
-#endif
     };
 }
 #endif // SERIALCOMMAND_H
