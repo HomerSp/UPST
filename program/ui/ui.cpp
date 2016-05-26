@@ -64,7 +64,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
 
     QObject* connectedDevicesList = rootObject->findChild<QObject*>("connectedDevicesList");
     QObject::connect(connectedDevicesList, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDeviceChanged(int)));
-    QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(devicesRefresh()));
+    QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(doRefresh()));
 
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
     QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
@@ -436,6 +436,10 @@ void UI::MainUI::provisionProgressChanged(Serial::SerialDevice* device, int stat
     }
 
     mDevicesModel->setProgress(device, provisionStatus, current, provisionError);
+}
+
+void UI::MainUI::doRefresh() {
+    emit devicesRefresh();
 }
 
 void UI::MainUI::provisionFailedClose() {

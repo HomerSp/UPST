@@ -82,6 +82,8 @@ namespace UI {
 
         void setStatus(const QString& status);
 
+        void doRefresh();
+
         void provisionFailedClose();
 
     protected slots:

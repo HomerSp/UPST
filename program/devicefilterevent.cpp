@@ -12,13 +12,12 @@ DeviceFilterEvent::DeviceFilterEvent()
 
 void DeviceFilterEvent::enable() {
     mEnabled = true;
-
     refresh();
 }
 
 void DeviceFilterEvent::disable() {
     mEnabled = false;
-    mConnectedDevices.clear();
+    refresh();
 }
 
 bool DeviceFilterEvent::nativeEventFilter(const QByteArray &, void*, long*) {
@@ -26,6 +25,7 @@ bool DeviceFilterEvent::nativeEventFilter(const QByteArray &, void*, long*) {
 }
 
 void DeviceFilterEvent::refresh() {
+    mConnectedDevices.clear();
     process();
 }
 
