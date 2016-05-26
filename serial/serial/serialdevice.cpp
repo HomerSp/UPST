@@ -442,7 +442,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         qDebug()<<"===== RESETTING DEVICE AFTER =====";
         Serial::QCDM::Commands::RadioModeCommand radioResetAfter(this, Serial::QCDM::MODE_RADIO_RESET);
-        radioResetAfter.setTimeout(0);
+        radioResetAfter.setTimeout((flagManualReboot())?1000:0);
         radioResetAfter.execute();
         if(!radioResetAfter.resultSuccess()) {
             qWarning()<<"Could not reset device";
