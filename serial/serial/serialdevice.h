@@ -68,6 +68,8 @@ namespace Serial {
 
         bool canProvision();
 
+        void handleEventReport(const QByteArray& data);
+
         bool update(bool* reschedule = nullptr);
         bool updateJson(const QJsonObject& obj);
 

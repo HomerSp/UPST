@@ -137,6 +137,11 @@ bool SerialDevice::canProvision() {
     return isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning() && (!flagMultiPort() || (flagMultiPort() && mChildren.size() > 0));
 }
 
+void SerialDevice::handleEventReport(const QByteArray& data) {
+    Q_UNUSED(data);
+    qWarning()<<"Ignoring event report message";
+}
+
 bool SerialDevice::provision(const QString& userToken) {
     mProvisionStop = false;
 

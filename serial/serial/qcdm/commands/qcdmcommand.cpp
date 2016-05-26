@@ -65,10 +65,38 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
             return;
         }
         qDebug()<<"QcdmCommand reading...";
-        if(!device->communicator()->read(data, timeout())) {
-            addResult(false);
-            return;
-        }
+        do {
+            QByteArray buf;
+            if(!device->communicator()->read(buf, timeout())) {
+                addResult(false);
+                return;
+            }
+
+            int end = 0;
+            while(end < buf.size()) {
+                while(buf.at(end) != 0x7e && end < buf.size()) {
+                    end++;
+                }
+
+                if(end > 0 && buf.at(end - 1) == 0x7d) {
+                    end++;
+                    continue;
+                }
+
+                if(buf.at(0) == Serial::QCDM::DIAG_EVENT_REPORT_F && request.at(0) != Serial::QCDM::DIAG_EVENT_REPORT_F) {
+                    device->handleEventReport(buf.mid(0, end + 1));
+                    buf = buf.mid(end + 1);
+                    end = 0;
+
+                    continue;
+                }
+
+                break;
+            }
+
+            data = buf.mid(0, end + 1);
+            break;
+        } while(true);
 
         if(data.size() < 1) {
             qDebug()<<"QcdmCommand read less than 1 bytes";
