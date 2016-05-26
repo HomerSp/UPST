@@ -841,12 +841,12 @@ ApplicationWindow {
                        onRunningChanged: {
                            if(running && noDeviceOverlay.opacity < 1.0) {
                                noDeviceOverlay.visible = true;
-                           } else if(!running && noDeviceOverlay.opacity === 0.0) {
-                               noDeviceOverlay.visible = false;
 
                                provisionSuccessContainer.hide();
                                deviceWaitingPortContainer.hide()
                                provisionFailedContainer.hide();
+                           } else if(!running && noDeviceOverlay.opacity === 0.0) {
+                               noDeviceOverlay.visible = false;
                            }
                        }
                    }
