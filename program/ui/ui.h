@@ -27,7 +27,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        MainUI(const QGuiApplication& app, Log::LogHandler* logHandler);
+        MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool updateFailed);
         ~MainUI();
 
         QQmlApplicationEngine* engine() {
@@ -65,10 +65,10 @@ namespace UI {
     public slots:
         void devicesListChanged(bool success, Serial::SerialDeviceConfig* config);
 
-        void loginStatusChanged(bool success, const QString &token);
+        void loginStatusChanged(bool success);
 
         void versionUpdateCheck();
-        void versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
+        void versionUpdateAvailable(const QString& updaterDir, const QString& id, const QString& version, const QDateTime& updateTime);
 
         void deviceAddChecked(Serial::SerialDevice* device);
         void deviceAddReschedule(QString port);
@@ -85,6 +85,7 @@ namespace UI {
         void doRefresh();
 
         void provisionFailedClose();
+        void updateFailedContinue();
 
     protected slots:
         void viewChanged();

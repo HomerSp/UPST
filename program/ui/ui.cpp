@@ -25,7 +25,7 @@ QString UI::WebDownloader::download(const QString& url) const {
     return QString(data);
 }
 
-UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
+UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool updateFailed)
     : QObject(),
       mApp(app),
       mSection(nullptr),
@@ -47,6 +47,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
 #else
     mEngine->rootContext()->setContextProperty("programTestingMode", QVariant::fromValue(false));
 #endif
+    mEngine->rootContext()->setContextProperty("updateFailed", updateFailed);
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
@@ -72,7 +73,9 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler)
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
     QObject::connect(rootObject->findChild<QObject*>("provisionSuccessContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
 
-    mWorker = new UI::Worker::UIWorker();
+    QObject::connect(rootObject->findChild<QObject*>("updateFailedContinueButton"), SIGNAL(clicked()), this, SLOT(updateFailedContinue()));
+
+    mWorker = new UI::Worker::UIWorker(updateFailed);
     connect(mWorker, &UI::Worker::UIWorker::devicesListChanged, this, &MainUI::devicesListChanged);
     connect(mWorker, &UI::Worker::UIWorker::loginStatus, this, &MainUI::loginStatusChanged);
     connect(mWorker, &UI::Worker::UIWorker::updateCheck, this, &MainUI::versionUpdateCheck);
@@ -355,7 +358,7 @@ void UI::MainUI::logout() {
     viewUpdate();
 }
 
-void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
+void UI::MainUI::loginStatusChanged(bool success) {
     qDebug()<<"loginStatusChanged"<<success;
     if(!success) {
         updateLoginStatus(false);
@@ -365,9 +368,6 @@ void UI::MainUI::loginStatusChanged(bool success, const QString& token) {
 
         return;
     }
-
-    QSettings settings;
-    settings.setValue("user/token", token);
 
     qInfo()<<"Logged in successfully!";
 
@@ -401,15 +401,11 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 
 void UI::MainUI::versionUpdateCheck() {
     QObject* rootObject = mEngine->rootObjects().first();
-    QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loggingInView"), "setCheckForUpdates", Q_ARG(QVariant, true));
+    QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loggingInView"), " setCheckForUpdates", Q_ARG(QVariant, true));
 }
 
-void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString& token, const QString &id, const QString &version, const QDateTime &updateTime) {
+void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString &id, const QString &version, const QDateTime &updateTime) {
     qDebug()<<"New Update is available"<<version;
-
-    QSettings settings;
-    settings.setValue("user/token", token);
-    settings.sync();
 
 #ifdef Q_OS_WIN
     QString updaterPath(updaterDir + "/Updater.exe");
@@ -418,7 +414,7 @@ void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString
 #endif
 
     QStringList argumentsList;
-    argumentsList << id << version << QCoreApplication::applicationDirPath();
+    argumentsList << id << version << QString::number(updateTime.toTime_t()) << QCoreApplication::applicationDirPath();
 
     Utils::FileUtils::execute(updaterPath, argumentsList, updaterDir);
 
@@ -456,6 +452,10 @@ void UI::MainUI::provisionFailedClose() {
     } else {
         viewUpdate();
     }
+}
+
+void UI::MainUI::updateFailedContinue() {
+    emit loginStatusChanged(true);
 }
 
 UI::UISection::UISection(UI::MainUI* ui)

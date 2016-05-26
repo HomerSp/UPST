@@ -25,6 +25,7 @@ void UI::UpdateWorker::process() {
 
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/download_update.php"), output, headers, postData, &status)) {
         emit updateStatus("error");
+        emit installFinished(mInstallDir);
         return;
     }
 
@@ -33,6 +34,20 @@ void UI::UpdateWorker::process() {
     emit installProgress(0, output.size());
 
     qint64 i = 0;
+    uint16_t updateVersion = 0;
+    if(output.size() >= 5) {
+        if(output.at(i) == 'U' && output.at(i + 1) == 'P' && output.at(i + 2) == 'Z') {
+            i += 3;
+
+            updateVersion = static_cast<uint16_t>(output.at(i) & 0xFF)
+                | static_cast<uint16_t>(output.at(i + 1) & 0xFF) << 8;
+
+            i += 2;
+        }
+    }
+
+    emit installProgress(i, output.size());
+
     while(i < output.size()) {
         uint16_t nameSize = static_cast<uint16_t>((output.at(i + 1) & 0xFF) << 8) | static_cast<uint16_t>(output.at(i) & 0xFF);
         i += 2;

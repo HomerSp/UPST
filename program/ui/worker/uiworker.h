@@ -26,7 +26,7 @@ namespace UI {
         {
             Q_OBJECT
         public:
-            UIWorker();
+            UIWorker(bool updateFailed);
             ~UIWorker();
 
             void addDevicesListUpdate();
@@ -47,10 +47,10 @@ namespace UI {
 
             void devicesListChanged(bool success, Serial::SerialDeviceConfig* config = nullptr);
 
-            void loginStatus(bool success, const QString& token);
+            void loginStatus(bool success);
 
             void updateCheck();
-            void updateAvailable(const QString& updaterDir, const QString& token, const QString& id, const QString& version, const QDateTime& updateTime);
+            void updateAvailable(const QString& updaterDir, const QString& id, const QString& version, const QDateTime& updateTime);
 
             void statusChange(const QString& status);
 
@@ -78,6 +78,8 @@ namespace UI {
 
             QMutex mWorkMutex;
             QList<QPair<WorkType, void*> > mWorkItems;
+
+            bool mUpdateFailed;
         };
     }
 }

@@ -30,22 +30,49 @@ Rectangle {
         mipmap: true
     }
 
-    Text {
-        id: loggingInLabel
-        objectName: 'loggingInLabel'
+    Column {
         anchors.centerIn: parent
+        spacing: unit.dp(16.0)
 
-        color: '#FFF'
+        Text {
+            id: loggingInLabel
+            objectName: 'loggingInLabel'
 
-        font.family: openSansRegularFont.name
-        font.pixelSize: unit.em(1.3)
+            color: '#FFF'
 
-        text: qsTr("Logging in...")
+            font.family: openSansRegularFont.name
+            font.pixelSize: unit.em(1.3)
+
+            horizontalAlignment: Text.Center
+
+            text: qsTr("Logging in...")
+        }
+
+        UPButton {
+            id: updateFailedContinueButton
+            objectName: "updateFailedContinueButton"
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            width: loggingInLabel.width / 2
+            height: unit.dp(32)
+
+            visible: false
+
+            text: "Continue"
+
+            scheme: "dark"
+        }
     }
 
     function setCheckForUpdates(b) {
         if(b) {
-            loggingInLabel.text = qsTr("Checking for updates...");
+            if(updateFailed) {
+                loggingInLabel.text = qsTr("The update failed.\nPlease report this to Ultimobile.");
+                updateFailedContinueButton.visible = true;
+            } else {
+                loggingInLabel.text = qsTr("Checking for updates...");
+                updateFailedContinueButton.visible = false;
+            }
         } else {
             loggingInLabel.text = qsTr("Logging in...");
         }

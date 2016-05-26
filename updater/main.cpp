@@ -62,8 +62,16 @@ int main(int argc, char *argv[])
         }
 
         QByteArray data;
+        data.append('U');
+        data.append('P');
+        data.append('Z');
+
+        uint16_t updaterVersion = static_cast<uint16_t>(QString(UPDATER_VERSION).toUInt());
+        data.append(static_cast<uint8_t>((updaterVersion) & 0xFF));
+        data.append(static_cast<uint8_t>((updaterVersion >> 8) & 0xFF));
+
         foreach(QString fileName, files) {
-            if(fileName == "out.umz") {
+            if(fileName == "out.upz") {
                 continue;
             }
 
@@ -116,16 +124,16 @@ int main(int argc, char *argv[])
             inFile.close();
         }
 
-        QFile outputFile("out.umz");
+        QFile outputFile("out.upz");
         if(outputFile.open(QIODevice::WriteOnly)) {
             outputFile.write(data);
             outputFile.flush();
             outputFile.close();
         }
-    } else if(args.size() == 4) {
-        qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate)<<"arg 1"<<args.at(1)<<"arg 2"<<args.at(3);
+    } else if(args.size() == 5) {
+        qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
-        UI::MainUI *mainUI = new UI::MainUI(*app, args.at(1), args.at(3));
+        UI::MainUI *mainUI = new UI::MainUI(*app, args.at(1), args.at(3).toULongLong(), args.at(4));
         ret = app->exec();
         delete mainUI;
     } else {

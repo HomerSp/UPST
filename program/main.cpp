@@ -62,8 +62,11 @@ int main(int argc, char *argv[])
     QGuiApplication *app = new QGuiApplication(argc, argv);
     app->setWindowIcon(QIcon(":/res/images/icon.svg"));
 
-    if(app->arguments().size() == 3 && app->arguments().at(1) == "update") {
-        QString updatePath = app->arguments().at(2);
+    bool updateFailed = false;
+    if(app->arguments().size() == 4 && app->arguments().at(1) == "update") {
+        updateFailed = (app->arguments().at(2) != PROG_BUILDTIME);
+
+        QString updatePath = app->arguments().at(3);
 
         qDebug()<<"Deleting temporary files from"<<updatePath;
 
@@ -71,38 +74,46 @@ int main(int argc, char *argv[])
         Utils::FileUtils::listFiles(updaterFiles, updatePath);
         Utils::FileUtils::listDirs(updaterDirs, updatePath);
 
-        int retries = 0;
-        bool retry = false;
-        do {
-            if(retries >= 5) {
-                qWarning()<<"Failed to delete temporary files...";
-                break;
-            }
-
-            foreach(QString file, updaterFiles) {
-                if(!QFile::remove(updatePath + "/" + file)) {
+        // Don't try to remove something we shouldn't.
+        if(updaterFiles.contains("UPST.exe") && updaterFiles.contains("Updater.exe")) {
+            int retries = 0;
+            bool retry = false;
+            do {
+                if(retries >= 5) {
+                    qWarning()<<"Failed to delete temporary files...";
                     break;
                 }
+
+                foreach(QString file, updaterFiles) {
+                    if(!QFile::remove(updatePath + "/" + file)) {
+                        break;
+                    }
+                }
+
+                if(retry) {
+                    retries++;
+                    QThread::sleep(5);
+                }
+            } while(retry);
+
+            foreach(QString dir, updaterDirs) {
+                QDir(updatePath).rmdir(dir);
             }
 
-            if(retry) {
-                retries++;
-                QThread::sleep(5);
-            }
-        } while(retry);
-
-        foreach(QString dir, updaterDirs) {
-            QDir(updatePath).rmdir(dir);
+            QDir().rmdir(updatePath);
+        } else {
+            qWarning()<<"Trying to remove"<<updatePath<<"which doesn't seem like a valid directory...";
         }
-
-        QDir().rmdir(updatePath);
     }
 
     qInfo()<<"Starting UPST"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
+    if(updateFailed) {
+        qCritical()<<"The update failed, please report this";
+    }
 
     updateConfigs();
 
-    UI::MainUI* mainUI = new UI::MainUI(*app, sLogHandler);
+    UI::MainUI* mainUI = new UI::MainUI(*app, sLogHandler, updateFailed);
 
 #ifdef Q_OS_WIN
     DeviceFilterEventWin deviceFilter;

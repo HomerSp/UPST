@@ -7,9 +7,10 @@
 #include "utils/fileutils.h"
 #include "ui.h"
 
-UI::MainUI::MainUI(const QGuiApplication& app, const QString& updateID, const QString& installDir)
+UI::MainUI::MainUI(const QGuiApplication& app, const QString& updateID, uint64_t updateTime, const QString& installDir)
     : QObject(),
-      mApp(app)
+      mApp(app),
+      mUpdateTime(updateTime)
 {
     mEngine = new QQmlApplicationEngine();
     mEngine->rootContext()->setContextProperty("programVersion", QString(PROG_VERSION));
@@ -79,7 +80,7 @@ void UI::MainUI::installFinished(const QString& installDir) {
 #endif
 
     QStringList args;
-    args << "update" << QCoreApplication::applicationDirPath();
+    args << "update" << QString::number(mUpdateTime) << QCoreApplication::applicationDirPath();
 
     Utils::FileUtils::execute(upstPath, args, installDir);
 

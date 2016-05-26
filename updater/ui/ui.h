@@ -13,7 +13,7 @@ namespace UI {
     {
         Q_OBJECT
     public:
-        MainUI(const QGuiApplication& app, const QString& updateID, const QString& installDir);
+        MainUI(const QGuiApplication& app, const QString& updateID, uint64_t updateTime, const QString& installDir);
         ~MainUI();
 
         QQmlApplicationEngine* engine() {
@@ -33,6 +33,8 @@ namespace UI {
         QQmlApplicationEngine *mEngine;
 
         UpdateWorker* mWorker;
+
+        uint64_t mUpdateTime;
 
     };
 }

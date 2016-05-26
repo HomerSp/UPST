@@ -8,9 +8,10 @@
 
 #include "uiworker.h"
 
-UI::Worker::UIWorker::UIWorker()
+UI::Worker::UIWorker::UIWorker(bool updateFailed)
     :   mThread(new QThread),
-        mRunning(true)
+        mRunning(true),
+        mUpdateFailed(updateFailed)
 {
     moveToThread(mThread);
 
@@ -231,20 +232,26 @@ void UI::Worker::UIWorker::processLogin(LoginItem* item) {
     }
 
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/login.php"), output, headers, postData)) {
-        emit loginStatus(false, "");
+        emit loginStatus(false);
     } else {
         if(item->token.size() > 0) {
             if(!processLoginCheckUpdate(item->token)) {
-                emit loginStatus(true, item->token);
+                emit loginStatus(true);
             }
         } else {
             QJsonDocument doc = QJsonDocument::fromJson(output);
             if(doc.isObject() && doc.object().contains("token")) {
-                if(!processLoginCheckUpdate(doc.object()["token"].toString())) {
-                    emit loginStatus(true, doc.object()["token"].toString());
+                QString token = doc.object()["token"].toString();
+
+                QSettings settings;
+                settings.setValue("user/token", token);
+                settings.sync();
+
+                if(!processLoginCheckUpdate(token)) {
+                    emit loginStatus(true);
                 }
             } else {
-                emit loginStatus(false, "");
+                emit loginStatus(false);
             }
         }
     }
@@ -255,11 +262,15 @@ void UI::Worker::UIWorker::processLogin(LoginItem* item) {
 bool UI::Worker::UIWorker::processLoginCheckUpdate(const QString& token) {
     emit updateCheck();
 
+    if(mUpdateFailed) {
+        return true;
+    }
+
     QByteArray output;
     QHash<QString, QString> headers;
     headers.insert("U-Token", token);
 
-    QString postData = "t=" + QString(PROG_BUILDTIME);
+    QString postData = "t=" + QString(PROG_BUILDTIME) + "&u=" + QString(UPDATER_VERSION);
 #ifdef TESTING_MODE
     postData += "&d=1";
 #endif
@@ -295,7 +306,7 @@ bool UI::Worker::UIWorker::processLoginCheckUpdate(const QString& token) {
 
             updaterDir.setAutoRemove(false);
 
-            emit updateAvailable(updaterDir.path(), token, obj["id"].toString(), obj["version"].toString(), QDateTime::fromTime_t(obj["time"].toInt()));
+            emit updateAvailable(updaterDir.path(), obj["id"].toString(), obj["version"].toString(), QDateTime::fromTime_t(obj["time"].toInt()));
 
             return true;
         }
