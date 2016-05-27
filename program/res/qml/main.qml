@@ -283,12 +283,17 @@ ApplicationWindow {
                 currentIndex: 0
 
                 function updateWidth() {
+                    var largestWidth = 0;
                     for(var i = 0; i < contentItem.children.length; i++) {
-                        var w = contentItem.children[i].width;
-                        if(w < width) {
-                            contentItem.children[i].width = width;
+                        if(contentItem.children[i].realWidth > largestWidth) {
+                            largestWidth = contentItem.children[i].realWidth;
                         }
                     }
+
+                    for(i = 0; i < contentItem.children.length; i++) {
+                        contentItem.children[i].implicitWidth = largestWidth;
+                    }
+                    implicitWidth = largestWidth;
                 }
 
                 onCurrentItemChanged: {
@@ -298,10 +303,6 @@ ApplicationWindow {
                 }
 
                 onCountChanged: {
-                    updateWidth();
-                }
-
-                onWidthChanged: {
                     updateWidth();
                 }
 
@@ -315,13 +316,14 @@ ApplicationWindow {
                         property int progressMax
                         property int progressMin
                         property int progressStatus
+                        property int realWidth
                         property string progressError
 
                         objectName: "deviceInfoWrapper"
                         id: deviceInfoWrapper
                         anchors.left: parent.left
                         Layout.fillWidth: true
-                        width: deviceInfoContainer.width + (deviceInfoText.height / 2)
+                        realWidth: 0
                         height: deviceInfoContainer.height + deviceInfoStatusProgress.height
                         x: 0
                         color: "#00ffffff"
@@ -335,14 +337,17 @@ ApplicationWindow {
                         progressStatus: provisionProgressStatus
                         progressError: provisionProgressError
 
-                        onWidthChanged: {
-                            if(width != connectedDevicesList.width) {
-                                connectedDevicesList.updateWidth();
-                            }
-                        }
-
                         onProgressCurrentChanged: {
                             deviceInfoStatusProgress.value = progressCurrent;
+                        }
+
+                        function updateItemWidth() {
+                            var w = ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth);
+                            var h = deviceInfoName.contentHeight + deviceInfoPort.contentHeight;
+                            implicitWidth = deviceInfoIcon.implicitWidth + w + unit.dp(20) + unit.dp(40) + (h / 2);
+                            realWidth = implicitWidth
+
+                            connectedDevicesList.updateWidth();
                         }
 
                         Behavior on color {
@@ -352,7 +357,7 @@ ApplicationWindow {
                         Item {
                             id: deviceInfoContainer
 
-                            width: deviceInfoIcon.width + deviceInfoText.width + unit.dp(40)
+                            implicitWidth: deviceInfoIcon.implicitWidth + deviceInfoText.implicitWidth + unit.dp(40)
                             height: deviceInfo.height + unit.dp(16)
 
                             RowLayout {
@@ -388,6 +393,7 @@ ApplicationWindow {
                                 Column {
                                     id: deviceInfoText
 
+                                    width: ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth)
                                     anchors.left: deviceInfoIcon.right
                                     anchors.leftMargin: unit.dp(8)
 
@@ -399,6 +405,13 @@ ApplicationWindow {
                                         font.pixelSize: unit.em(1.1)
                                         font.family: openSansRegularFont.name
                                         clip: true
+
+                                        onContentWidthChanged: {
+                                            updateItemWidth();
+                                        }
+                                        onContentHeightChanged: {
+                                            updateItemWidth();
+                                        }
                                     }
 
                                     Text {
@@ -410,6 +423,13 @@ ApplicationWindow {
                                         font.family: openSansBoldFont.name
                                         font.bold: true
                                         clip: true
+
+                                        onContentWidthChanged: {
+                                            updateItemWidth();
+                                        }
+                                        onContentHeightChanged: {
+                                            updateItemWidth();
+                                        }
                                     }
                                 }
                             }
