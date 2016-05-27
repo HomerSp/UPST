@@ -42,7 +42,7 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
         return;
     }
 
-    if(!device->communicator()->open()) {
+    if(!device->isAvailable() || !device->communicator()->open()) {
         addResult(false);
         return;
     }

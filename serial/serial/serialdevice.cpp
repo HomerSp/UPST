@@ -42,7 +42,6 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mProvisionStop(false),
       mNewMdn(""),
       mNewMin(0)
-
 {
     mCommunicator = new SerialCommunicator(*this);
     if(mCommunicator->open()) {
@@ -71,24 +70,14 @@ SerialCommunicator* SerialDevice::communicator() {
     return mCommunicator;
 }
 
-bool SerialDevice::open() {
-    bool ret = mCommunicator->open();
-    if(!ret) {
-        return false;
-    }
-
-    foreach(Serial::SerialDevice* c, mChildren) {
-        ret = ret || c->open();
-    }
-
-    return ret;
-}
-
 bool SerialDevice::close() {
-    bool ret = mCommunicator->close();
-    if(!ret) {
-        return false;
+    bool ret = true;
+
+    if(mCommunicator != nullptr) {
+        ret = mCommunicator->close();
+        delete mCommunicator;
     }
+    mCommunicator = nullptr;
 
     foreach(Serial::SerialDevice* c, mChildren) {
         if(!c->close()) {
@@ -301,7 +290,6 @@ void SerialDevice::updateFrom(Serial::SerialDevice* other) {
 
     foreach(Serial::SerialDevice* d, devices) {
         if(d->mModel == other->mModel && d->mMake == other->mMake) {
-            delete d->mCommunicator;
             d->mCommunicator = other->mCommunicator;
             other->mCommunicator = nullptr;
 
@@ -357,7 +345,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     float i = 2;
 
     foreach(SerialDevice* device, devices) {
-        qDebug()<<"===== Provisioning port"<<device->communicator()->port()<<"=====";
+        qDebug()<<"===== Provisioning port"<<mPort<<"=====";
 
         qDebug()<<"===== SETTING DEVICE OFFLINE BEFORE =====";
         Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);

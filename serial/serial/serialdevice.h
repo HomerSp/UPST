@@ -50,7 +50,6 @@ namespace Serial {
 
         SerialCommunicator* communicator();
 
-        bool open();
         bool close();
 
         void addChild(SerialDevice* device);
