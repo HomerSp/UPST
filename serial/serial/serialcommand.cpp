@@ -15,7 +15,7 @@ SerialCommand::SerialCommand(SerialDevice* device)
     : mDevice(device),
       mTimeout(1000),
       mOffset(0),
-      mDebuggingName("")
+      mName("")
 {
 
 }

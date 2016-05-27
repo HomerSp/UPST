@@ -466,7 +466,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 }
 
 bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd) {
-    qInfo()<<"Provisioning"<<cmd->debuggingName();
+    qInfo()<<"Provisioning"<<cmd->name();
 
     if(data->sequentialOffline()) {
         if(data->password16().size() == 16) {

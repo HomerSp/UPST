@@ -100,12 +100,12 @@ namespace Serial {
             mOffset = offset;
         }
 
-        const QString& debuggingName() {
-            return mDebuggingName;
+        const QString& name() {
+            return mName;
         }
 
-        void setDebuggingName(const QString& name) {
-            mDebuggingName = name;
+        void setName(const QString& name) {
+            mName = name;
         }
 
     protected:
@@ -132,7 +132,7 @@ namespace Serial {
 
         QList<SerialCommandResult*> mResults;
 
-        QString mDebuggingName;
+        QString mName;
     };
 }
 #endif // SERIALCOMMAND_H
