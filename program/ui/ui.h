@@ -114,7 +114,6 @@ namespace UI {
         UI::Worker::UIWorker* mWorker;
         UI::Worker::SerialDeviceWorker* mDeviceWorker;
 
-        QTimer* mDevicesChangedTimer;
         QList<Serial::SerialDevice*> mDevices;
         QMap<QString, int> mDeviceRechecks;
 
