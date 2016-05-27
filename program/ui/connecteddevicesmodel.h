@@ -23,7 +23,7 @@ namespace UI {
             PortRole,
             IconRole,
             AvailableRole,
-            ChildrenSizeRole,
+            ChildrenAvailableRole,
             FlagManualRebootRole,
             FlagMultiPortRole,
             ProgressMaxRole,

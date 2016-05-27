@@ -328,7 +328,7 @@ ApplicationWindow {
 
                         isProvisioned: progressStatus == 2
                         haveError: progressError.length > 0
-                        haveChildren: deviceChildrenSize > 0
+                        haveChildren: deviceChildrenAvailable
                         progressCurrent: provisionProgressCurrent
                         progressMax: provisionProgressMax
                         progressMin: provisionProgressMin

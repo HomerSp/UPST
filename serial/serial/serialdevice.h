@@ -66,12 +66,16 @@ namespace Serial {
         bool isSameDevice(SerialDevice* device);
         bool isValid();
 
+        bool childrenAvailable();
+
         bool canProvision();
 
         void handleEventReport(const QByteArray& data);
 
         bool update(bool* reschedule = nullptr);
         bool updateJson(const QJsonObject& obj);
+
+        void updateFrom(Serial::SerialDevice* other);
 
         bool provision(const QString& userToken);
 

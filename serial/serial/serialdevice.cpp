@@ -133,8 +133,32 @@ bool SerialDevice::isValid() {
     return cmd.result()->success();
 }
 
+bool SerialDevice::childrenAvailable() {
+    if(mChildren.size() <= 0) {
+        return false;
+    }
+
+    bool ret = true;
+    foreach(Serial::SerialDevice* d, mChildren) {
+        if(!d->isAvailable()) {
+            ret = false;
+            break;
+        }
+    }
+
+    return ret;
+}
+
 bool SerialDevice::canProvision() {
-    return isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning() && (!flagMultiPort() || (flagMultiPort() && mChildren.size() > 0));
+    if(isAvailable() && mType != Serial::SerialDeviceTypeUnknown && !isProvisioning()) {
+        if(!flagMultiPort()) {
+            return true;
+        }
+
+        return (childrenAvailable());
+    }
+
+    return false;
 }
 
 void SerialDevice::handleEventReport(const QByteArray& data) {
@@ -268,6 +292,25 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
     }
 
     return false;
+}
+
+void SerialDevice::updateFrom(Serial::SerialDevice* other) {
+    QList<Serial::SerialDevice*> devices;
+    devices.append(this);
+    devices.append(mChildren);
+
+    foreach(Serial::SerialDevice* d, devices) {
+        if(d->mModel == other->mModel && d->mMake == other->mMake) {
+            delete d->mCommunicator;
+            d->mCommunicator = other->mCommunicator;
+            other->mCommunicator = nullptr;
+
+            d->mMdn = other->mMdn;
+            d->mMin = other->mMin;
+            d->mNewMdn = other->mMdn;
+            d->mNewMin = other->mMin;
+        }
+    }
 }
 
 bool SerialDevice::operator==(const SerialDevice& other) {

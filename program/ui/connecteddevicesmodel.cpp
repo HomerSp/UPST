@@ -26,8 +26,8 @@ QVariant UI::ConnectedDevicesModel::data(const QModelIndex& index, int role) con
         return getDeviceIcon(device);
     case AvailableRole:
         return device->isAvailable();
-    case ChildrenSizeRole:
-        return device->deviceChildren().size();
+    case ChildrenAvailableRole:
+        return device->childrenAvailable();
     case FlagManualRebootRole:
         return device->flagManualReboot();
     case FlagMultiPortRole:
@@ -58,7 +58,7 @@ QHash<int, QByteArray> UI::ConnectedDevicesModel::roleNames() const {
     roles[PortRole] = "devicePort";
     roles[IconRole] = "deviceIcon";
     roles[AvailableRole] = "deviceAvailable";
-    roles[ChildrenSizeRole] = "deviceChildrenSize";
+    roles[ChildrenAvailableRole] = "deviceChildrenAvailable";
     roles[FlagManualRebootRole] = "deviceFlagManualReboot";
     roles[FlagMultiPortRole] = "deviceFlagMultiPort";
     roles[ProgressMaxRole] = "provisionProgressMax";
@@ -163,7 +163,7 @@ void UI::ConnectedDevicesModel::deviceUpdate(Serial::SerialDevice* device) {
 
     bool found = false;
     for(int i = 0; i < mDevices.size(); i++) {
-        if(mDevices[i]->isSameDevice(device)) {
+        if(mDevices.at(i)->isSameDevice(device)) {
             found = true;
             mDevices.replace(i, device);
 
@@ -206,6 +206,4 @@ void UI::ConnectedDevicesModel::setProgress(Serial::SerialDevice* device, Serial
     progress->current = current;
 
     deviceUpdate(device);
-
-    qDebug()<<"setProgress done";
 }

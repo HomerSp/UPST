@@ -132,7 +132,7 @@ void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* co
 }
 
 void UI::MainUI::deviceAdd(const QString& port) {
-    qDebug()<<"deviceAdd"<<port;
+    qInfo()<<"deviceAdd"<<port;
 
     bool shouldAdd = true;
     foreach(Serial::SerialDevice* d, mDevices) {
@@ -158,14 +158,13 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
     for(int i = 0; i < mDevices.size(); i++) {
         Serial::SerialDevice* d = mDevices.at(i);
         if(d->isSameDevice(device) && d->isProvisioning() && !d->isAvailable()) {
-            qDebug()<<"Devices are identical, replacing"<<d<<"with"<<device;
-            device->setProvisioning(true);
-            mDevices.replace(i, device);
+            qDebug()<<"Devices are identical, replacing"<<d->port()<<"with"<<device->port();
+            d->updateFrom(device);
 
-            emit deviceUpdate(device);
+            emit deviceUpdate(d);
             viewUpdate();
 
-            mDeviceWorker->addDeviceRemove(d);
+            mDeviceWorker->addDeviceRemove(device);
 
             return;
         }
@@ -231,7 +230,12 @@ void UI::MainUI::deviceClose(Serial::SerialDevice *device) {
     if(device != nullptr) {
         qDebug()<<"deviceClose"<<device->port();
 
-        emit deviceUpdate(device);
+        for(int i = 0; i < mDevices.size(); i++) {
+            if(mDevices.at(i) == device) {
+                emit deviceUpdate(device);
+                break;
+            }
+        }
     }
 
     viewUpdate();
@@ -439,6 +443,8 @@ void UI::MainUI::doRefresh() {
 }
 
 void UI::MainUI::provisionFailedClose() {
+    qDebug()<<"provisionFailedClose";
+
     Serial::SerialDevice* device = mDevices.at(currentIndex());
     if(device == nullptr) {
         return;
