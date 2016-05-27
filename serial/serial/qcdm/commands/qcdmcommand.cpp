@@ -64,7 +64,10 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
             addResult(false);
             return;
         }
+
         qDebug()<<"QcdmCommand reading...";
+
+        int retryCount = 0;
         do {
             QByteArray buf;
             if(!device->communicator()->read(buf, timeout())) {
@@ -99,6 +102,10 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
             }
 
             if(foundReport && end < 1) {
+                retryCount++;
+                if(retryCount >= 5) {
+                    data = "";
+                }
                 continue;
             }
 
