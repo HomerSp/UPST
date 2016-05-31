@@ -9,6 +9,9 @@ import Qt.labs.settings 1.0
 import "qrc:/res/qml/components"
 
 ApplicationWindow {
+    property variant userGuideWindow: null
+    property variant deviceGuideWindow: null
+
     id: mainWindow
     visible: true
     minimumWidth: unit.dp(640)
@@ -20,10 +23,34 @@ ApplicationWindow {
     }
 
     Settings {
+        category: "mainWindow"
         property alias x: mainWindow.x
         property alias y: mainWindow.y
         property alias width: mainWindow.width
         property alias height: mainWindow.height
+    }
+
+    Connections {
+        target: userGuideWindow
+        onClosing: {
+            userGuideWindow = null;
+        }
+    }
+
+    Connections {
+        target: deviceGuideWindow
+        onClosing: {
+            deviceGuideWindow = null;
+        }
+    }
+
+    onClosing: {
+        if(userGuideWindow != null) {
+            userGuideWindow.close();
+        }
+        if(deviceGuideWindow != null) {
+            deviceGuideWindow.close();
+        }
     }
 
     function updateTitle() {
@@ -130,12 +157,19 @@ ApplicationWindow {
                 id: helpMenuUserguide
                 text: qsTr("User guide")
                 onTriggered: {
-                    var component = Qt.createComponent("dialog/dialog_userguide.qml");
+                    if(userGuideWindow != null) {
+                        userGuideWindow.show();
+                        userGuideWindow.raise();
+                        userGuideWindow.requestActivate();
+                        return;
+                    }
+
+                    var component = Qt.createComponent("dialog/dialog_guide.qml");
                     if (component.status === Component.Ready) {
                         var url = "http://upst.ultimobile.net/userguide/";
                         var data = downloader.download(url + "index.html");
-                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url, "title": qsTr("UPST - User guide")});
-                        dialog.show();
+                        userGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "name": "userguide", "guideData": data, "guideUrl": url, "title": qsTr("UPST - User guide")});
+                        userGuideWindow.show();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
                     }
@@ -146,12 +180,17 @@ ApplicationWindow {
                 id: helpMenuDeviceGuide
                 text: qsTr("Device guides")
                 onTriggered: {
-                    var component = Qt.createComponent("dialog/dialog_userguide.qml");
+                    if(deviceGuideWindow != null) {
+                        deviceGuideWindow.requestActivate();
+                        return;
+                    }
+
+                    var component = Qt.createComponent("dialog/dialog_guide.qml");
                     if (component.status === Component.Ready) {
                         var url = "http://upst.ultimobile.net/userguide/devices/";
                         var data = downloader.download(url + "index.html");
-                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url, "title": qsTr("UPST - Device guides")});
-                        dialog.show();
+                        deviceGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "name": "deviceguide", "guideData": data, "guideUrl": url, "title": qsTr("UPST - Device guides")});
+                        deviceGuideWindow.show();
                     } else {
                         console.error("Could not load device guide dialog: " + component.errorString());
                     }

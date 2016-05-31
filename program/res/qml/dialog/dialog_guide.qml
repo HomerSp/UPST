@@ -2,21 +2,33 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
+import Qt.labs.settings 1.0
 import "qrc:/res/qml/components"
 
 Window {
+    property string name
     property string guideUrl
     property string guideData
 
-    id: userguideDialog
+    id: guideWindow
     visible: false
 
     width: unit.dp(990)
     height: unit.dp(540)
     minimumHeight: unit.dp(540)
 
+    flags: Qt.Window
+
     modality: Qt.NonModal
     title: ""
+
+    Settings {
+        category: name
+        property alias x: guideWindow.x
+        property alias y: guideWindow.y
+        property alias width: guideWindow.width
+        property alias height: guideWindow.height
+    }
 
     Units {
         id: unit
@@ -43,8 +55,8 @@ Window {
         font.pixelSize: unit.em(1.2)
 
         Component.onCompleted: {
-            userguideDialog.minimumWidth = unit.dp(990) + (width - contentItem.width);
-            userguideDialog.maximumWidth = userguideDialog.minimumWidth;
+            guideWindow.minimumWidth = unit.dp(990) + (width - contentItem.width);
+            guideWindow.maximumWidth = guideWindow.minimumWidth;
         }
 
         onLinkActivated: {
