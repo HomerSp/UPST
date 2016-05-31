@@ -14,7 +14,6 @@ ApplicationWindow {
     minimumWidth: unit.dp(640)
     minimumHeight: unit.dp(480)
     color: "#f1f1f1"
-    title: qsTr("UPST") + " v" + programVersion
 
     Units {
         id: unit
@@ -134,14 +133,31 @@ ApplicationWindow {
                     var component = Qt.createComponent("dialog/dialog_userguide.qml");
                     if (component.status === Component.Ready) {
                         var url = "http://upst.ultimobile.net/userguide/";
-                        var data = downloader.download(url + "/index.html");
-                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url});
+                        var data = downloader.download(url + "index.html");
+                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url, "title": qsTr("UPST - User guide")});
                         dialog.show();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
                     }
                 }
             }
+
+            MenuItem {
+                id: helpMenuDeviceGuide
+                text: qsTr("Device guides")
+                onTriggered: {
+                    var component = Qt.createComponent("dialog/dialog_userguide.qml");
+                    if (component.status === Component.Ready) {
+                        var url = "http://upst.ultimobile.net/userguide/devices/";
+                        var data = downloader.download(url + "index.html");
+                        var dialog = component.createObject(mainWindow, {"x": mainWindow.x, "y": mainWindow.y, "guideData": data, "guideUrl": url, "title": qsTr("UPST - Device guides")});
+                        dialog.show();
+                    } else {
+                        console.error("Could not load device guide dialog: " + component.errorString());
+                    }
+                }
+            }
+
             MenuItem {
                 id: helpMenuAbout
                 text: qsTr("About")

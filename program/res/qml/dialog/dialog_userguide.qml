@@ -16,7 +16,7 @@ Window {
     minimumHeight: unit.dp(540)
 
     modality: Qt.NonModal
-    title: qsTr("User guide")
+    title: ""
 
     Units {
         id: unit
@@ -45,6 +45,11 @@ Window {
         Component.onCompleted: {
             userguideDialog.minimumWidth = unit.dp(990) + (width - contentItem.width);
             userguideDialog.maximumWidth = userguideDialog.minimumWidth;
+        }
+
+        onLinkActivated: {
+            var data = downloader.download(guideUrl + link);
+            userguideLayout.text = data;
         }
     }
 }
