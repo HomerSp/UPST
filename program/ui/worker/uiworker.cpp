@@ -234,25 +234,34 @@ void UI::Worker::UIWorker::processLogin(LoginItem* item) {
     if(!Web::WebUtils::download(QUrl("http://upst.ultimobile.net/endpoint/login.php"), output, headers, postData)) {
         emit loginStatus(false);
     } else {
-        if(item->token.size() > 0) {
-            if(!processLoginCheckUpdate(item->token)) {
-                emit loginStatus(true);
-            }
-        } else {
-            QJsonDocument doc = QJsonDocument::fromJson(output);
-            if(doc.isObject() && doc.object().contains("token")) {
-                QString token = doc.object()["token"].toString();
+        QJsonDocument doc = QJsonDocument::fromJson(output);
+        if(doc.isObject() && doc.object().contains("display_name")) {
+            QString displayName = doc.object()["display_name"].toString();
 
-                QSettings settings;
-                settings.setValue("user/token", token);
-                settings.sync();
+            QSettings settings;
+            settings.setValue("user/display_name", displayName);
+            settings.sync();
 
-                if(!processLoginCheckUpdate(token)) {
+            if(item->token.size() > 0) {
+                if(!processLoginCheckUpdate(item->token)) {
                     emit loginStatus(true);
                 }
             } else {
-                emit loginStatus(false);
+                if(doc.object().contains("token")) {
+                    QString token = doc.object()["token"].toString();
+
+                    settings.setValue("user/token", token);
+                    settings.sync();
+
+                    if(!processLoginCheckUpdate(token)) {
+                        emit loginStatus(true);
+                    }
+                } else {
+                    emit loginStatus(false);
+                }
             }
+        } else {
+            emit loginStatus(false);
         }
     }
 

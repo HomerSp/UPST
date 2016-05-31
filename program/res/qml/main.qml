@@ -50,12 +50,8 @@ ApplicationWindow {
 
     menuBar: MenuBar {
         Menu {
+            id: fileMenu
             title: qsTr("File")
-            MenuItem {
-                objectName: "fileMenuLogout"
-                text: qsTr("Logout")
-                visible: false
-            }
 
             MenuItem {
                 text: qsTr("Exit")
@@ -66,6 +62,7 @@ ApplicationWindow {
         }
 
         Menu {
+            id: editMenu
             objectName: "editMenu"
             title: qsTr("Edit")
             visible: false
@@ -150,6 +147,17 @@ ApplicationWindow {
                         console.error("Could not load about dialog: " + component.errorString());
                     }
                 }
+            }
+        }
+
+        Menu {
+            id: userMenu
+            title: userDisplayName
+
+            MenuItem {
+                objectName: "userMenuLogout"
+                text: qsTr("Logout")
+                visible: false
             }
         }
     }

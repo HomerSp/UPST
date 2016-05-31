@@ -51,6 +51,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     mEngine->rootContext()->setContextProperty("qtVersion", QString(QT_VERSION_STR));
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
+    mEngine->rootContext()->setContextProperty("userDisplayName", "");
     mEngine->rootContext()->setContextProperty("downloader", &mDownloader);
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
@@ -68,7 +69,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(doRefresh()));
 
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
-    QObject::connect(rootObject->findChild<QObject*>("fileMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
+    QObject::connect(rootObject->findChild<QObject*>("userMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
     QObject::connect(rootObject->findChild<QObject*>("provisionSuccessContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
@@ -345,6 +346,7 @@ void UI::MainUI::login() {
 void UI::MainUI::logout() {
     QSettings settings;
     settings.remove("user/token");
+    settings.remove("user/display_name");
 
     updateLoginStatus(false);
 
@@ -385,7 +387,7 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 
     QObject* rootObject = mEngine->rootObjects().first();
 
-    rootObject->findChild<QObject*>("fileMenuLogout")->setProperty("visible", loggedIn);
+    rootObject->findChild<QObject*>("userMenuLogout")->setProperty("visible", loggedIn);
     rootObject->findChild<QObject*>("editMenu")->setProperty("visible", loggedIn);
     // Show advanced menu item if we are using a testing build
 #ifdef TESTING_MODE
@@ -396,10 +398,14 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
         rootObject->findChild<QObject*>("usernameText")->setProperty("text", "");
         rootObject->findChild<QObject*>("passwordText")->setProperty("text", "");
 
+        mEngine->rootContext()->setContextProperty("userDisplayName", QSettings().value("user/display_name").toString());
+
         QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "hide");
         rootObject->findChild<QObject*>("loggingInOverlay")->setProperty("opacity", 0.0f);
     } else {
         QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loginOverlay"), "show");
+
+        mEngine->rootContext()->setContextProperty("userDisplayName", "");
     }
 }
 
