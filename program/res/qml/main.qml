@@ -5,6 +5,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
+import Qt.labs.settings 1.0
 import "qrc:/res/qml/components"
 
 ApplicationWindow {
@@ -17,6 +18,13 @@ ApplicationWindow {
 
     Units {
         id: unit
+    }
+
+    Settings {
+        property alias x: mainWindow.x
+        property alias y: mainWindow.y
+        property alias width: mainWindow.width
+        property alias height: mainWindow.height
     }
 
     function updateTitle() {
