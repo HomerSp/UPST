@@ -221,6 +221,7 @@ void UI::MainUI::deviceAddReschedule(QString port) {
     mDeviceRechecks.insert(port, 1);
 
     QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &UI::MainUI::deviceRescheduleTimeout);
     timer->setInterval(5000);
     timer->setSingleShot(true);
     timer->setProperty("port", port);
