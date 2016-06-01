@@ -437,6 +437,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         foreach(Serial::SerialCommand* cmd, data->constCommands()) {
             if(!provision(device, data, cmd)) {
+                qInfo()<<"Provisioning failed";
                 ret = false;
                 break;
             }
@@ -468,6 +469,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
     }
 
+    // We need to check if the device is valid *before* the reset.
+    bool valid = isValid();
+
     if(!mProvisionStop) {
         qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
@@ -486,7 +490,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
         // If we can't communicate with the device anymore, consider it removed.
-        if(!isValid()) {
+        if(!valid) {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRemoved);
         } else {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
