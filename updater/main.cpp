@@ -6,9 +6,11 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QTextStream>
+#include <QIcon>
 
 #include "loghandler.h"
 #include "runguard.h"
+#include "utils/computerutils.h"
 #include "utils/fileutils.h"
 #ifdef Q_OS_WIN
 #include "utils/winutils.h"
@@ -42,11 +44,13 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(&logMessageHandler);
 
+    QGuiApplication *app = new QGuiApplication(argc, argv);
+    app->setWindowIcon(QIcon(":/res/images/icon.svg"));
+
 #ifdef Q_OS_WIN
+    Utils::ComputerUtils::init();
     Utils::WinUtils::enableIntelHack();
 #endif
-
-    QGuiApplication *app = new QGuiApplication(argc, argv);
 
     int ret = 0;
 

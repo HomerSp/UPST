@@ -10,6 +10,7 @@
 #include <QThread>
 
 #include "runguard.h"
+#include "utils/computerutils.h"
 #include "utils/fileutils.h"
 #ifdef Q_OS_WIN
 #include "utils/winutils.h"
@@ -55,12 +56,13 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(&logMessageHandler);
 
-#ifdef Q_OS_WIN
-    Utils::WinUtils::enableIntelHack();
-#endif
-
     QGuiApplication *app = new QGuiApplication(argc, argv);
     app->setWindowIcon(QIcon(":/res/images/icon.svg"));
+
+#ifdef Q_OS_WIN
+    Utils::ComputerUtils::init();
+    Utils::WinUtils::enableIntelHack();
+#endif
 
     bool updateFailed = false;
     if(app->arguments().size() == 4 && app->arguments().at(1) == "update") {

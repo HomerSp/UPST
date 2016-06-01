@@ -20,6 +20,7 @@ namespace UI {
             Serial::SerialDevice* device;
             bool error;
             QString log;
+            QString serialNumber;
         };
 
         class UIWorker : public QObject

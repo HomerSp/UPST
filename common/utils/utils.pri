@@ -1,7 +1,9 @@
 HEADERS += \
-    $$PWD/fileutils.h
+    $$PWD/fileutils.h \
+    $$PWD/computerutils.h
 SOURCES += \
-    $$PWD/fileutils.cpp
+    $$PWD/fileutils.cpp \
+    $$PWD/computerutils.cpp
 
 win32 {
     HEADERS += \

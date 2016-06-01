@@ -3,6 +3,7 @@
 #include <QThread>
 #include <QTemporaryDir>
 
+#include "utils/computerutils.h"
 #include "utils/fileutils.h"
 #include "web/webutils.h"
 
@@ -40,6 +41,7 @@ void UI::Worker::UIWorker::addDeviceProvisionTracking(Serial::SerialDevice* devi
     item->device = device;
     item->error = error;
     item->log = log;
+    item->serialNumber = Utils::ComputerUtils::serialNumber();
 
     QMutexLocker lock(&mWorkMutex);
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceProvisionTracking, item));
@@ -204,8 +206,12 @@ bool UI::Worker::UIWorker::processDeviceProvisionTracking(ProvisionTrackingItem*
     deviceObj.insert("mdn", item->device->newMdnStr());
     deviceObj.insert("uniqueID", QString(QCryptographicHash::hash(item->device->imeiStr().toLatin1(), QCryptographicHash::Sha256).toHex()));
 
+    QJsonObject computerObj;
+    computerObj.insert("serial", item->serialNumber);
+
     QJsonObject obj;
     obj.insert("device", QJsonValue(deviceObj));
+    obj.insert("computer", QJsonValue(computerObj));
 
     if(item->error) {
         obj.insert("log", item->log);

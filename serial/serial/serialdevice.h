@@ -227,7 +227,7 @@ namespace Serial {
             return mMdn;
         }
         QString minStr() const {
-            if(mMin == 0) {
+            if(mMin == static_cast<uint64_t>(-1)) {
                 return "-";
             }
 
@@ -263,7 +263,7 @@ namespace Serial {
             return mNewMdn;
         }
         QString newMinStr() const {
-            if(mNewMin == 0) {
+            if(mNewMin == static_cast<uint64_t>(-1)) {
                 QString ret = minStr();
                 if(ret == "-") {
                     return "";

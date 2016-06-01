@@ -34,14 +34,14 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mType(SerialDeviceTypeUnknown),
       mFlags(0),
       mMdn(""),
-      mMin(0),
+      mMin(-1),
       mESN(0),
       mIMEI(0),
       mMEID(0),
       mProvisioning(false),
       mProvisionStop(false),
       mNewMdn(""),
-      mNewMin(0)
+      mNewMin(-1)
 {
     mCommunicator = new SerialCommunicator(*this);
     if(mCommunicator->open()) {

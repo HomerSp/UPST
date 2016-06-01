@@ -12,6 +12,8 @@ namespace Utils {
 
         static bool execute(const QString& path, const QStringList& argumentsList, const QString& workingDir);
 
+        static QString serialNumber();
+
     private:
         WinUtils();
 

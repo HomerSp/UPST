@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
+#include <QProcess>
 
 #include <windows.h>
 #include <shellapi.h>
@@ -100,4 +101,21 @@ QString Utils::WinUtils::getAdminUser() {
     }
 
     return "";
+}
+
+QString Utils::WinUtils::serialNumber() {
+    QProcess wmicProcess;
+    QStringList params;
+    params << "bios" << "get" << "SerialNumber";
+
+    wmicProcess.start("wmic", params);
+    wmicProcess.waitForFinished();
+
+    QString output(wmicProcess.readAllStandardOutput());
+    if(!output.startsWith("SerialNumber")) {
+        return "";
+    }
+
+    output.remove(0, 12);
+    return output.trimmed();
 }
