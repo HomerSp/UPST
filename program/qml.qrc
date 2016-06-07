@@ -9,5 +9,6 @@
         <file>res/qml/logging_in.qml</file>
         <file>res/qml/dialog/dialog_log.qml</file>
         <file>res/qml/dialog/dialog_guide.qml</file>
+        <file>res/qml/updater.qml</file>
     </qresource>
 </RCC>

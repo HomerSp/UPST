@@ -15,3 +15,9 @@ void ComputerUtils::init() {
     sSerialNumber = Utils::WinUtils::serialNumber();
 #endif
 }
+
+void ComputerUtils::enableIntelHack() {
+#ifdef Q_OS_WIN
+    WinUtils::enableIntelHack();
+#endif
+}

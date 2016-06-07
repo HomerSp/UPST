@@ -61,11 +61,3 @@ void Utils::FileUtils::listDirs(QList<QString> &dirs, const QString& source, con
         }
     }
 }
-
-bool Utils::FileUtils::execute(const QString &path, const QStringList &argumentsList, const QString &workingDir) {
-#ifdef Q_OS_WIN
-    return Utils::WinUtils::execute(path, argumentsList, workingDir);
-#else
-    return QProcess::startDetached(path, argumentsList, workingDir);
-#endif
-}

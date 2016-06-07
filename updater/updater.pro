@@ -8,8 +8,10 @@ RESOURCES += \
     resources.qrc \
     qml.qrc
 
-SOURCES += main.cpp
-HEADERS +=
+SOURCES += main.cpp \
+    $$PWD/updateworker.cpp
+HEADERS += \
+    $$PWD/updateworker.h
 
 win32: RC_FILE = res/program.rc
 
@@ -30,4 +32,3 @@ CONFIG( debug, debug|release ) {
 }
 
 include(../defines.pri)
-include(ui/ui.pri)

@@ -298,13 +298,25 @@ bool UI::Worker::UIWorker::processLoginCheckUpdate(const QString& token) {
     if(doc.isObject()) {
         QJsonObject obj = doc.object();
         if(obj.contains("id") && obj.contains("version") && obj.contains("time")) {
-            QTemporaryDir updaterDir;
-            if(!updaterDir.isValid()) {
+            QString updaterDir;
+
+#ifndef Q_OS_WIN
+            QTemporaryDir tmpDir;
+            if(!tmpDir.isValid()) {
                 return false;
             }
 
+            tmpDir.setAutoRemove(false);
+
+            updaterDir = tmpDir.path();
+#else
+            updaterDir = "C:\\UPST.tmp";
+#endif
+
             QString sourcePath = QCoreApplication::applicationDirPath();
-            QString targetPath = updaterDir.path();
+            QString targetPath = updaterDir;
+
+            QDir().mkpath(targetPath);
 
             qDebug()<<"Copying"<<sourcePath<<"to"<<targetPath;
 
@@ -316,12 +328,13 @@ bool UI::Worker::UIWorker::processLoginCheckUpdate(const QString& token) {
                 QFileInfo target(targetPath + "/" + fileName);
 
                 QDir().mkpath(target.absoluteDir().absolutePath());
-                source.copy(target.absoluteFilePath());
+
+                QFile(target.absoluteFilePath()).remove();
+                QFile::copy(sourcePath + "/" + fileName, target.absoluteFilePath());
             }
 
-            updaterDir.setAutoRemove(false);
 
-            emit updateAvailable(updaterDir.path(), obj["id"].toString(), obj["version"].toString(), QDateTime::fromTime_t(obj["time"].toInt()));
+            emit updateAvailable(updaterDir, obj["id"].toString(), obj["version"].toString(), QDateTime::fromTime_t(obj["time"].toInt()));
 
             return true;
         }

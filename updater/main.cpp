@@ -7,6 +7,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QIcon>
+#include <QSettings>
+#include <QThread>
 
 #include "loghandler.h"
 #include "runguard.h"
@@ -15,7 +17,7 @@
 #ifdef Q_OS_WIN
 #include "utils/winutils.h"
 #endif
-#include "ui/ui.h"
+#include "updateworker.h"
 
 static Log::LogHandler *sLogHandler = nullptr;
 
@@ -44,13 +46,7 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(&logMessageHandler);
 
-    QGuiApplication *app = new QGuiApplication(argc, argv);
-    app->setWindowIcon(QIcon(":/res/images/icon.svg"));
-
-#ifdef Q_OS_WIN
-    Utils::ComputerUtils::init();
-    Utils::WinUtils::enableIntelHack();
-#endif
+    QCoreApplication *app = new QCoreApplication(argc, argv);
 
     int ret = 0;
 
@@ -111,7 +107,7 @@ int main(int argc, char *argv[])
                 inData.append(buffer);
             } while(buffer.size() > 0);
 
-            QByteArray compressedData = ::qCompress(inData);
+            QByteArray compressedData = ::qCompress(inData, 1);
 
             qint64 compressedSize = compressedData.size();
             data.append(static_cast<uint8_t>((compressedSize) & 0xFF));
@@ -134,12 +130,38 @@ int main(int argc, char *argv[])
             outputFile.flush();
             outputFile.close();
         }
-    } else if(args.size() == 5) {
+    } else if(args.size() == 2 && args.at(1) == "task") {
         qInfo()<<"Starting UPST Updater"<<PROG_VERSION<<"at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
-        UI::MainUI *mainUI = new UI::MainUI(*app, args.at(1), args.at(3).toULongLong(), args.at(4));
+        QSettings settings(QCoreApplication::applicationDirPath() + "/Updater.ini", QSettings::IniFormat);
+
+        QThread* thread = new QThread;
+
+        UI::UpdateWorker* worker = new UI::UpdateWorker(settings.value("id").toString(), settings.value("time").toULongLong(), settings.value("path").toString());
+        worker->moveToThread(thread);
+
+        QObject::connect(thread, &QThread::started, worker, &UI::UpdateWorker::process);
+        QObject::connect(worker, &UI::UpdateWorker::finished, thread, &QThread::quit);
+        QObject::connect(worker, &UI::UpdateWorker::finished, worker, &QThread::deleteLater);
+        QObject::connect(worker, &UI::UpdateWorker::finished, app, &QCoreApplication::quit);
+        QObject::connect(thread, &QThread::finished, worker, &UI::UpdateWorker::deleteLater);
+
+        thread->start();
+
         ret = app->exec();
-        delete mainUI;
+    } else if(args.size() == 3 && args.at(1) == "taskinit") {
+#ifdef Q_OS_WIN
+        Utils::WinUtils::initTaskScheduler(args.at(2));
+
+        QSettings upstSettings(QCoreApplication::applicationDirPath() + "/UPST.ini", QSettings::IniFormat);
+        upstSettings.setValue("Updater/UseTask", 1);
+        upstSettings.sync();
+#endif
+        ret = 0;
+    } else if(args.size() == 4 && args.at(1) == "taskelevate") {
+        Utils::WinUtils::elevateUpdaterTask(args.at(2), args.at(3));
+
+        ret = 0;
     } else {
         ret = -1;
     }

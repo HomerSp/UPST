@@ -418,16 +418,18 @@ void UI::MainUI::versionUpdateCheck() {
 void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString &id, const QString &version, const QDateTime &updateTime) {
     qDebug()<<"New Update is available"<<version;
 
-#ifdef Q_OS_WIN
-    QString updaterPath(updaterDir + "/Updater.exe");
-#else
-    QString updaterPath(updaterDir + "/Updater");
-#endif
+    QSettings updaterSettings(updaterDir + "/Updater.ini", QSettings::IniFormat);
+    updaterSettings.setValue("path", QCoreApplication::applicationDirPath());
+    updaterSettings.setValue("id", id);
+    updaterSettings.setValue("version", version);
+    updaterSettings.setValue("time", QString::number(updateTime.toTime_t()));
+    updaterSettings.sync();
 
     QStringList argumentsList;
-    argumentsList << id << version << QString::number(updateTime.toTime_t()) << QCoreApplication::applicationDirPath();
+    argumentsList << "updater";
 
-    Utils::FileUtils::execute(updaterPath, argumentsList, updaterDir);
+    QString upstFile = updaterDir + "/" + QFileInfo(QCoreApplication::applicationFilePath()).fileName();
+    QProcess::startDetached(upstFile, argumentsList, updaterDir);
 
     mApp.quit();
 }

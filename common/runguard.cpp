@@ -3,7 +3,7 @@
 
 #include "runguard.h"
 
-RunGuard::RunGuard( const QString& key )
+RunGuard::RunGuard(const QString& key)
     :   mSharedMem(generateKeyHash(key, "sharedmemKey")),
         mMemLock(generateKeyHash(key, "memLockKey"), 1)
 {
@@ -30,7 +30,7 @@ bool RunGuard::isAnotherRunning()
     const bool isRunning = mSharedMem.attach();
     if(isRunning) {
         mSharedMem.detach();
-     }
+    }
     mMemLock.release();
 
     return isRunning;

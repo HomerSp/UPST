@@ -7,17 +7,21 @@ namespace Utils {
     class WinUtils
     {
     public:
+        static void initTaskScheduler(const QString& user);
+
         // INTEL GRAPHICS BUGS !!!111one
         static void enableIntelHack();
+        static void enableUpdaterTask(const QString& user, const QString& password);
+        static void elevateUpdaterTask(const QString& user, const QString& password);
 
-        static bool execute(const QString& path, const QStringList& argumentsList, const QString& workingDir);
+        static bool executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir);
+        static bool executeElevated(const QString &path, const QString &arguments, const QString &workingDir);
 
         static QString serialNumber();
 
     private:
         WinUtils();
 
-        static QString getAdminUser();
     };
 }
 

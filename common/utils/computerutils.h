@@ -9,6 +9,8 @@ namespace Utils {
     public:
         static void init();
 
+        static void enableIntelHack();
+
         static const QString &serialNumber() {
             return sSerialNumber;
         }
