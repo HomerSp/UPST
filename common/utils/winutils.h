@@ -11,7 +11,8 @@ namespace Utils {
 
         // INTEL GRAPHICS BUGS !!!111one
         static void enableIntelHack();
-        static void enableUpdaterTask(const QString& user, const QString& password);
+
+        static void createUpdaterTask();
         static void elevateUpdaterTask(const QString& user, const QString& password);
 
         static bool executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir);

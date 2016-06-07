@@ -39,22 +39,22 @@ UI::UpdaterUI::UpdaterUI(const QGuiApplication& app)
 
     mEngine->load(QUrl(QStringLiteral("qrc:/res/qml/updater.qml")));
 
+#ifdef Q_OS_WIN
     QSettings upstSettings(QCoreApplication::applicationDirPath() + "/UPST.ini", QSettings::IniFormat);
     if(upstSettings.value("Updater/UseTask", 0).toInt() == 1) {
         QStringList argumentsList;
-        argumentsList << "/run" << "/tn" << "UPSTUpdater";
+        argumentsList << "/run" << "/tn" << TASK_NAME;
 
         QProcess::startDetached("schtasks", argumentsList, QCoreApplication::applicationDirPath());
     } else {
         QStringList argumentsList;
         argumentsList << "task";
 
-#ifdef Q_OS_WIN
         QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater.exe", argumentsList, QCoreApplication::applicationDirPath());
-#else
-        QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater", argumentsList, QCoreApplication::applicationDirPath());
-#endif
     }
+#else
+    QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater", argumentsList, QCoreApplication::applicationDirPath());
+#endif
 
     QTimer::singleShot(10000, this, &UI::UpdaterUI::updaterTimeout);
 }

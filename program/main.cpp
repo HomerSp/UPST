@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         }
 
         Utils::WinUtils::executeElevated(QCoreApplication::applicationDirPath() + "/Updater.exe", "taskinit \"" + user + "\"", QCoreApplication::applicationDirPath());
-        Utils::WinUtils::enableUpdaterTask(args.at(2), args.at(3));
+        Utils::WinUtils::createUpdaterTask();
         Utils::WinUtils::executeElevated(QCoreApplication::applicationDirPath() + "/Updater.exe", "taskelevate \"" + args.at(2) + "\" \"" + args.at(3) + "\"", QCoreApplication::applicationDirPath());
 #endif
 

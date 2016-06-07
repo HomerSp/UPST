@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QProcess>
+#include <QSysInfo>
 
 #include <windows.h>
 #include <shellapi.h>
@@ -14,12 +15,24 @@ void WinUtils::initTaskScheduler(const QString& user) {
     QStringList params1;
     params1 << (qgetenv("WINDIR") + "\\Tasks") << "/C" << "/E" << "/P" << (user + ":F");
 
-    QProcess::execute("cacls", params1);
+    QProcess cacls1Process;
+    if(QSysInfo::currentCpuArchitecture() == "x86_64") {
+        cacls1Process.start(qgetenv("WINDIR") + "\\sysnative\\cacls.exe", params1);
+    } else {
+        cacls1Process.start(qgetenv("WINDIR") + "\\system32\\cacls.exe", params1);
+    }
+    cacls1Process.waitForFinished();
 
     QStringList params2;
     params2 << (qgetenv("WINDIR") + "\\system32\\Tasks") << "/C" << "/E" << "/P" << (user + ":F");
 
-    QProcess::execute("cacls", params2);
+    QProcess cacls2Process;
+    if(QSysInfo::currentCpuArchitecture() == "x86_64") {
+        cacls2Process.start(qgetenv("WINDIR") + "\\sysnative\\cacls.exe", params2);
+    } else {
+        cacls2Process.start(qgetenv("WINDIR") + "\\system32\\cacls.exe", params2);
+    }
+    cacls2Process.waitForFinished();
 }
 
 void WinUtils::enableIntelHack() {
@@ -34,10 +47,10 @@ void WinUtils::enableIntelHack() {
     }
 }
 
-void WinUtils::enableUpdaterTask(const QString& user, const QString& password) {
+void WinUtils::createUpdaterTask() {
     QProcess schtasksProcess;
     QStringList params;
-    params << "/create" << "/tn" << "UPSTUpdater" << "/xml" << QString(QCoreApplication::applicationDirPath() + "/Updater.xml") << "/RU" << user << "/RP" << password;
+    params << "/create" << "/tn" << TASK_NAME << "/xml" << QCoreApplication::applicationDirPath() + "/Updater.xml";
 
     schtasksProcess.start("schtasks", params);
     schtasksProcess.waitForFinished();
@@ -46,7 +59,7 @@ void WinUtils::enableUpdaterTask(const QString& user, const QString& password) {
 void WinUtils::elevateUpdaterTask(const QString& user, const QString& password) {
     QProcess schtasksProcess;
     QStringList params;
-    params << "/change" << "/tn" << "UPSTUpdater" << "/rl" << "highest" << "/RU" << user << "/RP" << password;
+    params << "/change" << "/tn" << TASK_NAME << "/rl" << "highest" << "/RU" << user << "/RP" << password << "/IT";
 
     schtasksProcess.start("schtasks", params);
     schtasksProcess.waitForFinished();
