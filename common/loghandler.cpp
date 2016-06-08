@@ -98,7 +98,7 @@ QString Log::LogHandler::formatLog(QtMsgType type, const QMessageLogContext& con
     }
 
 #ifdef QT_DEBUG
-    data += " " + context.file + "." + QString::number(context.line) + ":";
+    data += " " + QString(context.file) + "." + QString::number(context.line) + ":";
 #endif
     data += " " + msg;
 
