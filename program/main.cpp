@@ -168,6 +168,9 @@ int main(int argc, char *argv[])
         QSettings buildSettings(args.at(2), QSettings::IniFormat);
         buildSettings.setValue("time", PROG_BUILDTIME);
         buildSettings.setValue("version", PROG_VERSION);
+#ifdef TESTING_MODE
+        buildSettings.setValue("testing", 1);
+#endif
         buildSettings.sync();
     } else {
         updateConfigs();

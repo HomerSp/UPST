@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 
         uint64_t buildTime = 0;
         QString buildVersion = "";
+        bool buildTesting = false;
         {
             QTemporaryDir dir;
             QFile buildFile(dir.path() + "/build.ini");
@@ -92,6 +93,7 @@ int main(int argc, char *argv[])
             QSettings buildSettings(buildFile.fileName(), QSettings::IniFormat);
             buildTime = buildSettings.value("time").toULongLong();
             buildVersion = buildSettings.value("version").toString();
+            buildTesting = buildSettings.contains("testing");
         }
 
         QByteArray data;
@@ -102,6 +104,8 @@ int main(int argc, char *argv[])
         uint16_t updaterVersion = static_cast<uint16_t>(QString(UPDATER_VERSION).toUInt());
         data.append(static_cast<uint8_t>((updaterVersion) & 0xFF));
         data.append(static_cast<uint8_t>((updaterVersion >> 8) & 0xFF));
+
+        data.append(static_cast<uint8_t>(buildTesting & 0xFF));
 
         data.append(static_cast<uint8_t>((buildTime) & 0xFF));
         data.append(static_cast<uint8_t>((buildTime >> 8) & 0xFF));
