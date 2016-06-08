@@ -66,6 +66,8 @@ UI::UpdaterUI::~UpdaterUI() {
 void UI::UpdaterUI::updaterTimeout() {
     if(!mHaveClient) {
         qCritical()<<"Timed out waiting for updater to start!";
+
+        installFinished();
     }
 }
 

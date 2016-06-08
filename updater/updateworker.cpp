@@ -61,6 +61,8 @@ void UI::UpdateWorker::process() {
 
     qint64 i = 0;
     uint16_t updateVersion = 0;
+    uint64_t buildTime = 0;
+    QString buildVersion = "";
     if(output.size() >= 5) {
         if(output.at(i) == 'U' && output.at(i + 1) == 'P' && output.at(i + 2) == 'Z') {
             i += 3;
@@ -68,18 +70,37 @@ void UI::UpdateWorker::process() {
             updateVersion = static_cast<uint16_t>(output.at(i) & 0xFF)
                 | static_cast<uint16_t>(output.at(i + 1) & 0xFF) << 8;
 
-            i += 2;
+            i += sizeof(updateVersion);
+
+            buildTime = static_cast<quint64>(output.at(i) & 0xFF)
+                    | static_cast<quint64>(output.at(i + 1) & 0xFF) << 8
+                    | static_cast<quint64>(output.at(i + 2) & 0xFF) << 16
+                    | static_cast<quint64>(output.at(i + 3) & 0xFF) << 24
+                    | static_cast<quint64>(output.at(i + 4) & 0xFF) << 32
+                    | static_cast<quint64>(output.at(i + 5) & 0xFF) << 40
+                    | static_cast<quint64>(output.at(i + 6) & 0xFF) << 48
+                    | static_cast<quint64>(output.at(i + 7) & 0xFF) << 56;
+
+            i += sizeof(buildTime);
+
+            buildVersion = QString::fromUtf8(output.constData() + i);
+            i += buildVersion.toUtf8().size() + 1;
+
+            if(updateVersion > QString(UPDATER_VERSION).toInt()) {
+                qCritical()<<"Updater package version"<<updateVersion<<"is higher than supported"<<UPDATER_VERSION<<", failing...";
+
+                updateStatus(Updater::UpdateStatusError);
+                emit finished();
+                return;
+            }
         }
     }
 
     updateStatus(Updater::UpdateStatusInstallProgress, i, output.size());
 
     while(i < output.size()) {
-        uint16_t nameSize = static_cast<uint16_t>((output.at(i + 1) & 0xFF) << 8) | static_cast<uint16_t>(output.at(i) & 0xFF);
-        i += 2;
-
-        QString name = output.mid(i, nameSize);
-        i += nameSize;
+        QString name = QString::fromUtf8(output.constData() + i);
+        i += name.toUtf8().size() + 1;
 
         quint64 originalSize = static_cast<quint64>(output.at(i) & 0xFF)
             | static_cast<quint64>(output.at(i + 1) & 0xFF) << 8
@@ -89,6 +110,8 @@ void UI::UpdateWorker::process() {
             | static_cast<quint64>(output.at(i + 5) & 0xFF) << 40
             | static_cast<quint64>(output.at(i + 6) & 0xFF) << 48
             | static_cast<quint64>(output.at(i + 7) & 0xFF) << 56;
+
+        Q_UNUSED(originalSize);
 
         i += 8;
 
@@ -102,8 +125,6 @@ void UI::UpdateWorker::process() {
             | static_cast<quint64>(output.at(i + 7) & 0xFF) << 56;
 
         i += 8;
-
-        qDebug()<<"name"<<name<<originalSize;
 
         QByteArray compressedData = output.mid(i, compressedSize);
         QByteArray data = ::qUncompress(compressedData);
@@ -162,5 +183,4 @@ void UI::UpdateWorker::updateStatus(Updater::UpdateStatus status, quint64 receiv
 
     mSocket->write(block);
     mSocket->flush();
-    mSocket->waitForBytesWritten();
 }

@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
                 if(retry) {
                     retries++;
-                    QThread::sleep(1);
+                    QThread::sleep(2);
                 }
             } while(retry);
 
@@ -164,6 +164,11 @@ int main(int argc, char *argv[])
 #endif
 
         ret = 0;
+    } else if(args.size() == 3 && args.at(1) == "build") {
+        QSettings buildSettings(args.at(2), QSettings::IniFormat);
+        buildSettings.setValue("time", PROG_BUILDTIME);
+        buildSettings.setValue("version", PROG_VERSION);
+        buildSettings.sync();
     } else {
         updateConfigs();
 

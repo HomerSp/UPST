@@ -9,6 +9,8 @@
 #include <QIcon>
 #include <QSettings>
 #include <QThread>
+#include <QTemporaryDir>
+#include <QProcess>
 
 #include "loghandler.h"
 #include "runguard.h"
@@ -61,6 +63,37 @@ int main(int argc, char *argv[])
             }
         }
 
+        QFile outputFile("out.upz");
+        outputFile.remove();
+
+#ifdef Q_OS_WIN
+        if(!files.contains("UPST.exe")) {
+#else
+        if(!files.contains("UPST")) {
+#endif
+            return -1;
+        }
+
+        uint64_t buildTime = 0;
+        QString buildVersion = "";
+        {
+            QTemporaryDir dir;
+            QFile buildFile(dir.path() + "/build.ini");
+
+            QStringList args;
+            args << "build" << buildFile.fileName();
+
+#ifdef Q_OS_WIN
+            QProcess::execute(QCoreApplication::applicationDirPath() + "/UPST.exe", args);
+#else
+            QProcess::execute(QCoreApplication::applicationDirPath() + "/UPST", args);
+#endif
+
+            QSettings buildSettings(buildFile.fileName(), QSettings::IniFormat);
+            buildTime = buildSettings.value("time").toULongLong();
+            buildVersion = buildSettings.value("version").toString();
+        }
+
         QByteArray data;
         data.append('U');
         data.append('P');
@@ -69,6 +102,18 @@ int main(int argc, char *argv[])
         uint16_t updaterVersion = static_cast<uint16_t>(QString(UPDATER_VERSION).toUInt());
         data.append(static_cast<uint8_t>((updaterVersion) & 0xFF));
         data.append(static_cast<uint8_t>((updaterVersion >> 8) & 0xFF));
+
+        data.append(static_cast<uint8_t>((buildTime) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 8) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 16) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 24) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 32) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 40) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 48) & 0xFF));
+        data.append(static_cast<uint8_t>((buildTime >> 56) & 0xFF));
+
+        data.append(buildVersion.toUtf8());
+        data.append('\0');
 
         foreach(QString fileName, files) {
             if(fileName == "out.upz") {
@@ -81,9 +126,8 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            data.append(static_cast<uint8_t>((fileName.length()) & 0xFF));
-            data.append(static_cast<uint8_t>((fileName.length() >> 8) & 0xFF));
-            data.append(fileName.toLatin1());
+            data.append(fileName.toUtf8());
+            data.append('\0');
 
             qint64 size = file.size();
             data.append(static_cast<uint8_t>((size) & 0xFF));
@@ -107,7 +151,7 @@ int main(int argc, char *argv[])
                 inData.append(buffer);
             } while(buffer.size() > 0);
 
-            QByteArray compressedData = ::qCompress(inData, 1);
+            QByteArray compressedData = ::qCompress(inData);
 
             qint64 compressedSize = compressedData.size();
             data.append(static_cast<uint8_t>((compressedSize) & 0xFF));
@@ -124,7 +168,6 @@ int main(int argc, char *argv[])
             inFile.close();
         }
 
-        QFile outputFile("out.upz");
         if(outputFile.open(QIODevice::WriteOnly)) {
             outputFile.write(data);
             outputFile.flush();
@@ -143,7 +186,7 @@ int main(int argc, char *argv[])
         QObject::connect(thread, &QThread::started, worker, &UI::UpdateWorker::process);
         QObject::connect(worker, &UI::UpdateWorker::finished, thread, &QThread::quit);
         QObject::connect(worker, &UI::UpdateWorker::finished, worker, &QThread::deleteLater);
-        QObject::connect(worker, &UI::UpdateWorker::finished, app, &QCoreApplication::quit);
+        QObject::connect(thread, &QThread::finished, app, &QCoreApplication::quit);
         QObject::connect(thread, &QThread::finished, worker, &UI::UpdateWorker::deleteLater);
 
         thread->start();
