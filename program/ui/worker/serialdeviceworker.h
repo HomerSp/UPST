@@ -57,6 +57,7 @@ namespace UI {
             void addDeviceCheck(const QSerialPortInfo &info);
             void addDeviceRemove(Serial::SerialDevice* device);
             void addDeviceClose(Serial::SerialDevice* device);
+            void addDeviceUpdate(Serial::SerialDevice* device);
 
             void addDeviceProvision(Serial::SerialDevice* device);
 
@@ -78,6 +79,9 @@ namespace UI {
             void deviceAdd(Serial::SerialDevice* device);
             void deviceAddReschedule(QString port);
             void deviceClose(Serial::SerialDevice* device);
+            void deviceUpdated(Serial::SerialDevice* device);
+
+            void deviceBatchLoaded();
 
             void provisionProgressChanged(Serial::SerialDevice* device, int status, int progress, int error);
             void provisionSPCFailed(Serial::SerialDevice* device);
@@ -90,6 +94,7 @@ namespace UI {
                 WorkTypeDeviceCheck,
                 WorkTypeDeviceRemove,
                 WorkTypeDeviceClose,
+                WorkTypeDeviceUpdate,
                 WorkTypeCommand,
                 WorkTypeDeviceProvision,
             };
@@ -97,6 +102,7 @@ namespace UI {
             void processDeviceBatchLoad(SerialBatchLoadItem* item);
             void processDeviceCheck(QSerialPortInfo* portInfo);
             void processDeviceRemove(Serial::SerialDevice* device, bool close = false);
+            void processDeviceUpdate(Serial::SerialDevice* device);
             void processDeviceProvision(Serial::SerialDevice* device);
             void processCommand(SerialCommandItem* command);
 

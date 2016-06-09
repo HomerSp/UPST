@@ -74,6 +74,9 @@ namespace UI {
         void deviceAddReschedule(QString port);
         void deviceClose(Serial::SerialDevice* device);
         void deviceRescheduleTimeout();
+        void deviceUpdated(Serial::SerialDevice* device);
+
+        void deviceBatchLoaded();
 
         void provisionProgressChanged(Serial::SerialDevice* device, int status, int current, int error);
 

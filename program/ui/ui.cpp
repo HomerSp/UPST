@@ -89,6 +89,8 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAdd, this, &MainUI::deviceAddChecked);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceAddReschedule, this, &MainUI::deviceAddReschedule);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceClose, this, &MainUI::deviceClose);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceUpdated, this, &MainUI::deviceUpdated);
+    connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::deviceBatchLoaded, this, &MainUI::deviceBatchLoaded);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::provisionProgressChanged, this, &MainUI::provisionProgressChanged);
     connect(mDeviceWorker, &UI::Worker::SerialDeviceWorker::statusChange, this, &MainUI::setStatus);
 
@@ -281,6 +283,17 @@ void UI::MainUI::deviceRescheduleTimeout() {
     }
 
     timer->deleteLater();
+}
+
+void UI::MainUI::deviceUpdated(Serial::SerialDevice *device) {
+    emit deviceUpdate(device);
+    viewUpdate();
+}
+
+void UI::MainUI::deviceBatchLoaded() {
+    foreach(Serial::SerialDevice* d, mDevices) {
+        mDeviceWorker->addDeviceUpdate(d);
+    }
 }
 
 void UI::MainUI::currentDeviceChanged(int index) {

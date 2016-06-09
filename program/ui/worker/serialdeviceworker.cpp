@@ -90,6 +90,12 @@ void UI::Worker::SerialDeviceWorker::addDeviceClose(Serial::SerialDevice* device
     mWaitCondition.wakeAll();
 }
 
+void UI::Worker::SerialDeviceWorker::addDeviceUpdate(Serial::SerialDevice *device) {
+    QMutexLocker locker(&mWorkMutex);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceUpdate, device));
+    mWaitCondition.wakeAll();
+}
+
 void UI::Worker::SerialDeviceWorker::addDeviceProvision(Serial::SerialDevice* device) {
     QMutexLocker locker(&mWorkMutex);
     mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceProvision, device));
@@ -174,6 +180,10 @@ void UI::Worker::SerialDeviceWorker::process() {
                     processDeviceCheck(static_cast<QSerialPortInfo*>(data));
                     break;
                 }
+                case WorkTypeDeviceUpdate: {
+                    processDeviceUpdate(static_cast<Serial::SerialDevice*>(data));
+                    break;
+                }
                 case WorkTypeDeviceProvision: {
                     processDeviceProvision(static_cast<Serial::SerialDevice*>(data));
                     break;
@@ -228,6 +238,8 @@ void UI::Worker::SerialDeviceWorker::processDeviceBatchLoad(SerialBatchLoadItem 
     mBatchParser = new Serial::SerialBatchParser(item->data);
 
     delete item;
+
+    emit deviceBatchLoaded();
 }
 
 void UI::Worker::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, bool close) {
@@ -274,6 +286,25 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
     emit statusChange("");
 
     delete portInfo;
+}
+
+void UI::Worker::SerialDeviceWorker::processDeviceUpdate(Serial::SerialDevice *device) {
+    if(device == nullptr) {
+        return;
+    }
+
+    bool reschedule = false;
+    if(device->update(&reschedule)) {
+        if(!mDeviceConfig->updateDevice(device)) {
+            qWarning()<<"Could not find device info for"<<device->port();
+        }
+
+        if(mBatchParser != nullptr) {
+            mBatchParser->updateDevice(device);
+        }
+
+        emit deviceUpdated(device);
+    }
 }
 
 void UI::Worker::SerialDeviceWorker::processDeviceProvision(Serial::SerialDevice* device) {
