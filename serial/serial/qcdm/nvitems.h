@@ -1,5 +1,5 @@
-#ifndef NVCOMMANDS_H
-#define NVCOMMANDS_H
+#ifndef SERIAL_QCDM_NVITEMS_H
+#define SERIAL_QCDM_NVITEMS_H
 
 namespace Serial {
     namespace QCDM {
@@ -6249,4 +6249,4 @@ namespace Serial {
         };
     }
 }
-#endif // NVCOMMANDS_H
+#endif // SERIAL_QCDM_NVITEMS_H

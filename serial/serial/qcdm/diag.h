@@ -1,5 +1,5 @@
-#ifndef QCDM_H
-#define QCDM_H
+#ifndef SERIAL_QCDM_DIAG_H
+#define SERIAL_QCDM_DIAG_H
 
 namespace Serial {
     namespace QCDM {
@@ -176,6 +176,10 @@ namespace Serial {
             DIAG_MAX_F                          = 0xFF, // [255]
         };
 
+        enum DiagSubSysID : unsigned char {
+            DIAG_SUBSYS_FS                      = 0x13, // [19] File System - EFS2
+        };
+
         enum Response
         {
            DIAG_ERR_SUCCESS             = 0x0,
@@ -206,4 +210,4 @@ namespace Serial {
     }
 }
 
-#endif // QCDM_H
+#endif // SERIAL_QCDM_DIAG_H
