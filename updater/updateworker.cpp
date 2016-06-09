@@ -61,6 +61,7 @@ void UI::UpdateWorker::process() {
 
     qint64 i = 0;
     uint16_t updateVersion = 0;
+    bool buildTesting = false;
     uint64_t buildTime = 0;
     QString buildVersion = "";
     if(output.size() >= 5) {
@@ -71,6 +72,9 @@ void UI::UpdateWorker::process() {
                 | static_cast<uint16_t>(output.at(i + 1) & 0xFF) << 8;
 
             i += sizeof(updateVersion);
+
+            buildTesting = output.at(i) == 0x01;
+            i++;
 
             buildTime = static_cast<quint64>(output.at(i) & 0xFF)
                     | static_cast<quint64>(output.at(i + 1) & 0xFF) << 8
@@ -85,6 +89,24 @@ void UI::UpdateWorker::process() {
 
             buildVersion = QString::fromUtf8(output.constData() + i);
             i += buildVersion.toUtf8().size() + 1;
+
+#ifndef TESTING_MODE
+            if(buildTesting) {
+                qCritical()<<"Trying to update to a testing build from a release build, failing...";
+
+                updateStatus(Updater::UpdateStatusError);
+                emit finished();
+                return;
+            }
+#else
+            if(!buildTesting) {
+                qCritical()<<"Trying to update to a release build from a testing build, failing...";
+
+                updateStatus(Updater::UpdateStatusError);
+                emit finished();
+                return;
+            }
+#endif
 
             if(updateVersion > QString(UPDATER_VERSION).toInt()) {
                 qCritical()<<"Updater package version"<<updateVersion<<"is higher than supported"<<UPDATER_VERSION<<", failing...";
