@@ -4,11 +4,13 @@ HEADERS += $$PWD/crcutils.h \
     $$PWD/serialcommand.h \
     $$PWD/serialdeviceconfig.h \
     $$PWD/serialprovisiondata.h \
-    $$PWD/serialitemparser.h
+    $$PWD/serialitemparser.h \
+    $$PWD/serialbatchparser.h
 SOURCES += $$PWD/crcutils.cpp \
     $$PWD/serialcommunicator.cpp \
     $$PWD/serialdevice.cpp \
     $$PWD/serialcommand.cpp \
     $$PWD/serialdeviceconfig.cpp \
     $$PWD/serialprovisiondata.cpp \
-    $$PWD/serialitemparser.cpp
+    $$PWD/serialitemparser.cpp \
+    $$PWD/serialbatchparser.cpp

@@ -96,6 +96,8 @@ namespace UI {
         void login();
         void logout();
 
+        void importDevices(const QUrl& url);
+
     private:
         void updateLoginStatus(bool loggedIn);
 

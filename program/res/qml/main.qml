@@ -82,10 +82,36 @@ ApplicationWindow {
         source: "qrc:/res/fonts/OpenSans-Bold.ttf"
     }
 
+    FileDialog {
+        signal importDevices(url path)
+
+        objectName: "importDevicesDialog"
+        id: importDevicesDialog
+        visible: false
+        modality: Qt.WindowModal
+        title: qsTr("Choose a file")
+        selectExisting: true
+        nameFilters: [ "Comma-separated values (*.csv)" ]
+        sidebarVisible: true
+        onAccepted: {
+            importDevices(fileUrl);
+        }
+    }
+
     menuBar: MenuBar {
         Menu {
             id: fileMenu
             title: qsTr("File")
+
+            MenuItem {
+                objectName: "fileImportDevices"
+                text: qsTr("Import devices")
+                visible: false
+
+                onTriggered: {
+                    importDevicesDialog.open()
+                }
+            }
 
             MenuItem {
                 text: qsTr("Exit")
@@ -214,13 +240,13 @@ ApplicationWindow {
         }
 
         Menu {
+            objectName: "userMenu"
             id: userMenu
             title: userDisplayName
 
             MenuItem {
                 objectName: "userMenuLogout"
                 text: qsTr("Logout")
-                visible: false
             }
         }
     }

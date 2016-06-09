@@ -11,6 +11,7 @@
 #include "serial/serialdevice.h"
 #include "serial/serialdeviceconfig.h"
 #include "serial/serialcommand.h"
+#include "serial/serialbatchparser.h"
 
 namespace UI {
     namespace Worker {
@@ -40,12 +41,18 @@ namespace UI {
             QList<Serial::SerialCommand*> mCmds;
         };
 
+        struct SerialBatchLoadItem {
+            QString data;
+        };
+
         class SerialDeviceWorker: public QObject
         {
             Q_OBJECT
         public:
             SerialDeviceWorker();
             ~SerialDeviceWorker();
+
+            void addDeviceBatchLoad(const QString &data);
 
             void addDeviceCheck(const QSerialPortInfo &info);
             void addDeviceRemove(Serial::SerialDevice* device);
@@ -79,6 +86,7 @@ namespace UI {
 
         private:
             enum WorkType {
+                WorkTypeDeviceBatchLoad,
                 WorkTypeDeviceCheck,
                 WorkTypeDeviceRemove,
                 WorkTypeDeviceClose,
@@ -86,6 +94,7 @@ namespace UI {
                 WorkTypeDeviceProvision,
             };
 
+            void processDeviceBatchLoad(SerialBatchLoadItem* item);
             void processDeviceCheck(QSerialPortInfo* portInfo);
             void processDeviceRemove(Serial::SerialDevice* device, bool close = false);
             void processDeviceProvision(Serial::SerialDevice* device);
@@ -104,6 +113,7 @@ namespace UI {
             QList<QPair<WorkType, void*> > mWorkItems;
 
             Serial::SerialDeviceConfig* mDeviceConfig;
+            Serial::SerialBatchParser* mBatchParser;
         };
     }
 }

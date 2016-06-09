@@ -94,9 +94,12 @@ namespace Serial {
         void setProvisioning(bool f) {
             mProvisioning = f;
         }
-        void setProvisionData(const QString& mdn, uint64_t min) {
+        void setProvisionData(const QString& mdn, uint64_t min, const QString& spc = "") {
             mNewMdn = mdn;
             mNewMin = min;
+            if(spc.size() > 0) {
+                mSPC = spc;
+            }
         }
 
         bool operator==(const SerialDevice& other);
@@ -316,6 +319,7 @@ namespace Serial {
         bool mProvisionStop;
         QString mNewMdn;
         uint64_t mNewMin;
+        QString mSPC;
     };
 }
 

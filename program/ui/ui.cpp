@@ -69,6 +69,8 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     QObject::connect(connectedDevicesList, SIGNAL(refresh()), this, SLOT(doRefresh()));
 
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
+
+    QObject::connect(rootObject->findChild<QObject*>("importDevicesDialog"), SIGNAL(importDevices(const QUrl&)), this, SLOT(importDevices(const QUrl&)));
     QObject::connect(rootObject->findChild<QObject*>("userMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
@@ -365,6 +367,18 @@ void UI::MainUI::logout() {
     viewUpdate();
 }
 
+void UI::MainUI::importDevices(const QUrl& url) {
+    QFile file(url.toLocalFile());
+    if(!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    QString data = QString(file.readAll());
+    file.close();
+
+    mDeviceWorker->addDeviceBatchLoad(data);
+}
+
 void UI::MainUI::loginStatusChanged(bool success) {
     qDebug()<<"loginStatusChanged"<<success;
     if(!success) {
@@ -388,7 +402,8 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 
     QObject* rootObject = mEngine->rootObjects().first();
 
-    rootObject->findChild<QObject*>("userMenuLogout")->setProperty("visible", loggedIn);
+    rootObject->findChild<QObject*>("fileImportDevices")->setProperty("visible", loggedIn);
+    rootObject->findChild<QObject*>("userMenu")->setProperty("visible", loggedIn);
     rootObject->findChild<QObject*>("editMenu")->setProperty("visible", loggedIn);
     // Show advanced menu item if we are using a testing build
 #ifdef TESTING_MODE

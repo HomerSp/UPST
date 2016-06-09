@@ -34,7 +34,8 @@ void UI::Worker::SerialCommandItem::process() {
 UI::Worker::SerialDeviceWorker::SerialDeviceWorker()
     :   mThread(new QThread),
         mRunning(true),
-        mDeviceConfig(nullptr)
+        mDeviceConfig(nullptr),
+        mBatchParser(nullptr)
 {
     moveToThread(mThread);
 
@@ -45,7 +46,18 @@ UI::Worker::SerialDeviceWorker::SerialDeviceWorker()
 }
 
 UI::Worker::SerialDeviceWorker::~SerialDeviceWorker() {
+    if(mBatchParser != nullptr) {
+        delete mBatchParser;
+    }
+}
 
+void UI::Worker::SerialDeviceWorker::addDeviceBatchLoad(const QString &data) {
+    SerialBatchLoadItem* item = new SerialBatchLoadItem;
+    item->data = data;
+
+    QMutexLocker locker(&mWorkMutex);
+    mWorkItems.append(QPair<WorkType, void*>(WorkTypeDeviceBatchLoad, item));
+    mWaitCondition.wakeAll();
 }
 
 void UI::Worker::SerialDeviceWorker::addDeviceCheck(const QSerialPortInfo &info) {
@@ -111,7 +123,9 @@ void UI::Worker::SerialDeviceWorker::stop() {
 
     QMutexLocker lock(&mWorkMutex);
     for(QList<QPair<WorkType, void*> >::iterator i = mWorkItems.begin(); i != mWorkItems.end(); i++) {
-        if((*i).first == WorkTypeDeviceCheck) {
+        if((*i).first == WorkTypeDeviceBatchLoad) {
+            delete static_cast<SerialBatchLoadItem*>((*i).second);
+        } else if((*i).first == WorkTypeDeviceCheck) {
             delete static_cast<QSerialPortInfo*>((*i).second);
         } else if((*i).first == WorkTypeCommand) {
             delete static_cast<SerialCommandItem*>((*i).second);
@@ -147,6 +161,10 @@ void UI::Worker::SerialDeviceWorker::process() {
 
                 bool unknownCommand = false;
                 switch(type) {
+                case WorkTypeDeviceBatchLoad: {
+                    processDeviceBatchLoad(static_cast<SerialBatchLoadItem*>(data));
+                    break;
+                }
                 case WorkTypeDeviceClose:
                 case WorkTypeDeviceRemove: {
                     processDeviceRemove(static_cast<Serial::SerialDevice*>(data), type == WorkTypeDeviceClose);
@@ -201,6 +219,17 @@ void UI::Worker::SerialDeviceWorker::process() {
     emit finished();
 }
 
+void UI::Worker::SerialDeviceWorker::processDeviceBatchLoad(SerialBatchLoadItem *item) {
+    if(mBatchParser != nullptr) {
+        delete mBatchParser;
+    }
+    mBatchParser = nullptr;
+
+    mBatchParser = new Serial::SerialBatchParser(item->data);
+
+    delete item;
+}
+
 void UI::Worker::SerialDeviceWorker::processDeviceRemove(Serial::SerialDevice* device, bool close) {
     if(device == nullptr) {
         return;
@@ -229,6 +258,10 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
         if(device->update(&reschedule)) {
             if(!mDeviceConfig->updateDevice(device)) {
                 qWarning()<<"Could not find device info for"<<portInfo->portName();
+            }
+
+            if(mBatchParser != nullptr) {
+                mBatchParser->updateDevice(device);
             }
 
             emit deviceAdd(device);
