@@ -70,6 +70,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
 
     QObject::connect(rootObject->findChild<QObject*>("loginButton"), SIGNAL(clicked()), this, SLOT(login()));
 
+    QObject::connect(rootObject->findChild<QObject*>("editMenuProvisionAll"), SIGNAL(triggered()), this, SLOT(provisionAll()));
     QObject::connect(rootObject->findChild<QObject*>("importDevicesDialog"), SIGNAL(importDevices(const QUrl&)), this, SLOT(importDevices(const QUrl&)));
     QObject::connect(rootObject->findChild<QObject*>("userMenuLogout"), SIGNAL(triggered()), this, SLOT(logout()));
 
@@ -323,6 +324,8 @@ void UI::MainUI::viewChanged() {
     }
     mSection = nullptr;
 
+    rootObject->findChild<QObject*>("editMenuProvisionAll")->setProperty("visible", view == "provision");
+
     if(view == "manual") {
         mSection = new UI::Section::Manual(this);
     } else if(view == "provision") {
@@ -477,6 +480,20 @@ void UI::MainUI::provisionProgressChanged(Serial::SerialDevice* device, int stat
 
 void UI::MainUI::doRefresh() {
     emit devicesRefresh();
+}
+
+void UI::MainUI::provisionAll() {
+    foreach(Serial::SerialDevice* device, mDevices) {
+        if(!device->canProvision() || device->newMdn().size() == 0 || device->newMin() == -1) {
+            continue;
+        }
+
+        device->setProvisioning(true);
+        provisionProgressChanged(device, Serial::SerialProvisionStatusQueue, 0, Serial::SerialProvisionErrorNone);
+        viewUpdate();
+
+        mDeviceWorker->addDeviceProvision(device);
+    }
 }
 
 void UI::MainUI::provisionFailedClose() {

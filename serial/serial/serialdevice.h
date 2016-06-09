@@ -158,6 +158,13 @@ namespace Serial {
         uint64_t min() const {
             return mMin;
         }
+        const QString& newMdn() const {
+            return mNewMdn;
+        }
+        uint64_t newMin() const {
+            return mNewMin;
+        }
+
         uint32_t esn() const {
             return mESN;
         }

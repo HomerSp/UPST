@@ -50,7 +50,7 @@ void UI::Section::Provision::provision() {
     uint64_t min = (uint64_t)rootObject->findChild<QObject*>("textMIN")->property("text").toString().toULongLong();
 
     Serial::SerialDevice* device = currentDevice();
-    if(device == nullptr) {
+    if(device == nullptr || !device->canProvision()) {
         return;
     }
 

@@ -126,6 +126,11 @@ ApplicationWindow {
             objectName: "editMenu"
             title: qsTr("Edit")
             visible: false
+
+            MenuItem {
+                objectName: "editMenuProvisionAll"
+                text: qsTr("Provision all")
+            }
             MenuItem {
                 text: qsTr("Refresh")
                 onTriggered: {

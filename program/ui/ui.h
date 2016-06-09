@@ -86,6 +86,7 @@ namespace UI {
         void setStatus(const QString& status);
 
         void doRefresh();
+        void provisionAll();
 
         void provisionFailedClose();
         void updateFailedContinue();
