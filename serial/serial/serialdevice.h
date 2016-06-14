@@ -46,6 +46,7 @@ namespace Serial {
     public:
         SerialDevice(const QString& port, uint16_t vid, uint16_t pid);
         SerialDevice(const QSerialPortInfo& info);
+        SerialDevice(const QJsonObject& obj);
         ~SerialDevice();
 
         SerialCommunicator* communicator();
@@ -142,6 +143,10 @@ namespace Serial {
 
         SerialDeviceType type() const {
             return mType;
+        }
+
+        const QJsonObject &guide() const {
+            return mGuide;
         }
 
         bool flagManualReboot() const {
@@ -315,6 +320,7 @@ namespace Serial {
         QString mCodename;
         SerialDeviceType mType;
         uint32_t mFlags;
+        QJsonObject mGuide;
 
         QString mMdn;
         uint64_t mMin;

@@ -10,5 +10,6 @@
         <file>res/qml/dialog/dialog_log.qml</file>
         <file>res/qml/dialog/dialog_guide.qml</file>
         <file>res/qml/updater.qml</file>
+        <file>res/qml/dialog/dialog_deviceguide.qml</file>
     </qresource>
 </RCC>

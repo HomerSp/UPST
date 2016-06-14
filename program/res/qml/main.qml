@@ -216,11 +216,9 @@ ApplicationWindow {
                         return;
                     }
 
-                    var component = Qt.createComponent("dialog/dialog_guide.qml");
+                    var component = Qt.createComponent("dialog/dialog_deviceguide.qml");
                     if (component.status === Component.Ready) {
-                        var url = "http://upst.ultimobile.net/userguide/devices/";
-                        var data = downloader.download(url + "index.html");
-                        deviceGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "name": "deviceguide", "guideData": data, "guideUrl": url, "title": qsTr("UPST - Device guides")});
+                        deviceGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "title": qsTr("UPST - Device guides")});
                         deviceGuideWindow.show();
                     } else {
                         console.error("Could not load device guide dialog: " + component.errorString());
@@ -368,324 +366,353 @@ ApplicationWindow {
 
         Rectangle {
             id: connectedDevicesListRectangle
-            width: connectedDevicesList.contentItem.childrenRect.width
+            implicitWidth: connectedDevicesLabel.implicitWidth
             Layout.minimumWidth: connectedDevicesLabel.Layout.minimumWidth
             Layout.fillHeight: true
             color: "#232b2e"
             z: 4
 
-            ListView {
-                signal refresh()
-                signal currentIndexChanged(int index)
-
-                id: connectedDevicesList
-                objectName: "connectedDevicesList"
+            ScrollView {
+                id: connectedDevicesListScroll
                 anchors.fill: parent
-                orientation: ListView.Vertical
-                currentIndex: 0
 
-                function updateWidth() {
-                    var largestWidth = 0;
-                    for(var i = 0; i < contentItem.children.length; i++) {
-                        if(contentItem.children[i].realWidth > largestWidth) {
-                            largestWidth = contentItem.children[i].realWidth;
+                implicitWidth: connectedDevicesListRectangle.implicitWidth
+
+                horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+                verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
+
+                ListView {
+                    signal refresh()
+                    signal currentIndexChanged(int index)
+
+                    id: connectedDevicesList
+                    objectName: "connectedDevicesList"
+                    anchors.fill: parent
+
+                    implicitWidth: connectedDevicesListScroll.implicitWidth
+
+                    orientation: ListView.Vertical
+                    currentIndex: 0
+
+                    function updateWidth() {
+                        var largestWidth = 0;
+                        for(var i = 0; i < contentItem.children.length; i++) {
+                            if(contentItem.children[i].realWidth > largestWidth) {
+                                largestWidth = contentItem.children[i].realWidth;
+                            }
+                        }
+
+                        for(i = 0; i < contentItem.children.length; i++) {
+                            contentItem.children[i].implicitWidth = largestWidth;
+                        }
+
+                        largestWidth += (connectedDevicesListScroll.childrenRect.width - connectedDevicesListScroll.contentItem.width);
+                        if(largestWidth > connectedDevicesListRectangle.implicitWidth) {
+                            connectedDevicesListRectangle.implicitWidth = largestWidth;
                         }
                     }
 
-                    for(i = 0; i < contentItem.children.length; i++) {
-                        contentItem.children[i].implicitWidth = largestWidth;
+                    onCurrentItemChanged: {
+                        this.currentIndexChanged(this.currentIndex)
+
+                        currentItem.updateProgress();
                     }
-                    implicitWidth = largestWidth;
-                }
 
-                onCurrentItemChanged: {
-                    this.currentIndexChanged(this.currentIndex)
+                    onCountChanged: {
+                        updateWidth();
+                    }
 
-                    currentItem.updateProgress();
-                }
+                    delegate: Component {
+                        id: deviceListDelegate
+                        Rectangle {
+                            property bool isProvisioned
+                            property bool haveError
+                            property bool haveChildren
+                            property int progressCurrent
+                            property int progressMax
+                            property int progressMin
+                            property int progressStatus
+                            property int realWidth
+                            property string progressError
 
-                onCountChanged: {
-                    updateWidth();
-                }
+                            objectName: "deviceInfoWrapper"
+                            id: deviceInfoWrapper
+                            anchors.left: parent.left
+                            Layout.fillWidth: true
+                            realWidth: 0
+                            height: deviceInfoContainer.height + deviceInfoStatusProgress.height
+                            x: 0
+                            color: "#00ffffff"
 
-                delegate: Component {
-                    id: deviceListDelegate
-                    Rectangle {
-                        property bool isProvisioned
-                        property bool haveError
-                        property bool haveChildren
-                        property int progressCurrent
-                        property int progressMax
-                        property int progressMin
-                        property int progressStatus
-                        property int realWidth
-                        property string progressError
+                            isProvisioned: progressStatus == 2
+                            haveError: progressError.length > 0
+                            haveChildren: deviceChildrenAvailable
+                            progressCurrent: provisionProgressCurrent
+                            progressMax: provisionProgressMax
+                            progressMin: provisionProgressMin
+                            progressStatus: provisionProgressStatus
+                            progressError: provisionProgressError
 
-                        objectName: "deviceInfoWrapper"
-                        id: deviceInfoWrapper
-                        anchors.left: parent.left
-                        Layout.fillWidth: true
-                        realWidth: 0
-                        height: deviceInfoContainer.height + deviceInfoStatusProgress.height
-                        x: 0
-                        color: "#00ffffff"
+                            onProgressCurrentChanged: {
+                                deviceInfoStatusProgress.value = progressCurrent;
+                            }
 
-                        isProvisioned: progressStatus == 2
-                        haveError: progressError.length > 0
-                        haveChildren: deviceChildrenAvailable
-                        progressCurrent: provisionProgressCurrent
-                        progressMax: provisionProgressMax
-                        progressMin: provisionProgressMin
-                        progressStatus: provisionProgressStatus
-                        progressError: provisionProgressError
+                            function updateItemWidth() {
+                                var w = ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth);
+                                var h = deviceInfoName.contentHeight + deviceInfoPort.contentHeight;
+                                implicitWidth = deviceInfoIcon.implicitWidth + w + unit.dp(20) + unit.dp(48) + (h / 2);
+                                realWidth = implicitWidth
 
-                        onProgressCurrentChanged: {
-                            deviceInfoStatusProgress.value = progressCurrent;
-                        }
+                                connectedDevicesList.updateWidth();
+                            }
 
-                        function updateItemWidth() {
-                            var w = ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth);
-                            var h = deviceInfoName.contentHeight + deviceInfoPort.contentHeight;
-                            implicitWidth = deviceInfoIcon.implicitWidth + w + unit.dp(20) + unit.dp(40) + (h / 2);
-                            realWidth = implicitWidth
+                            Behavior on color {
+                                ColorAnimation {}
+                            }
 
-                            connectedDevicesList.updateWidth();
-                        }
+                            Item {
+                                id: deviceInfoContainer
 
-                        Behavior on color {
-                            ColorAnimation {}
-                        }
+                                implicitWidth: deviceInfoIcon.implicitWidth + deviceInfoText.implicitWidth + unit.dp(48)
+                                height: deviceInfo.height + unit.dp(16)
 
-                        Item {
-                            id: deviceInfoContainer
+                                RowLayout {
+                                    id: deviceInfo
 
-                            implicitWidth: deviceInfoIcon.implicitWidth + deviceInfoText.implicitWidth + unit.dp(40)
-                            height: deviceInfo.height + unit.dp(16)
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: unit.dp(8)
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: unit.dp(8)
+                                    anchors.verticalCenter: parent.verticalCenter
 
-                            RowLayout {
-                                id: deviceInfo
+                                    spacing: 0
+                                    clip: true
 
-                                anchors.left: parent.left
-                                anchors.leftMargin: unit.dp(8)
+                                    Image {
+                                        id: deviceInfoIcon
+
+                                        Layout.fillHeight: true
+                                        Layout.rowSpan: 2
+
+                                        source: deviceIcon
+                                        fillMode: Image.PreserveAspectFit
+                                        mipmap: true
+                                        sourceSize.height: deviceInfoText.height
+                                    }
+
+                                    ColorOverlay {
+                                        anchors.fill: deviceInfoIcon
+                                        source: deviceInfoIcon
+                                        color: "#ffffff"
+                                    }
+
+                                    Column {
+                                        id: deviceInfoText
+
+                                        width: ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth)
+                                        anchors.left: deviceInfoIcon.right
+                                        anchors.leftMargin: unit.dp(8)
+
+                                        Text {
+                                            id: deviceInfoName
+
+                                            text: deviceName
+                                            color: (deviceAvailable)?"#ffffff":"#eeeeee"
+                                            font.pixelSize: unit.em(1.1)
+                                            font.family: openSansRegularFont.name
+                                            clip: true
+
+                                            onContentWidthChanged: {
+                                                updateItemWidth();
+                                            }
+                                            onContentHeightChanged: {
+                                                updateItemWidth();
+                                            }
+                                        }
+
+                                        Text {
+                                            id: deviceInfoPort
+
+                                            text: devicePort
+                                            color: deviceInfoName.color
+                                            font.pixelSize: unit.em(1.0)
+                                            font.family: openSansBoldFont.name
+                                            font.bold: true
+                                            clip: true
+
+                                            onContentWidthChanged: {
+                                                updateItemWidth();
+                                            }
+                                            onContentHeightChanged: {
+                                                updateItemWidth();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Image {
+                                id: deviceInfoStatus
+
+                                anchors.verticalCenter: parent.verticalCenter
                                 anchors.right: parent.right
                                 anchors.rightMargin: unit.dp(8)
-                                anchors.verticalCenter: parent.verticalCenter
 
-                                spacing: 0
-                                clip: true
+                                opacity: (progressStatus > 0)?1.0:0.0
 
-                                Image {
-                                    id: deviceInfoIcon
+                                source: "qrc:/res/images/icons/" + ((progressStatus == 4)?"queued":(progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
+                                fillMode: Image.PreserveAspectFit
+                                mipmap: true
+                                sourceSize.height: deviceInfoText.height / 2
 
-                                    Layout.fillHeight: true
-                                    Layout.rowSpan: 2
-
-                                    source: deviceIcon
-                                    fillMode: Image.PreserveAspectFit
-                                    mipmap: true
-                                    sourceSize.height: deviceInfoText.height
-                                }
-
-                                ColorOverlay {
-                                    anchors.fill: deviceInfoIcon
-                                    source: deviceInfoIcon
-                                    color: "#ffffff"
-                                }
-
-                                Column {
-                                    id: deviceInfoText
-
-                                    width: ((deviceInfoName.contentWidth > deviceInfoPort.contentWidth)?deviceInfoName.contentWidth:deviceInfoPort.contentWidth)
-                                    anchors.left: deviceInfoIcon.right
-                                    anchors.leftMargin: unit.dp(8)
-
-                                    Text {
-                                        id: deviceInfoName
-
-                                        text: deviceName
-                                        color: (deviceAvailable)?"#ffffff":"#eeeeee"
-                                        font.pixelSize: unit.em(1.1)
-                                        font.family: openSansRegularFont.name
-                                        clip: true
-
-                                        onContentWidthChanged: {
-                                            updateItemWidth();
-                                        }
-                                        onContentHeightChanged: {
-                                            updateItemWidth();
-                                        }
-                                    }
-
-                                    Text {
-                                        id: deviceInfoPort
-
-                                        text: devicePort
-                                        color: deviceInfoName.color
-                                        font.pixelSize: unit.em(1.0)
-                                        font.family: openSansBoldFont.name
-                                        font.bold: true
-                                        clip: true
-
-                                        onContentWidthChanged: {
-                                            updateItemWidth();
-                                        }
-                                        onContentHeightChanged: {
-                                            updateItemWidth();
-                                        }
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 150
                                     }
                                 }
                             }
-                        }
 
-                        Image {
-                            id: deviceInfoStatus
+                            ProgressBar {
+                                id: deviceInfoStatusProgress
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
 
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
-                            anchors.rightMargin: unit.dp(8)
+                                minimumValue: progressMin
+                                maximumValue: progressMax
+                                value: 0
 
-                            opacity: (progressStatus > 0)?1.0:0.0
+                                opacity: (progressStatus > 0)?1.0:0.0
 
-                            source: "qrc:/res/images/icons/" + ((progressStatus == 4)?"queued":(progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
-                            fillMode: Image.PreserveAspectFit
-                            mipmap: true
-                            sourceSize.height: deviceInfoText.height / 2
+                                style: ProgressBarStyle {
+                                    background: Rectangle {
+                                        color: 'transparent'
 
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: 150
+                                        implicitHeight: unit.dp(4)
+                                    }
+                                    progress: Rectangle {
+                                        color: '#FFF'
+                                    }
                                 }
-                            }
-                        }
 
-                        ProgressBar {
-                            id: deviceInfoStatusProgress
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-
-                            minimumValue: progressMin
-                            maximumValue: progressMax
-                            value: 0
-
-                            opacity: (progressStatus > 0)?1.0:0.0
-
-                            style: ProgressBarStyle {
-                                background: Rectangle {
-                                    color: 'transparent'
-
-                                    implicitHeight: unit.dp(4)
-                                }
-                                progress: Rectangle {
-                                    color: '#FFF'
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 150
+                                    }
                                 }
                             }
 
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: 150
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: mouser
-                            anchors.fill: parent
-                            onClicked: connectedDevicesList.currentIndex = index
-                            hoverEnabled: true
-                        }
-
-                        states: [
-                            State {
-                                name: "hover"
-                                when: mouser.containsMouse && !mouser.pressed
-
-                                PropertyChanges {
-                                    target: deviceInfoWrapper
-                                    color: "#33ffffff"
-                                }
-                                PropertyChanges {
-                                    target: deviceInfo
-                                    anchors.leftMargin: unit.dp(12)
-                                }
-                            },
-                            State {
-                                name: "click"
-                                when: mouser.pressed
-
-                                PropertyChanges {
-                                    target: deviceInfoWrapper
-                                    color: "#33000000"
-                                }
-                                PropertyChanges {
-                                    target: deviceInfo
-                                    anchors.leftMargin: unit.dp(12)
-                                }
-                            }
-                        ]
-
-                        transitions: Transition {
-                            NumberAnimation { properties: "anchors.leftMargin"; duration: 100 }
-                        }
-
-                        onIsProvisionedChanged: {
-                            updateProgress();
-                        }
-                        onHaveErrorChanged: {
-                            updateProgress();
-                        }
-                        onHaveChildrenChanged: {
-                            updateProgress();
-                        }
-
-                        function updateProgress() {
-                            if(connectedDevicesList.currentIndex != index) {
-                                return;
+                            MouseArea {
+                                id: mouser
+                                anchors.fill: parent
+                                onClicked: connectedDevicesList.currentIndex = index
+                                hoverEnabled: true
                             }
 
-                            if(haveError) {
-                                provisionSuccessContainer.hide();
-                                deviceWaitingPortContainer.hide()
+                            states: [
+                                State {
+                                    name: "normal"
+                                    when: !mouser.containsMouse
+                                    PropertyChanges {
+                                        target: deviceInfoWrapper
+                                        color: "#00ffffff"
+                                    }
+                                    PropertyChanges {
+                                        target: deviceInfo
+                                        anchors.leftMargin: unit.dp(8)
+                                    }
+                                },
+                                State {
+                                    name: "hover"
+                                    when: mouser.containsMouse && !mouser.pressed
 
-                                provisionFailedContainer.showError(progressError);
-                            } else {
-                                provisionFailedContainer.hide();
+                                    PropertyChanges {
+                                        target: deviceInfoWrapper
+                                        color: "#33ffffff"
+                                    }
+                                    PropertyChanges {
+                                        target: deviceInfo
+                                        anchors.leftMargin: unit.dp(12)
+                                    }
+                                },
+                                State {
+                                    name: "click"
+                                    when: mouser.pressed
 
-                                if(isProvisioned) {
-                                    provisionFailedContainer.hide();
+                                    PropertyChanges {
+                                        target: deviceInfoWrapper
+                                        color: "#33000000"
+                                    }
+                                    PropertyChanges {
+                                        target: deviceInfo
+                                        anchors.leftMargin: unit.dp(12)
+                                    }
+                                }
+                            ]
+
+                            transitions: Transition {
+                                NumberAnimation { properties: "anchors.leftMargin"; duration: 100 }
+                            }
+
+                            onIsProvisionedChanged: {
+                                updateProgress();
+                            }
+                            onHaveErrorChanged: {
+                                updateProgress();
+                            }
+                            onHaveChildrenChanged: {
+                                updateProgress();
+                            }
+
+                            function updateProgress() {
+                                if(connectedDevicesList.currentIndex != index) {
+                                    return;
+                                }
+
+                                if(haveError) {
+                                    provisionSuccessContainer.hide();
                                     deviceWaitingPortContainer.hide()
 
-                                    if(deviceFlagManualReboot) {
-                                        provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
-                                    } else {
-                                        provisionSuccessContainer.showError("");
-                                    }
+                                    provisionFailedContainer.showError(progressError);
                                 } else {
-                                    provisionSuccessContainer.hide();
+                                    provisionFailedContainer.hide();
 
-                                    if(deviceFlagMultiPort && !haveChildren) {
+                                    if(isProvisioned) {
                                         provisionFailedContainer.hide();
+                                        deviceWaitingPortContainer.hide()
+
+                                        if(deviceFlagManualReboot) {
+                                            provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
+                                        } else {
+                                            provisionSuccessContainer.showError("");
+                                        }
+                                    } else {
                                         provisionSuccessContainer.hide();
 
-                                        deviceWaitingPortContainer.show();
-                                    } else {
-                                        deviceWaitingPortContainer.hide();
+                                        if(deviceFlagMultiPort && !haveChildren) {
+                                            provisionFailedContainer.hide();
+                                            provisionSuccessContainer.hide();
+
+                                            deviceWaitingPortContainer.show();
+                                        } else {
+                                            deviceWaitingPortContainer.hide();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                highlight: Component {
-                    Rectangle {
-                        color: "#5f92eb"
-                        width: connectedDevicesListRectangle.width
-                        height: deviceListDelegate.height
+                    highlight: Component {
+                        Rectangle {
+                            color: "#5f92eb"
+                            width: connectedDevicesListRectangle.width
+                            height: deviceListDelegate.height
+                        }
                     }
-                }
 
-                model: devicesModel
-                focus: true
+                    model: devicesModel
+                    focus: true
+                }
             }
         }
 

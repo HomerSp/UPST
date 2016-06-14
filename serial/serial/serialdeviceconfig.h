@@ -16,6 +16,8 @@ namespace Serial {
             return mIsValid;
         }
 
+        QList<SerialDevice*> getDeviceGuides();
+
         bool updateDevice(SerialDevice* device);
 
         static void updateConfig();

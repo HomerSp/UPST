@@ -33,6 +33,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mModel(""),
       mType(SerialDeviceTypeUnknown),
       mFlags(0),
+      mGuide(QJsonObject()),
       mMdn(""),
       mMin(-1),
       mESN(0),
@@ -43,15 +44,23 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mNewMdn(""),
       mNewMin(-1)
 {
-    mCommunicator = new SerialCommunicator(*this);
-    if(mCommunicator->open()) {
-        mCommunicator->clear();
+    if(!port.isEmpty()) {
+        mCommunicator = new SerialCommunicator(*this);
+        if(mCommunicator->open()) {
+            mCommunicator->clear();
+        }
     }
 }
 
 SerialDevice::SerialDevice(const QSerialPortInfo& info)
     : SerialDevice(info.portName(), info.vendorIdentifier(), info.productIdentifier()) {
 
+}
+
+SerialDevice::SerialDevice(const QJsonObject& obj)
+    : SerialDevice("", 0, 0)
+{
+    updateJson(obj);
 }
 
 SerialDevice::~SerialDevice() {
@@ -275,6 +284,10 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
 
         if(obj.contains("flags")) {
             mFlags = obj["flags"].toInt();
+        }
+
+        if(obj.contains("guide")) {
+            mGuide = obj["guide"].toObject();
         }
 
         return true;

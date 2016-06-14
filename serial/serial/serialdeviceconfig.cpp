@@ -35,6 +35,28 @@ SerialDeviceConfig::~SerialDeviceConfig() {
 
 }
 
+QList<SerialDevice*> SerialDeviceConfig::getDeviceGuides() {
+    QList<SerialDevice*> ret;
+
+    if(!mDevices.isObject() || mDevices.object().isEmpty() || !mDevices.object().contains("devices")) {
+        return ret;
+    }
+
+     QJsonArray devicesArr = mDevices.object()["devices"].toArray();
+     if(devicesArr.isEmpty()) {
+         return ret;
+     }
+
+     foreach(QJsonValue val, devicesArr) {
+        QJsonObject obj = val.toObject();
+        if(obj.contains("guide")) {
+            ret.append(new SerialDevice(obj));
+        }
+     }
+
+     return ret;
+}
+
 bool SerialDeviceConfig::update(const QString& data) {
 #ifdef TESTING_MODE
     if(QFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/data/devices.json").exists()) {

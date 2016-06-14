@@ -35,6 +35,8 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     QObject::connect(this, &UI::MainUI::deviceChanged, mDevicesModel, &UI::ConnectedDevicesModel::deviceChanged);
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
+    mDeviceGuideListModel = new UI::Guide::DeviceGuideListModel(this);
+
     QDateTime buildTime;
     buildTime.setTime_t(QString(PROG_BUILDTIME).toULongLong());
 
@@ -53,6 +55,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
     mEngine->rootContext()->setContextProperty("userDisplayName", "");
     mEngine->rootContext()->setContextProperty("downloader", &mDownloader);
+    mEngine->rootContext()->setContextProperty("deviceGuideListModel", mDeviceGuideListModel);
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
@@ -131,6 +134,7 @@ UI::MainUI::~MainUI() {
 void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* config) {
     qDebug()<<"devicesListChanged main"<<success;
     if(success) {
+        mDeviceGuideListModel->setDeviceConfig(config);
         mDeviceWorker->setDeviceConfig(config);
     }
 
@@ -443,7 +447,7 @@ void UI::MainUI::updateLoginStatus(bool loggedIn) {
 
 void UI::MainUI::versionUpdateCheck() {
     QObject* rootObject = mEngine->rootObjects().first();
-    QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loggingInView"), " setCheckForUpdates", Q_ARG(QVariant, true));
+    QMetaObject::invokeMethod(rootObject->findChild<QObject*>("loggingInView"), "setCheckForUpdates", Q_ARG(QVariant, true));
 }
 
 void UI::MainUI::versionUpdateAvailable(const QString& updaterDir, const QString &id, const QString &version, const QDateTime &updateTime) {
@@ -484,7 +488,7 @@ void UI::MainUI::doRefresh() {
 
 void UI::MainUI::provisionAll() {
     foreach(Serial::SerialDevice* device, mDevices) {
-        if(!device->canProvision() || device->newMdn().size() == 0 || device->newMin() == -1) {
+        if(!device->canProvision() || device->newMdn().size() == 0 || device->newMin() == static_cast<uint64_t>(-1)) {
             continue;
         }
 

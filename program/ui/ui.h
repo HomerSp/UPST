@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QSet>
 
+#include "guide/deviceguidelistmodel.h"
 #include "connecteddevicesmodel.h"
 #include "loghandler.h"
 #include "worker/uiworker.h"
@@ -124,6 +125,8 @@ namespace UI {
         QMap<QString, int> mDeviceRechecks;
 
         int mCurrentIndex;
+
+        UI::Guide::DeviceGuideListModel* mDeviceGuideListModel;
     };
 
     class UISection : public QObject {

@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
             QSettings buildSettings(buildFile.fileName(), QSettings::IniFormat);
             buildTime = buildSettings.value("time").toULongLong();
             buildVersion = buildSettings.value("version").toString();
-            buildTesting = buildSettings.value("testing").toBool();
+            buildTesting = buildSettings.value("testing", false).toBool();
         }
 
         QByteArray data;
