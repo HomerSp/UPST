@@ -197,9 +197,7 @@ ApplicationWindow {
 
                     var component = Qt.createComponent("dialog/dialog_guide.qml");
                     if (component.status === Component.Ready) {
-                        var url = "http://upst.ultimobile.net/userguide/";
-                        var data = downloader.download(url + "index.html");
-                        userGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "name": "userguide", "guideData": data, "guideUrl": url, "title": qsTr("UPST - User guide")});
+                        userGuideWindow = component.createObject(null, {"x": mainWindow.x, "y": mainWindow.y, "guideData": userGuideHelper.getData(), "title": qsTr("UPST - User guide")});
                         userGuideWindow.show();
                     } else {
                         console.error("Could not load user guide dialog: " + component.errorString());
@@ -209,7 +207,11 @@ ApplicationWindow {
 
             MenuItem {
                 id: helpMenuDeviceGuide
+                objectName: "helpMenuDeviceGuide"
+
                 text: qsTr("Device guides")
+
+                visible: false
                 onTriggered: {
                     if(deviceGuideWindow != null) {
                         deviceGuideWindow.requestActivate();

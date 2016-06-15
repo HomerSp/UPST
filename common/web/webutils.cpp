@@ -18,6 +18,11 @@ bool WebUtils::download(const QUrl& url, QByteArray& output) {
     return download(url, output, headers);
 }
 
+bool WebUtils::download(const QUrl& url, QByteArray& output, QString postData, WebDownloadStatus* status) {
+    QHash<QString, QString> headers;
+    return download(url, output, headers, postData, status);
+}
+
 bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData, WebDownloadStatus* status) {
     WebLoop loop;
 

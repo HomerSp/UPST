@@ -43,6 +43,7 @@ namespace Web {
     {
     public:
         static bool download(const QUrl& url, QByteArray& output);
+        static bool download(const QUrl& url, QByteArray& output, QString postData, WebDownloadStatus* status = nullptr);
         static bool download(const QUrl& url, QByteArray& output, const QHash<QString, QString> &headers, QString postData = "", WebDownloadStatus* status = nullptr);
 
     private:

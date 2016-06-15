@@ -18,6 +18,7 @@ DeviceGuideListModel::~DeviceGuideListModel() {
         if(item->Device != nullptr) {
             delete item->Device;
         }
+        item->Device = nullptr;
 
         delete item;
     }
@@ -25,6 +26,10 @@ DeviceGuideListModel::~DeviceGuideListModel() {
 
 QVariant DeviceGuideListModel::data(const QModelIndex& index, int role) const {
     DeviceGuideListItem* item = mItems.at(index.row());
+    if(item == nullptr) {
+        return "";
+    }
+
     if(item->Header.size() > 0) {
         switch(role) {
         case HeaderRole:
@@ -35,6 +40,10 @@ QVariant DeviceGuideListModel::data(const QModelIndex& index, int role) const {
             break;
         }
 
+        return "";
+    }
+
+    if(item->Device == nullptr) {
         return "";
     }
 
@@ -167,13 +176,13 @@ QString DeviceGuideListModel::deviceData(int index) {
     QJsonArray steps = obj["data"].toArray();
     for(int i = 0; i < steps.size(); i++) {
         QJsonObject step = steps.at(i).toObject();
-        data += "<h2>" + QString::number(i + 1) + " - " + step["header"].toString() + "</h2>";
+        data += "<h2>" + QString::number(i + 1) + " - " + step["header"].toString("") + "</h2>";
 
         data += "<p>";
 
         QJsonArray lines = step["lines"].toArray();
         for(int y = 0; y < lines.size(); y++) {
-            data += QString::number(y + 1) + ". " + lines.at(y).toString();
+            data += QString::number(y + 1) + ". " + lines.at(y).toString("");
             if(y < lines.size() - 1) {
                 data += "<br/>";
             }
@@ -186,7 +195,7 @@ QString DeviceGuideListModel::deviceData(int index) {
 
     data += "</td>";
 
-    if(obj.contains("image")) {
+    if(obj.contains("image") && obj["image"].toString().length() > 0) {
         data += "<td width=\"450\" class=\"content-right\"><img src=\"" + obj["image"].toString() + "\" align=\"right\"/></td>";
     }
     data += "</tr></table></div></div></body>";

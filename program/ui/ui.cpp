@@ -16,15 +16,6 @@
 #include "section/manual.h"
 #include "section/provision.h"
 
-QString UI::WebDownloader::download(const QString& url) const {
-    QByteArray data;
-    if(!Web::WebUtils::download(QUrl(url), data)) {
-        return "";
-    }
-
-    return QString(data);
-}
-
 UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool updateFailed)
     : QObject(),
       mApp(app),
@@ -36,6 +27,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     QObject::connect(this, &UI::MainUI::deviceUpdate, mDevicesModel, &UI::ConnectedDevicesModel::deviceUpdate);
 
     mDeviceGuideListModel = new UI::Guide::DeviceGuideListModel(this);
+    mUserGuideHelper = new UI::Guide::UserGuideHelper(this);
 
     QDateTime buildTime;
     buildTime.setTime_t(QString(PROG_BUILDTIME).toULongLong());
@@ -54,7 +46,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
     mEngine->rootContext()->setContextProperty("devicesModel", mDevicesModel);
     mEngine->rootContext()->setContextProperty("userTokenSet", QSettings().contains("user/token"));
     mEngine->rootContext()->setContextProperty("userDisplayName", "");
-    mEngine->rootContext()->setContextProperty("downloader", &mDownloader);
+    mEngine->rootContext()->setContextProperty("userGuideHelper", mUserGuideHelper);
     mEngine->rootContext()->setContextProperty("deviceGuideListModel", mDeviceGuideListModel);
 
     QObject::connect(mEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
@@ -136,6 +128,8 @@ void UI::MainUI::devicesListChanged(bool success, Serial::SerialDeviceConfig* co
     if(success) {
         mDeviceGuideListModel->setDeviceConfig(config);
         mDeviceWorker->setDeviceConfig(config);
+
+        mEngine->rootObjects().first()->findChild<QObject*>("helpMenuDeviceGuide")->setProperty("visible", true);
     }
 
     emit loggedIn();
@@ -372,6 +366,8 @@ void UI::MainUI::logout() {
     settings.remove("user/display_name");
 
     updateLoginStatus(false);
+
+    mEngine->rootObjects().first()->findChild<QObject*>("helpMenuDeviceGuide")->setProperty("visible", true);
 
     emit loggedOut();
 

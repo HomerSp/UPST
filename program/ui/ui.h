@@ -8,6 +8,7 @@
 #include <QSet>
 
 #include "guide/deviceguidelistmodel.h"
+#include "guide/userguidehelper.h"
 #include "connecteddevicesmodel.h"
 #include "loghandler.h"
 #include "worker/uiworker.h"
@@ -17,12 +18,6 @@
 
 namespace UI {
     class UISection;
-
-    class WebDownloader: public QObject {
-        Q_OBJECT
-    public:
-        Q_INVOKABLE QString download(const QString& url) const;
-    };
 
     class MainUI : public QObject
     {
@@ -108,8 +103,6 @@ namespace UI {
 
         const QGuiApplication& mApp;
 
-        WebDownloader mDownloader;
-
         UISection* mSection;
 
         QQmlApplicationEngine *mEngine;
@@ -127,6 +120,7 @@ namespace UI {
         int mCurrentIndex;
 
         UI::Guide::DeviceGuideListModel* mDeviceGuideListModel;
+        UI::Guide::UserGuideHelper* mUserGuideHelper;
     };
 
     class UISection : public QObject {
