@@ -69,7 +69,7 @@ Window {
                 anchors.rightMargin: unit.dp(16)
                 anchors.verticalCenter: parent.verticalCenter
 
-                height: parent.height / 2
+                height: logoText.height
 
                 source: "qrc:/res/images/logo.svg"
                 fillMode: Image.PreserveAspectFit
@@ -77,6 +77,7 @@ Window {
             }
 
             ColumnLayout {
+                id: logoText
                 Layout.fillWidth: true
 
                 anchors.left: parent.left
@@ -312,6 +313,8 @@ Window {
                             }
                         }
                     }
+                    highlightMoveDuration: 100
+                    highlightMoveVelocity: 800
                     highlight: Component {
                         Rectangle {
                             color: "#5f92eb"

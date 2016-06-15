@@ -702,6 +702,8 @@ ApplicationWindow {
                             }
                         }
                     }
+                    highlightMoveDuration: 100
+                    highlightMoveVelocity: 800
                     highlight: Component {
                         Rectangle {
                             color: "#5f92eb"
