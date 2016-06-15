@@ -56,7 +56,11 @@ QString UserGuideHelper::getData() {
         data += "<h2>" + step["header"].toString("") + "</h2>";
 
         data += "<p>" + step["line"].toString() + "</p>";
-        data += "</td><td class=\"content-right\" width=\"480\"><img src=\"" + step["image"].toString() + "\" align=\"right\"/></td></tr>";
+        data += "</td><td class=\"content-right\" width=\"480\">";
+        if(step.contains("image") && step["image"].toString().length() > 0) {
+            data += "<img src=\"" + step["image"].toString() + "\" align=\"right\"/>";
+        }
+        data += "</td></tr>";
     }
 
     data += "</table></div></div></body>";
