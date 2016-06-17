@@ -43,7 +43,7 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
     }
 
     if(reply == nullptr) {
-        manager->deleteLater();
+        delete manager;
         return false;
     }
 
@@ -53,13 +53,16 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
 
     loop.exec();
 
-    if(reply->error() == QNetworkReply::NoError) {
+    bool success = reply->error() == QNetworkReply::NoError;
+    if(success) {
         output.clear();
         output = reply->readAll();
     }
 
-    reply->deleteLater();
-    manager->deleteLater();
+    QObject::disconnect(reply, &QNetworkReply::downloadProgress, status, &WebDownloadStatus::progress);
 
-    return reply->error() == QNetworkReply::NoError;
+    delete reply;
+    delete manager;
+
+    return success;
 }
