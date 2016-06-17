@@ -177,6 +177,7 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
     // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
         if(*d == *device) {
+            qInfo()<<"Deleting already existing device"<<device->portStr();
             delete device;
             return;
         }
@@ -484,6 +485,10 @@ void UI::MainUI::doRefresh() {
 
 void UI::MainUI::provisionAll() {
     foreach(Serial::SerialDevice* device, mDevices) {
+        if(device->newMdn().size() == 0) {
+            device->setProvisionData(device->mdn(), device->min());
+        }
+
         if(!device->canProvision() || device->newMdn().size() == 0 || device->newMin() == static_cast<uint64_t>(-1)) {
             continue;
         }
