@@ -15,6 +15,7 @@ namespace Serial {
         virtual ~SerialProvisionData();
 
         enum UserType {
+            UserTypeNone = 0xff,
             UserTypeMDN = 0,
             UserTypeESN,
             UserTypeMIN,
@@ -80,6 +81,7 @@ namespace Serial {
 
         bool mValid;
 
+        Serial::QCDM::RTREMode mRTREMode;
         QString mCarrierSPC;
         bool mSequentialOffline;
         QString mPassword16;

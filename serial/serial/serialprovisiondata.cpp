@@ -10,10 +10,16 @@ using namespace Serial;
 
 SerialProvisionData::SerialProvisionData(SerialDevice* device)
     : mDevice(device),
-      mValid(false)
+      mValid(false),
+      mRTREMode(Serial::QCDM::RTREModeNVOnly),
+      mCarrierSPC(""),
+      mSequentialOffline(false),
+      mPassword16(""),
+      mUserType(UserTypeNone),
+      mUser(""),
+      mUserProfIndex(0)
 {
-    mSequentialOffline = false;
-    mPassword16 = "";
+
 }
 
 SerialProvisionData::~SerialProvisionData() {
@@ -29,27 +35,33 @@ void SerialProvisionData::resetCommands() {
 }
 
 void SerialProvisionData::update(const QJsonObject& rootObject) {
+    if(rootObject.contains("rtreMode")) {
+        mRTREMode = static_cast<Serial::QCDM::RTREMode>(rootObject["rtreMode"].toInt());
+    }
     if(rootObject.contains("carrierSPC")) {
         mCarrierSPC = rootObject["carrierSPC"].toString();
     }
     if(rootObject.contains("sequentialOffline")) {
         mSequentialOffline = rootObject["sequentialOffline"].toString().toUInt() != 0;
     }
-    if(rootObject.contains("sixteendigitpassword") && rootObject["sixteendigitpassword"].toString() != "null") {
+    if(rootObject.contains("sixteendigitpassword") && rootObject["sixteendigitpassword"].toString().length() > 0) {
         mPassword16 = rootObject["sixteendigitpassword"].toString();
     }
-    mUserType = static_cast<UserType>(rootObject["userType"].toString().toUInt());
-    mUser = getUser(mDevice, mUserType, rootObject["user"].toString());
-    mUserProfIndex = 0;
+    if(rootObject.contains("userType")) {
+        mUserType = static_cast<UserType>(rootObject["userType"].toString().toUInt());
+    }
+    if(rootObject.contains("user")) {
+        mUser = getUser(mDevice, mUserType, rootObject["user"].toString());
+    }
     if(rootObject.contains("genUserProf")) {
         mUserProfIndex = static_cast<uint8_t>(rootObject["genUserProf"].toObject()["index"].toString().toUInt());
     }
 
     updateObj("", rootObject);
 
-    if(rootObject.contains("calibrationFile") && rootObject["calibrationFile"].toString() != "null") {
+    if(rootObject.contains("calibrationFile") && rootObject["calibrationFile"].toString().length() > 0) {
         QString md5 = "";
-        if(rootObject.contains("calibrationFilemd5")) {
+        if(rootObject.contains("calibrationFilemd5") && rootObject["calibrationFilemd5"].toString().length() > 0) {
             md5 = rootObject["calibrationFilemd5"].toString();
         }
         updateCalibration(QUrl(rootObject["calibrationFile"].toString()), md5);

@@ -562,7 +562,7 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
 }
 
 bool SerialDevice::sendSPC(SerialDevice* device, SerialProvisionData* data) {
-    // Try the one from the device first.
+    // Try the one from the device first, if applicable.
     if(mSPC.size() > 0) {
         Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, mSPC.toLatin1());
         spcCommand.setTimeout(10000);
