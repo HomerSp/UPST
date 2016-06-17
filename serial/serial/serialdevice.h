@@ -304,6 +304,8 @@ namespace Serial {
         bool provision(SerialProvisionData* data);
         bool provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd);
 
+        bool sendSPC(SerialDevice* device, SerialProvisionData* data);
+
         SerialCommunicator* mCommunicator;
 
         QList<SerialDevice*> mChildren;

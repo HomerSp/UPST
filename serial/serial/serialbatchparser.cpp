@@ -144,7 +144,7 @@ bool SerialBatchParser::updateDevice(SerialDevice* device) {
         }
         }
 
-        device->setProvisionData(item->MDN, item->MIN);
+        device->setProvisionData(item->MDN, item->MIN, item->SPC);
         return true;
     }
 

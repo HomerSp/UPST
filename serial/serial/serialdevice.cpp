@@ -44,7 +44,8 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mProvisioning(false),
       mProvisionStop(false),
       mNewMdn(""),
-      mNewMin(-1)
+      mNewMin(-1),
+      mSPC("")
 {
     if(!port.isEmpty()) {
         mCommunicator = new SerialCommunicator(*this);
@@ -399,12 +400,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         qDebug()<<"===== Writing SPC =====";
-        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
-        spcCommand.setTimeout(10000);
-        spcCommand.execute();
-        if(spcCommand.result()->success()) {
-            qDebug()<<"Result="<<spcCommand.result()->data().toString();
-        } else {
+        if(!sendSPC(device, data)) {
             qCritical()<<"Could not unlock SPC";
             ret = false;
             break;
@@ -539,10 +535,8 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
             }
         }
 
-        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
-        spcCommand.setTimeout(10000);
-        spcCommand.execute();
-        if(!spcCommand.resultSuccess()) {
+        if(!sendSPC(device, data)) {
+            qCritical()<<"Could not unlock SPC";
             return false;
         }
     }
@@ -565,4 +559,22 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     }
 
     return true;
+}
+
+bool SerialDevice::sendSPC(SerialDevice* device, SerialProvisionData* data) {
+    // Try the one from the device first.
+    if(mSPC.size() > 0) {
+        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, mSPC.toLatin1());
+        spcCommand.setTimeout(10000);
+        spcCommand.execute();
+        if(spcCommand.resultSuccess()) {
+            return true;
+        }
+    }
+
+    // If that doesn't work, try the one from the provision data.
+    Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+    spcCommand.setTimeout(10000);
+    spcCommand.execute();
+    return (spcCommand.resultSuccess());
 }
