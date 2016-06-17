@@ -50,13 +50,12 @@ QString UserGuideHelper::getData() {
     for(int i = 0; i < steps.size(); i++) {
         QJsonObject step = steps.at(i).toObject();
 
-        data += "<tr>\
-                <td class=\"content-left\">";
-
-        data += "<h2>" + step["header"].toString("") + "</h2>";
-
-        data += "<p>" + step["line"].toString() + "</p>";
-        data += "</td><td class=\"content-right\" width=\"480\">";
+        data += "<tr height=\"400\">\
+                    <td class=\"content-left\">\
+                        <h2>" + step["header"].toString("") + "</h2>\
+                        <p>" + step["line"].toString() + "</p>\
+                    </td>\
+                    <td class=\"content-right\" width=\"480\"  height=\"400\">";
         if(step.contains("image") && step["image"].toString().length() > 0) {
             data += "<img src=\"" + step["image"].toString() + "\" align=\"right\"/>";
         }

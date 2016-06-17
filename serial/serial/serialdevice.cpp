@@ -15,6 +15,7 @@
 #include "qcdm/commands/nvcommands/meidcommand.h"
 #include "qcdm/commands/nvcommands/mdncommand.h"
 #include "qcdm/commands/nvcommands/mincommand.h"
+#include "qcdm/commands/nvcommands/rtrecommand.h"
 #include "qcdm/commands/passwordcommand.h"
 #include "qcdm/commands/prlcommand.h"
 #include "qcdm/commands/radiomodecommand.h"
@@ -39,6 +40,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mESN(0),
       mIMEI(0),
       mMEID(0),
+      mRTRE(Serial::QCDM::RTREModeNone),
       mProvisioning(false),
       mProvisionStop(false),
       mNewMdn(""),
@@ -250,7 +252,14 @@ bool SerialDevice::update(bool* reschedule) {
         mMin = minCmd.result()->data().toULongLong();
     }
 
-    qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin;
+    qDebug()<<"====== GETTING RTRE ======";
+    Serial::QCDM::Commands::Nv::RTRECommand rtreCommand(this);
+    rtreCommand.execute();
+    if(rtreCommand.result()->success()) {
+        mRTRE = rtreCommand.mode();
+    }
+
+    qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin<<", RTRE:"<<mRTRE;
 
     return true;
 }
@@ -415,7 +424,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(mdnCmd.result()->success()) {
             qDebug()<<"Result="<<mdnCmd.result()->data().toString();
         } else {
-            qCritical()<<"Could not write MDN";
+            qCritical()<<"Could not write MDN"<<mdnCmd.result()->errorCode();
             ret = false;
             break;
         }
@@ -434,7 +443,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(minCmd.result()->success()) {
             qDebug()<<"Result="<<minCmd.result()->data().toString();
         } else {
-            qCritical()<<"Could not write MIN";
+            qCritical()<<"Could not write MIN"<<minCmd.result()->errorCode();
             ret = false;
             break;
         }
@@ -502,6 +511,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
+        if(mRTRE != Serial::QCDM::RTREModeNVOnly) {
+            emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRTRE);
+        }
+
         // If we can't communicate with the device anymore, consider it removed.
         if(!valid) {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRemoved);

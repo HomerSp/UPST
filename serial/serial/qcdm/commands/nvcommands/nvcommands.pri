@@ -6,7 +6,8 @@ HEADERS += \
     $$PWD/imeicommand.h \
     $$PWD/meidcommand.h \
     $$PWD/esncommand.h \
-    $$PWD/mincommand.h
+    $$PWD/mincommand.h \
+    $$PWD/rtrecommand.h
 SOURCES += \  
     $$PWD/nvcommand.cpp \
     $$PWD/mdncommand.cpp \

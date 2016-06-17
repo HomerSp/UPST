@@ -102,6 +102,8 @@ QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError
         return "Failed to write one or more items.";
     case Serial::SerialProvisionErrorRemoved:
         return "The device was removed prematurely.";
+    case Serial::SerialProvisionErrorRTRE:
+        return "The device is configured to read from SIM only.";
     default:
         return "";
     }

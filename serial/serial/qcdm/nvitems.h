@@ -6247,6 +6247,12 @@ namespace Serial {
             NV_GENERIC_NAM_UINT16_ARRAY,
             NV_GENERIC_NAM_ANSI_ARRAY,
         };
+
+        enum RTREMode {
+            RTREModeNone = 0xFF,
+            RTREModeRUIMOnly = 0,
+            RTREModeNVOnly,
+        };
     }
 }
 #endif // SERIAL_QCDM_NVITEMS_H

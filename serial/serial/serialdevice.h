@@ -5,6 +5,8 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
+#include "qcdm/nvitems.h"
+
 namespace Serial {
     class SerialCommunicator;
     class SerialCommand;
@@ -32,6 +34,7 @@ namespace Serial {
         SerialProvisionErrorData,
         SerialProvisionErrorNv,
         SerialProvisionErrorRemoved,
+        SerialProvisionErrorRTRE,
     };
 
     enum SerialDeviceFlags {
@@ -327,6 +330,7 @@ namespace Serial {
         uint32_t mESN;
         uint64_t mIMEI;
         uint64_t mMEID;
+        Serial::QCDM::RTREMode mRTRE;
 
         bool mProvisioning;
         bool mProvisionStop;

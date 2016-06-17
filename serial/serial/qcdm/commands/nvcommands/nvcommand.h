@@ -69,8 +69,8 @@ namespace Serial {
                     virtual void execute();
 
                     uint8_t resultData() {
-                        return result()->data().toChar().toLatin1();                    }
-
+                        return result()->data().toChar().toLatin1();
+                    }
                 };
 
                 class NvCommand16Bit : public NvCommand
