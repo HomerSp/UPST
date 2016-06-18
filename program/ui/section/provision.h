@@ -15,6 +15,8 @@ namespace UI {
             virtual void beforeDeviceChanged();
             virtual void update();
 
+            virtual void saveChanges();
+
         protected slots:
             void provision();
         };

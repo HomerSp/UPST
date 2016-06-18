@@ -486,6 +486,8 @@ void UI::MainUI::doRefresh() {
 }
 
 void UI::MainUI::provisionAll() {
+    mSection->saveChanges();
+
     foreach(Serial::SerialDevice* device, mDevices) {
         if(device->newMdn().size() == 0) {
             device->setProvisionData(device->mdn(), device->min());
@@ -533,6 +535,10 @@ UI::UISection::UISection(UI::MainUI* ui)
 }
 
 void UI::UISection::beforeDeviceChanged() {
+
+}
+
+void UI::UISection::saveChanges() {
 
 }
 

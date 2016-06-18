@@ -44,6 +44,10 @@ void UI::Section::Provision::update() {
     UISection::endUpdate();
 }
 
+void UI::Section::Provision::saveChanges() {
+    beforeDeviceChanged();
+}
+
 void UI::Section::Provision::provision() {
     QObject* rootObject = UISection::rootObject();
     QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();

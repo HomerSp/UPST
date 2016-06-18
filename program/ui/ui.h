@@ -132,6 +132,7 @@ namespace UI {
 
         virtual void beforeDeviceChanged();
         virtual void update() = 0;
+        virtual void saveChanges();
 
     protected:
         UISection(MainUI* ui);
