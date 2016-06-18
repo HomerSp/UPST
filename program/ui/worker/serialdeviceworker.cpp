@@ -262,12 +262,12 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
     Serial::SerialDevice* device = new Serial::SerialDevice(*portInfo);
     if(!device->isValid()) {
         qWarning()<<"Device"<<portInfo->portName()<<"is not valid";
+        emit deviceAddReschedule(device->port());
         delete device;
     } else {
         qDebug()<<"Device"<<portInfo->portName()<<"is valid";
 
-        bool reschedule = false;
-        if(device->update(&reschedule)) {
+        if(device->update()) {
             if(!mDeviceConfig->updateDevice(device)) {
                 qWarning()<<"Could not find device info for"<<portInfo->portName();
             }
@@ -277,7 +277,7 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
             }
 
             emit deviceAdd(device);
-        } else if(reschedule) {
+        } else {
             emit deviceAddReschedule(device->port());
             delete device;
         }
@@ -293,8 +293,7 @@ void UI::Worker::SerialDeviceWorker::processDeviceUpdate(Serial::SerialDevice *d
         return;
     }
 
-    bool reschedule = false;
-    if(device->update(&reschedule)) {
+    if(device->update()) {
         if(!mDeviceConfig->updateDevice(device)) {
             qWarning()<<"Could not find device info for"<<device->port();
         }

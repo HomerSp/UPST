@@ -64,6 +64,13 @@ namespace Serial {
 
         bool isAvailable();
         bool isProvisioning() const {
+            // A child may still be showing as provisioning.
+            foreach(Serial::SerialDevice* c, mChildren) {
+                if(c->mProvisioning) {
+                    return true;
+                }
+            }
+
             return mProvisioning;
         }
         bool isSameDevice(SerialDevice* device);
@@ -75,7 +82,7 @@ namespace Serial {
 
         void handleEventReport(const QByteArray& data);
 
-        bool update(bool* reschedule = nullptr);
+        bool update();
         bool updateJson(const QJsonObject& obj);
 
         void updateFrom(Serial::SerialDevice* other);
@@ -301,6 +308,8 @@ namespace Serial {
         void provisionProgressChanged(int status, int progress, int error = Serial::SerialProvisionErrorNone);
 
     private:
+        static void updateFrom(Serial::SerialDevice* device, Serial::SerialDevice* other);
+
         bool provision(SerialProvisionData* data);
         bool provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd);
 

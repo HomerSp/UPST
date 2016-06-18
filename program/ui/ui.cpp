@@ -162,7 +162,7 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
     for(int i = 0; i < mDevices.size(); i++) {
         Serial::SerialDevice* d = mDevices.at(i);
         if(d->isSameDevice(device) && d->isProvisioning() && !d->isAvailable()) {
-            qDebug()<<"Devices are identical, replacing"<<d->port()<<"with"<<device->port();
+            qDebug()<<"Devices are identical, replacing old"<<d->port()<<"with new"<<device->port();
             d->updateFrom(device);
 
             emit deviceUpdate(d);
@@ -177,8 +177,9 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
     // Do we already have this device?
     foreach(Serial::SerialDevice* d, mDevices) {
         if(*d == *device) {
+            // Don't delete a device directly - call deleteLater instead, this causes problems as the device was created in another thread.
             qInfo()<<"Deleting already existing device"<<device->portStr();
-            delete device;
+            device->deleteLater();
             return;
         }
     }
@@ -214,19 +215,20 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
 }
 
 void UI::MainUI::deviceAddReschedule(QString port) {
-    if(mDeviceRechecks.contains(port) && mDeviceRechecks.value(port) >= 3) {
+    if(mDeviceRechecks.contains(port) && mDeviceRechecks.value(port) > 3) {
         qCritical()<<"Failed to check device"<<port<<"not checking again.";
         mDeviceRechecks.remove(port);
         return;
     }
 
-    qWarning()<<"Rescheduling check for"<<port<<"in 5 secs";
+    qWarning()<<"Rescheduling check for"<<port;
 
-    mDeviceRechecks.insert(port, 1);
+    int recheckCount = (mDeviceRechecks.contains(port))?mDeviceRechecks.value(port)+1:0;
+    mDeviceRechecks.insert(port, recheckCount);
 
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &UI::MainUI::deviceRescheduleTimeout);
-    timer->setInterval(5000);
+    timer->setInterval(2000);
     timer->setSingleShot(true);
     timer->setProperty("port", port);
     timer->start();

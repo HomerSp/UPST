@@ -51,6 +51,9 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
         mCommunicator = new SerialCommunicator(*this);
         if(mCommunicator->open()) {
             mCommunicator->clear();
+        } else {
+            delete mCommunicator;
+            mCommunicator = nullptr;
         }
     }
 }
@@ -105,6 +108,12 @@ void SerialDevice::addChild(SerialDevice *device) {
 }
 
 bool SerialDevice::isAvailable() {
+    foreach(Serial::SerialDevice* c, mChildren) {
+        if(!c->isAvailable()) {
+            return false;
+        }
+    }
+
     return mCommunicator != nullptr && mCommunicator->isOpen();
 }
 
@@ -211,7 +220,7 @@ bool SerialDevice::provision(const QString& userToken) {
     return ret;
 }
 
-bool SerialDevice::update(bool* reschedule) {
+bool SerialDevice::update() {
     qDebug()<<"===== GETTING ESN =====";
     Serial::QCDM::Commands::Nv::ESNCommand esnCmd(this);
     esnCmd.execute();
@@ -219,10 +228,7 @@ bool SerialDevice::update(bool* reschedule) {
         mESN = esnCmd.result()->data().toUInt();
     } else {
         // Could not retrieve ESN, reschedule the device check.
-        if(reschedule != nullptr) {
-            *reschedule = true;
-            return false;
-        }
+        return false;
     }
 
     qDebug()<<"===== GETTING IMEI =====";
@@ -306,20 +312,34 @@ bool SerialDevice::updateJson(const QJsonObject& obj) {
     return false;
 }
 
+void SerialDevice::updateFrom(SerialDevice *device, Serial::SerialDevice* other) {
+    device->mCommunicator = other->mCommunicator;
+    other->mCommunicator = nullptr;
+
+    device->mMdn = other->mMdn;
+    device->mMin = other->mMin;
+    device->mNewMdn = other->mMdn;
+    device->mNewMin = other->mMin;
+}
+
 void SerialDevice::updateFrom(Serial::SerialDevice* other) {
     QList<Serial::SerialDevice*> devices;
     devices.append(this);
     devices.append(mChildren);
 
+    // Check if the port matches first.
     foreach(Serial::SerialDevice* d, devices) {
-        if(d->mModel == other->mModel && d->mMake == other->mMake) {
-            d->mCommunicator = other->mCommunicator;
-            other->mCommunicator = nullptr;
+        if(d->port() == other->port() && !d->isAvailable()) {
+            updateFrom(d, other);
+            return;
+        }
+    }
 
-            d->mMdn = other->mMdn;
-            d->mMin = other->mMin;
-            d->mNewMdn = other->mMdn;
-            d->mNewMin = other->mMin;
+    // If it doesn't, we check that the make and model match, and that the device is not available.
+    foreach(Serial::SerialDevice* d, devices) {
+        if(d->mModel == other->mModel && d->mMake == other->mMake && !d->isAvailable()) {
+            updateFrom(d, other);
+            return;
         }
     }
 }
