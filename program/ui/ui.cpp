@@ -495,6 +495,8 @@ void UI::MainUI::provisionProgressChanged(Serial::SerialDevice* device, int stat
 }
 
 void UI::MainUI::doRefresh() {
+    mDeviceRechecks.clear();
+
     emit devicesRefresh();
 }
 
