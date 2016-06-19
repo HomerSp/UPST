@@ -134,39 +134,62 @@ Rectangle {
 
        Rectangle {
            anchors {left: parent.left; right: parent.right}
-           height: container.childrenRect.height + unit.dp(32)
+           height: errorLine1Text.height + errorLine2Text.height + errorLine3Text.height + unit.dp(32)
            color: '#232b2e'
 
            ColumnLayout {
                id: container
                anchors.fill: parent
                anchors.margins: unit.dp(16)
-               spacing: unit.dp(8)
+               height: parent.height
+               spacing: 0
 
-               Text {
+               TextArea {
+                   id: errorLine1Text
                    anchors {left: parent.left; right: parent.right}
-                   color: "#ffffff"
+                   implicitHeight: (errorLine1.length > 0)?contentHeight:0
+                   textColor: "#ffffff"
                    font.family: openSansRegularFont.name
                    font.pixelSize: unit.em(1.2)
                    text: errorLine1
                    visible: errorLine1.length > 0
+                   wrapMode: Text.Wrap
+                   readOnly: true
+                   backgroundVisible: false
+                   frameVisible: false
                }
-               Text {
+               TextArea {
+                   id: errorLine2Text
                    anchors {left: parent.left; right: parent.right}
-                   color: errorTextColor
+                   implicitHeight: (errorLine2.length > 0)?contentHeight:0
+                   textColor: errorTextColor
                    font.family: openSansBoldFont.name
                    font.pixelSize: unit.em(1.2)
                    font.weight: Font.Bold
                    text: errorLine2
                    visible: errorLine2.length > 0
+                   wrapMode: Text.Wrap
+                   readOnly: true
+                   backgroundVisible: false
+                   frameVisible: false
+
+                   onTextChanged: {
+                       console.info("onTextChanged " + height);
+                   }
                }
-               Text {
+               TextArea {
+                   id: errorLine3Text
                    anchors {left: parent.left; right: parent.right}
-                   color: "#ffffff"
+                   implicitHeight: (errorLine3.length > 0)?contentHeight:0
+                   textColor: "#ffffff"
                    font.family: openSansRegularFont.name
                    font.pixelSize: unit.em(1.2)
                    text: errorLine3
                    visible: errorLine3.length > 0
+                   wrapMode: Text.Wrap
+                   readOnly: true
+                   backgroundVisible: false
+                   frameVisible: false
                }
            }
        }
