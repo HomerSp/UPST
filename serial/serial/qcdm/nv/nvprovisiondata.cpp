@@ -180,6 +180,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD_NULL("sixteendigitpassword");
             PROVISION_CMD_NULL("user");
             PROVISION_CMD_NULL("usertype");
+            PROVISION_CMD_NULL("rtremode");
 
             PROVISION_CMD("genuserprof", GenUserProfCommand, user());
             PROVISION_CMD("genuserss", GenUserSSCommand);

@@ -26,6 +26,7 @@ namespace Serial {
         SerialProvisionStatusDone,
         SerialProvisionStatusError,
         SerialProvisionStatusQueue,
+        SerialProvisionStatusDoneRTRE,
     };
 
     enum SerialProvisionError {
@@ -79,6 +80,10 @@ namespace Serial {
         bool childrenAvailable();
 
         bool canProvision();
+
+        bool rtreSet() const {
+            return mRTRESet;
+        }
 
         void handleEventReport(const QByteArray& data);
 
@@ -345,6 +350,7 @@ namespace Serial {
 
         bool mProvisioning;
         bool mProvisionStop;
+        bool mRTRESet;
         QString mNewMdn;
         uint64_t mNewMin;
         QString mSPC;

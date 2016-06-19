@@ -166,9 +166,22 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
             d->updateFrom(device);
 
             emit deviceUpdate(d);
-            viewUpdate();
 
             mDeviceWorker->addDeviceRemove(device);
+
+            if(d->rtreSet()) {
+                d->setProvisioning(false);
+
+                if(d->canProvision()) {
+                    d->setProvisioning(true);
+                    provisionProgressChanged(d, Serial::SerialProvisionStatusQueue, 0, Serial::SerialProvisionErrorNone);
+                    viewUpdate();
+
+                    mDeviceWorker->addDeviceProvision(d);
+                }
+            }
+
+            viewUpdate();
 
             return;
         }

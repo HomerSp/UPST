@@ -446,7 +446,7 @@ ApplicationWindow {
                             x: 0
                             color: "#00ffffff"
 
-                            isProvisioned: progressStatus == 2
+                            isProvisioned: progressStatus == 2 || progressStatus == 5
                             haveError: progressError.length > 0
                             haveChildren: deviceChildrenAvailable
                             progressCurrent: provisionProgressCurrent
@@ -673,6 +673,7 @@ ApplicationWindow {
 
                                 if(haveError) {
                                     provisionSuccessContainer.hide();
+                                    provisionRebootingContainer.hide();
                                     deviceWaitingPortContainer.hide()
 
                                     provisionFailedContainer.showError(progressError);
@@ -683,13 +684,24 @@ ApplicationWindow {
                                         provisionFailedContainer.hide();
                                         deviceWaitingPortContainer.hide()
 
-                                        if(deviceFlagManualReboot) {
-                                            provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
+                                        if(progressStatus == 5) {
+                                            provisionSuccessContainer.hide();
+                                            if(deviceFlagManualReboot) {
+                                                provisionRebootingContainer.showError(qsTr("Please reboot the phone manually to continue the process."));
+                                            } else {
+                                                provisionRebootingContainer.showError("");
+                                            }
                                         } else {
-                                            provisionSuccessContainer.showError("");
+                                            provisionRebootingContainer.hide();
+                                            if(deviceFlagManualReboot) {
+                                                provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
+                                            } else {
+                                                provisionSuccessContainer.showError("");
+                                            }
                                         }
                                     } else {
                                         provisionSuccessContainer.hide();
+                                        provisionRebootingContainer.hide();
 
                                         if(deviceFlagMultiPort && !haveChildren) {
                                             provisionFailedContainer.hide();
@@ -939,7 +951,7 @@ ApplicationWindow {
                 headerTextColor: '#FFFFFF'
                 header: "Failed to provision device"
                 errorLine1: qsTr("An error has ocurred while provisioning the device:")
-                errorLine3: qsTr("A log has been sent to Ultimobile automatically,\nif you require immediate assistance, please call\nour support team at 720-433-3028.")
+                errorLine3: qsTr("A log has been sent to Ultimobile automatically, if you require immediate assistance, please call our support team at 720-433-3028.")
                 errorTextColor: '#EF9A9A'
             }
 
@@ -952,6 +964,16 @@ ApplicationWindow {
                 header: "Device has been provisioned"
                 errorLine1: qsTr("The device was provisioned successfully!")
                 errorTextColor: '#C5E1A5'
+            }
+
+            UPErrorBox {
+                objectName: 'provisionRebootingContainer'
+                id: provisionRebootingContainer
+
+                headerColor: '#a78b4e'
+                headerTextColor: '#FFFFFF'
+                header: "Device is rebooting"
+                errorLine1: qsTr("The provision process will continue after a reboot.")
             }
 
             UPErrorBox {

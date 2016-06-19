@@ -43,6 +43,7 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mRTRE(Serial::QCDM::RTREModeNone),
       mProvisioning(false),
       mProvisionStop(false),
+      mRTRESet(false),
       mNewMdn(""),
       mNewMin(-1),
       mSPC("")
@@ -316,10 +317,15 @@ void SerialDevice::updateFrom(SerialDevice *device, Serial::SerialDevice* other)
     device->mCommunicator = other->mCommunicator;
     other->mCommunicator = nullptr;
 
-    device->mMdn = other->mMdn;
-    device->mMin = other->mMin;
-    device->mNewMdn = other->mMdn;
-    device->mNewMin = other->mMin;
+    device->mRTRE = other->mRTRE;
+
+    // Don't update the min and mdn if we have set the RTRE.
+    if(!device->mRTRESet) {
+        device->mMdn = other->mMdn;
+        device->mMin = other->mMin;
+        device->mNewMdn = other->mMdn;
+        device->mNewMin = other->mMin;
+    }
 }
 
 void SerialDevice::updateFrom(Serial::SerialDevice* other) {
@@ -387,6 +393,14 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     // The progress starts at 2 (downloading the provision data is 1%, and parsing it is another 1%).
     float i = 2;
 
+    bool shouldSetRtre = false;
+    foreach(SerialDevice* device, devices) {
+        if(!device->mRTRESet && device->mRTRE != data->rtreMode()) {
+            shouldSetRtre = true;
+            break;
+        }
+    }
+
     foreach(SerialDevice* device, devices) {
         qDebug()<<"===== Provisioning port"<<mPort<<"=====";
 
@@ -396,6 +410,16 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
         i += mod;
         emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+
+        if(shouldSetRtre) {
+            qDebug()<<"===== SETTING RTRE MODE =====";
+
+            device->mRTRESet = true;
+
+            Serial::QCDM::Commands::Nv::RTRECommand rtreCommand(device, false, data->rtreMode());
+            rtreCommand.execute();
+            continue;
+        }
 
         if(mProvisionStop) {
             break;
@@ -525,9 +549,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     }
 
     if(ret) {
-        emit provisionProgressChanged(SerialProvisionStatusDone, 100);
+        emit provisionProgressChanged((shouldSetRtre)?SerialProvisionStatusDoneRTRE:SerialProvisionStatusDone, 100);
     } else {
-        if(mRTRE != data->rtreMode()) {
+        if(mRTRESet && mRTRE != data->rtreMode()) {
             qCritical()<<"Wrong RTRE mode, device has"<<mRTRE<<"while provision data has"<<data->rtreMode();
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRTRE);
         }
@@ -537,6 +561,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRemoved);
         } else {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
+        }
+    }
+
+    if(!shouldSetRtre) {
+        foreach(SerialDevice* device, devices) {
+            device->mRTRESet = false;
         }
     }
 
