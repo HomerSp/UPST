@@ -321,6 +321,7 @@ void UI::MainUI::viewChanged() {
     qDebug()<<"viewChanged"<<view;
 
     if(mSection != nullptr) {
+        mSection->saveChanges();
         delete mSection;
     }
     mSection = nullptr;
