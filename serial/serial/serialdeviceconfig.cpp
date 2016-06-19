@@ -121,6 +121,9 @@ bool SerialDeviceConfig::shouldReschedule(SerialDevice* device) {
         if(!pidFound) {
             continue;
         }
+
+        foundDevice = true;
+        break;
      }
 
      return foundDevice;
