@@ -267,7 +267,7 @@ ApplicationWindow {
             id: connectedDevicesLabel
             anchors.left: parent.left
             anchors.top: parent.top
-            Layout.minimumWidth: Math.max(connectedDevicesListRectangle.width, connectedDevicesLabelText.width + connectedDevicesLabelIcon.width + unit.dp(24))
+            Layout.minimumWidth: connectedDevicesLabelText.width + connectedDevicesLabelIcon.width + unit.dp(24)
             implicitHeight: connectedDevicesLabelText.height + unit.dp(32)
             color: "#21242b"
             z: 5
@@ -409,9 +409,8 @@ ApplicationWindow {
                         }
 
                         largestWidth += (connectedDevicesListScroll.childrenRect.width - connectedDevicesListScroll.contentItem.width);
-                        if(largestWidth > connectedDevicesListRectangle.implicitWidth) {
-                            connectedDevicesListRectangle.implicitWidth = largestWidth;
-                        }
+                        connectedDevicesLabel.implicitWidth = largestWidth;
+                        connectedDevicesListRectangle.implicitWidth = largestWidth;
                     }
 
                     onCurrentItemChanged: {
@@ -441,6 +440,7 @@ ApplicationWindow {
                             id: deviceInfoWrapper
                             anchors.left: parent.left
                             Layout.fillWidth: true
+                            Layout.minimumWidth: connectedDevicesLabel.Layout.minimumWidth
                             realWidth: 0
                             height: deviceInfoContainer.height + deviceInfoStatusProgress.height
                             x: 0
