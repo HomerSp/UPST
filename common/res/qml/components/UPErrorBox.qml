@@ -172,10 +172,6 @@ Rectangle {
                    readOnly: true
                    backgroundVisible: false
                    frameVisible: false
-
-                   onTextChanged: {
-                       console.info("onTextChanged " + height);
-                   }
                }
                TextArea {
                    id: errorLine3Text
