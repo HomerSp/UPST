@@ -527,7 +527,8 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     if(ret) {
         emit provisionProgressChanged(SerialProvisionStatusDone, 100);
     } else {
-        if(mRTRE != Serial::QCDM::RTREModeNVOnly) {
+        if(mRTRE != data->rtreMode()) {
+            qCritical()<<"Wrong RTRE mode, device has"<<mRTRE<<"while provision data has"<<data->rtreMode();
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRTRE);
         }
 

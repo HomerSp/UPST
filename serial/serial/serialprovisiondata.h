@@ -29,6 +29,10 @@ namespace Serial {
             return mValid;
         }
 
+        Serial::QCDM::RTREMode rtreMode() const {
+            return mRTREMode;
+        }
+
         const QString& carrierSPC() const {
             return mCarrierSPC;
         }
