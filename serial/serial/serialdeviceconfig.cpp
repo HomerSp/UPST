@@ -86,6 +86,46 @@ bool SerialDeviceConfig::update(const QString& data) {
     return mDevices.isObject();
 }
 
+bool SerialDeviceConfig::shouldReschedule(SerialDevice* device) {
+    if(!mDevices.isObject() || mDevices.object().isEmpty() || !mDevices.object().contains("devices")) {
+        return false;
+    }
+
+     QJsonArray devicesArr = mDevices.object()["devices"].toArray();
+     if(devicesArr.isEmpty()) {
+         return false;
+     }
+
+     bool foundDevice = false;
+     foreach(QJsonValue val, devicesArr) {
+        QJsonObject obj = val.toObject();
+        if(!obj.contains("vid") || !obj.contains("pid")) {
+            continue;
+        }
+
+        uint16_t vid = obj["vid"].toString().toUShort(0, 0);
+        if(device->vid() != vid) {
+            continue;
+        }
+
+        bool pidFound = false;
+
+        QStringList pidList = obj["pid"].toString().split(',');
+        foreach(QString pid, pidList) {
+            if(pid.toUShort(0, 0) == device->pid()) {
+                pidFound = true;
+                break;
+            }
+        }
+
+        if(!pidFound) {
+            continue;
+        }
+     }
+
+     return foundDevice;
+}
+
 bool SerialDeviceConfig::updateDevice(SerialDevice *device) {
     if(!mDevices.isObject() || mDevices.object().isEmpty() || !mDevices.object().contains("devices")) {
         return false;

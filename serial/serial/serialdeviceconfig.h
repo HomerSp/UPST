@@ -18,6 +18,7 @@ namespace Serial {
 
         QList<SerialDevice*> getDeviceGuides();
 
+        bool shouldReschedule(SerialDevice* device);
         bool updateDevice(SerialDevice* device);
 
         static void updateConfig();

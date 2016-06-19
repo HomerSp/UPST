@@ -260,10 +260,10 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
     emit statusChange("Getting device information for " + portInfo->portName());
 
     Serial::SerialDevice* device = new Serial::SerialDevice(*portInfo);
+    bool reschedule = true;
+
     if(!device->isValid()) {
         qWarning()<<"Device"<<portInfo->portName()<<"is not valid";
-        emit deviceAddReschedule(device->port());
-        delete device;
     } else {
         qDebug()<<"Device"<<portInfo->portName()<<"is valid";
 
@@ -277,7 +277,12 @@ void UI::Worker::SerialDeviceWorker::processDeviceCheck(QSerialPortInfo* portInf
             }
 
             emit deviceAdd(device);
-        } else {
+            reschedule = false;
+        }
+    }
+
+    if(reschedule) {
+        if(mDeviceConfig->shouldReschedule(device)) {
             emit deviceAddReschedule(device->port());
             delete device;
         }
