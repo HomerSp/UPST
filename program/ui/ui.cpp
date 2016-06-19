@@ -215,7 +215,7 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
 }
 
 void UI::MainUI::deviceAddReschedule(QString port) {
-    if(mDeviceRechecks.contains(port) && mDeviceRechecks.value(port) > 3) {
+    if(mDeviceRechecks.contains(port) && mDeviceRechecks.value(port) >= 3) {
         qCritical()<<"Failed to check device"<<port<<"not checking again.";
         mDeviceRechecks.remove(port);
         return;
