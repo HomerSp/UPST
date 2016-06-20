@@ -48,6 +48,12 @@ Dialog {
             font.family: openSansRegularFont.name
             font.pixelSize: unit.em(1.1)
         }
+
+        Text {
+            text: "Icons made by <a href='http://www.flaticon.com/authors/freepik'>Freepik</a> from <a href='http://www.flaticon.com'>www.flaticon.com</a>"
+            font.family: openSansRegularFont.name
+            font.pixelSize: unit.em(1.1)
+        }
     }
 
     MouseArea {
