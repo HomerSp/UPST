@@ -6252,6 +6252,8 @@ namespace Serial {
             RTREModeNone = 0xFF,
             RTREModeRUIMOnly = 0,
             RTREModeNVOnly,
+            RTREModeRUIMPref,
+            RTREMode1XGSM,
         };
     }
 }

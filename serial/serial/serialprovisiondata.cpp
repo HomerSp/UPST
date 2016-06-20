@@ -36,7 +36,16 @@ void SerialProvisionData::resetCommands() {
 
 void SerialProvisionData::update(const QJsonObject& rootObject) {
     if(rootObject.contains("rtreMode")) {
-        mRTREMode = static_cast<Serial::QCDM::RTREMode>(rootObject["rtreMode"].toInt());
+        QString rtre = rootObject["rtreMode"].toString().toLower();
+        if(rtre == "ruimonly") {
+            mRTREMode = Serial::QCDM::RTREModeRUIMOnly;
+        } else if(rtre == "ruimpref") {
+            mRTREMode = Serial::QCDM::RTREModeRUIMPref;
+        } else if(rtre == "1xgsm") {
+            mRTREMode = Serial::QCDM::RTREMode1XGSM;
+        } else {
+            mRTREMode = Serial::QCDM::RTREModeNVOnly;
+        }
     }
     if(rootObject.contains("carrierSPC")) {
         mCarrierSPC = rootObject["carrierSPC"].toString();
