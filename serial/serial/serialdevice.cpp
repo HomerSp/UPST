@@ -46,7 +46,8 @@ SerialDevice::SerialDevice(const QString& port, uint16_t vid, uint16_t pid)
       mRTRESet(false),
       mNewMdn(""),
       mNewMin(-1),
-      mSPC("")
+      mSPC(""),
+      mWrongSPC(false)
 {
     if(!port.isEmpty()) {
         mCommunicator = new SerialCommunicator(*this);
@@ -401,6 +402,12 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
     }
 
+    if(mSPC.size() == 0) {
+        mSPC = data->carrierSPC();
+    }
+
+    mWrongSPC = false;
+
     foreach(SerialDevice* device, devices) {
         qDebug()<<"===== Provisioning port"<<mPort<<"=====";
 
@@ -444,8 +451,9 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         }
 
         qDebug()<<"===== Writing SPC =====";
-        if(!sendSPC(device, data)) {
+        if(!sendSPC(device)) {
             qCritical()<<"Could not unlock SPC";
+            mWrongSPC = true;
             ret = false;
             break;
         }
@@ -534,7 +542,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     // We need to check if the device is valid *before* the reset.
     bool valid = isValid();
 
-    if(!mProvisionStop) {
+    if(!mProvisionStop && !mWrongSPC) {
         qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
         qDebug()<<"===== RESETTING DEVICE AFTER =====";
@@ -554,10 +562,11 @@ bool SerialDevice::provision(SerialProvisionData* data) {
         if(mRTRESet && mRTRE != data->rtreMode()) {
             qCritical()<<"Wrong RTRE mode, device has"<<mRTRE<<"while provision data has"<<data->rtreMode();
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRTRE);
-        }
+        } else if(mWrongSPC) {
+            emit provisionProgressChanged(SerialProvisionStatusWrongSPC, 100);
 
         // If we can't communicate with the device anymore, consider it removed.
-        if(!valid) {
+        } else if(!valid) {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorRemoved);
         } else {
             emit provisionProgressChanged(SerialProvisionStatusError, i, SerialProvisionErrorNv);
@@ -586,7 +595,7 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
             }
         }
 
-        if(!sendSPC(device, data)) {
+        if(!sendSPC(device)) {
             qCritical()<<"Could not unlock SPC";
             return false;
         }
@@ -612,20 +621,9 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
     return true;
 }
 
-bool SerialDevice::sendSPC(SerialDevice* device, SerialProvisionData* data) {
-    // Try the one from the device first, if applicable.
-    if(mSPC.size() > 0) {
-        Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, mSPC.toLatin1());
-        spcCommand.setTimeout(10000);
-        spcCommand.execute();
-        if(spcCommand.resultSuccess()) {
-            return true;
-        }
-    }
-
-    // If that doesn't work, try the one from the provision data.
-    Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, data->carrierSPC().toLatin1());
+bool SerialDevice::sendSPC(SerialDevice* device) {
+    Serial::QCDM::Commands::QcdmCommand spcCommand(device, Serial::QCDM::DiagCommands::DIAG_SPC_F, mSPC.toLatin1());
     spcCommand.setTimeout(10000);
     spcCommand.execute();
-    return (spcCommand.resultSuccess());
+    return (spcCommand.resultSuccess() && (spcCommand.result()->data().toByteArray().at(0) == 0x01));
 }

@@ -121,6 +121,7 @@ QString UI::ConnectedDevicesModel::getStatusIcon(int progress, bool manualReboot
     case Serial::SerialProvisionStatusQueue:
         return "queued";
     case Serial::SerialProvisionStatusDoneRTRE:
+    case Serial::SerialProvisionStatusWrongSPC:
         return "information";
     default:
         return "download";

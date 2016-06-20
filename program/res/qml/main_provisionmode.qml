@@ -22,96 +22,106 @@ Item {
         source: "qrc:/res/fonts/OpenSans-Bold.ttf"
     }
 
-    GridLayout {
-        id: provisionViewLayout
-        anchors.fill: parent
-        z: 99
-
-        columns: 2
+    ColumnLayout {
+        anchors {left: parent.left; right: parent.right;}
+        anchors.margins: unit.dp(20)
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: unit.dp(12)
 
         Item {
-            id: mdnContainer
-            Layout.alignment: Qt.AlignLeft
-            Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.fillHeight: true
+            height: childrenRect.height
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
+            ColumnLayout {
+                Layout.fillWidth: true
+                id: spcLayout
+                objectName: "spcLayout"
                 anchors.right: parent.right
-                anchors.leftMargin: unit.dp(20)
-                anchors.rightMargin: anchors.leftMargin
-                width: parent.width
-                height: childrenRect.height
-                color: "transparent"
+                spacing: unit.dp(12)
+                width: (visible)?(unit.dp(64)):0
+                visible: false
 
                 Text {
+                    Layout.fillWidth: true
+                    id: labelSPC
+                    text: qsTr("SPC")
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: labelMDN.font.pixelSize
+                }
+
+                TextField {
+                    Layout.fillWidth: true
+                    id: textSPC
+                    objectName: "textSPC"
+                    height: labelSPC.height + unit.dp(12)
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: labelSPC.font.pixelSize
+                    maximumLength: 6
+                }
+            }
+
+            GridLayout {
+                Layout.fillWidth: true
+                anchors {left: parent.left; right: spcLayout.left}
+                anchors.rightMargin: (spcLayout.visible)?unit.dp(20):0
+
+                rowSpacing: unit.dp(12)
+                columnSpacing: unit.dp(20)
+
+                flow: GridLayout.LeftToRight
+                columns: 2
+
+                z: 99
+
+                Text {
+                    Layout.fillWidth: true
                     id: labelMDN
                     text: qsTr("MDN")
                     font.family: openSansRegularFont.name
                     font.pixelSize: unit.em(1.1)
                 }
 
+                Text {
+                    Layout.fillWidth: true
+                    id: labelMIN
+                    text: qsTr("MIN")
+                    font.family: openSansRegularFont.name
+                    font.pixelSize: labelMDN.font.pixelSize
+                }
+
                 TextField {
+                    Layout.fillWidth: true
                     id: textMDN
                     objectName: "textMDN"
-                    anchors.top: labelMDN.bottom
-                    anchors.topMargin: unit.dp(4)
-                    width: parent.width
                     height: labelMDN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
                     font.pixelSize: labelMDN.font.pixelSize
                     maximumLength: 10
                 }
-            }
-        }
-
-        Item {
-            id: minContainer
-            Layout.alignment: Qt.AlignRight
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-
-            Rectangle {
-                id: minContainerRect
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: unit.dp(20)
-                anchors.rightMargin: anchors.leftMargin
-                width: parent.width
-                height: childrenRect.height
-                color: "transparent"
-
-                Text {
-                    id: labelMIN
-                    text: qsTr("MIN")
-                    font.family: openSansRegularFont.name
-                    font.pixelSize: unit.em(1.1)
-                }
 
                 TextField {
+                    Layout.fillWidth: true
                     id: textMIN
                     objectName: "textMIN"
-                    anchors.top: labelMIN.bottom
-                    anchors.topMargin: unit.dp(4)
-                    width: parent.width
                     height: labelMIN.height + unit.dp(12)
                     font.family: openSansRegularFont.name
                     font.pixelSize: labelMIN.font.pixelSize
                     maximumLength: 10
                 }
             }
+        }
+
+        Item {
+            Layout.fillWidth: true
 
             UPButton {
                 id: provisionButton
                 objectName: "provisionButton"
+                anchors.right: parent.right
                 text: qsTr("Provision")
-                width: minContainerRect.width / 2
+                width: unit.dp(80)
                 height: textMIN.height
-                anchors.top: minContainerRect.bottom
-                anchors.right: minContainerRect.right
-                anchors.topMargin: unit.dp(20)
 
                 scheme: "light"
             }

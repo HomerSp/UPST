@@ -23,8 +23,9 @@ void UI::Section::Provision::beforeDeviceChanged() {
     QObject* rootObject = UISection::rootObject();
     QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();
     uint64_t min = (uint64_t)rootObject->findChild<QObject*>("textMIN")->property("text").toString().toULongLong();
+    QString spc = rootObject->findChild<QObject*>("textSPC")->property("text").toString();
 
-    currentDevice()->setProvisionData(mdn, min);
+    currentDevice()->setProvisionData(mdn, min, spc);
 }
 
 void UI::Section::Provision::update() {
@@ -35,9 +36,12 @@ void UI::Section::Provision::update() {
         QObject* rootObject = UISection::rootObject();
         rootObject->findChild<QObject*>("textMDN")->setProperty("text", device->newMdnStr());
         rootObject->findChild<QObject*>("textMIN")->setProperty("text", device->newMinStr());
+        rootObject->findChild<QObject*>("textSPC")->setProperty("text", device->spc());
 
         rootObject->findChild<QObject*>("textMDN")->setProperty("enabled", device->canProvision());
         rootObject->findChild<QObject*>("textMIN")->setProperty("enabled", device->canProvision());
+        rootObject->findChild<QObject*>("textSPC")->setProperty("enabled", device->canProvision());
+        rootObject->findChild<QObject*>("spcLayout")->setProperty("visible", device->wrongSPC());
         rootObject->findChild<QObject*>("provisionButton")->setProperty("enabled", device->canProvision());
     }
 
@@ -49,18 +53,15 @@ void UI::Section::Provision::saveChanges() {
 }
 
 void UI::Section::Provision::provision() {
-    QObject* rootObject = UISection::rootObject();
-    QString mdn = rootObject->findChild<QObject*>("textMDN")->property("text").toString();
-    uint64_t min = (uint64_t)rootObject->findChild<QObject*>("textMIN")->property("text").toString().toULongLong();
-
     Serial::SerialDevice* device = currentDevice();
     if(device == nullptr || !device->canProvision()) {
         return;
     }
 
-    qDebug()<<"Provision"<<device->name()<<mdn<<min;
+    beforeDeviceChanged();
 
-    device->setProvisionData(mdn, min);
+    qDebug()<<"Provision"<<device->name();
+
     device->setProvisioning(true);
     ui()->provisionProgressChanged(device, Serial::SerialProvisionStatusQueue, 0, Serial::SerialProvisionErrorNone);
     update();

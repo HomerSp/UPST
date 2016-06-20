@@ -446,7 +446,7 @@ ApplicationWindow {
                             x: 0
                             color: "#00ffffff"
 
-                            isProvisioned: progressStatus == 2 || progressStatus == 5
+                            isProvisioned: progressStatus == 2 || progressStatus == 5 || progressStatus == 6
                             haveError: progressError.length > 0
                             haveChildren: deviceChildrenAvailable
                             progressCurrent: provisionProgressCurrent
@@ -674,6 +674,7 @@ ApplicationWindow {
                                 if(haveError) {
                                     provisionSuccessContainer.hide();
                                     provisionRebootingContainer.hide();
+                                    provisionWrongSPCContainer.hide();
                                     deviceWaitingPortContainer.hide()
 
                                     provisionFailedContainer.showError(progressError);
@@ -684,8 +685,13 @@ ApplicationWindow {
                                         provisionFailedContainer.hide();
                                         deviceWaitingPortContainer.hide()
 
-                                        if(progressStatus == 5) {
+                                        if(progressStatus == 6) {
                                             provisionSuccessContainer.hide();
+                                            provisionRebootingContainer.hide();
+                                            provisionWrongSPCContainer.show();
+                                        } else if(progressStatus == 5) {
+                                            provisionSuccessContainer.hide();
+                                            provisionWrongSPCContainer.hide();
                                             if(deviceFlagManualReboot) {
                                                 provisionRebootingContainer.showError(qsTr("Please reboot the phone manually to continue the process."));
                                             } else {
@@ -693,6 +699,7 @@ ApplicationWindow {
                                             }
                                         } else {
                                             provisionRebootingContainer.hide();
+                                            provisionWrongSPCContainer.hide();
                                             if(deviceFlagManualReboot) {
                                                 provisionSuccessContainer.showError(qsTr("Please reboot the phone manually to finish the process."));
                                             } else {
@@ -702,6 +709,7 @@ ApplicationWindow {
                                     } else {
                                         provisionSuccessContainer.hide();
                                         provisionRebootingContainer.hide();
+                                        provisionWrongSPCContainer.hide();
 
                                         if(deviceFlagMultiPort && !haveChildren) {
                                             provisionFailedContainer.hide();
@@ -974,6 +982,16 @@ ApplicationWindow {
                 headerTextColor: '#FFFFFF'
                 header: "Device is rebooting"
                 errorLine1: qsTr("The provision process will continue after a reboot.")
+            }
+
+            UPErrorBox {
+                objectName: 'provisionWrongSPCContainer'
+                id: provisionWrongSPCContainer
+
+                headerColor: '#a78b4e'
+                headerTextColor: '#FFFFFF'
+                header: "Wrong SPC"
+                errorLine1: qsTr("Input the correct SPC in the UI, please.")
             }
 
             UPErrorBox {

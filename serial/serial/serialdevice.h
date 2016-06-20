@@ -27,6 +27,7 @@ namespace Serial {
         SerialProvisionStatusError,
         SerialProvisionStatusQueue,
         SerialProvisionStatusDoneRTRE,
+        SerialProvisionStatusWrongSPC,
     };
 
     enum SerialProvisionError {
@@ -83,6 +84,10 @@ namespace Serial {
 
         bool rtreSet() const {
             return mRTRESet;
+        }
+
+        bool wrongSPC() const {
+            return mWrongSPC;
         }
 
         void handleEventReport(const QByteArray& data);
@@ -183,6 +188,10 @@ namespace Serial {
         }
         uint64_t newMin() const {
             return mNewMin;
+        }
+
+        const QString& spc() const {
+            return mSPC;
         }
 
         uint32_t esn() const {
@@ -318,7 +327,7 @@ namespace Serial {
         bool provision(SerialProvisionData* data);
         bool provision(SerialDevice* device, SerialProvisionData* data, SerialCommand* cmd);
 
-        bool sendSPC(SerialDevice* device, SerialProvisionData* data);
+        bool sendSPC(SerialDevice* device);
 
         SerialCommunicator* mCommunicator;
 
@@ -354,6 +363,7 @@ namespace Serial {
         QString mNewMdn;
         uint64_t mNewMin;
         QString mSPC;
+        bool mWrongSPC;
     };
 }
 
