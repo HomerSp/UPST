@@ -1,15 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/images/icons/computer.svg</file>
-        <file>res/images/icons/download.svg</file>
-        <file>res/images/icons/feature_phone.svg</file>
-        <file>res/images/icons/smartphone.svg</file>
-        <file>res/images/icons/tablet.svg</file>
-        <file>res/images/icons/unknown.svg</file>
-        <file>res/images/icons/mifi.svg</file>
-        <file>res/images/icons/done.svg</file>
-        <file>res/images/icons/failed.svg</file>
-        <file>res/images/icons/restart.svg</file>
-        <file>res/images/icons/queued.svg</file>
+        <file>res/images/icons/devices/computer.svg</file>
+        <file>res/images/icons/devices/feature_phone.svg</file>
+        <file>res/images/icons/devices/smartphone.svg</file>
+        <file>res/images/icons/devices/tablet.svg</file>
+        <file>res/images/icons/devices/mifi.svg</file>
+        <file>res/images/icons/devices/unknown.svg</file>
+        <file>res/images/icons/status/download.svg</file>
+        <file>res/images/icons/status/upload.svg</file>
+        <file>res/images/icons/status/done.svg</file>
+        <file>res/images/icons/status/failed.svg</file>
+        <file>res/images/icons/status/restart.svg</file>
+        <file>res/images/icons/status/queued.svg</file>
+        <file>res/images/icons/status/information.svg</file>
     </qresource>
 </RCC>

@@ -40,6 +40,8 @@ namespace UI {
         virtual QHash<int, QByteArray> roleNames() const;
         virtual int rowCount(const QModelIndex &parent) const;
 
+        Q_INVOKABLE QString getStatusIcon(int progress, bool manualReboot);
+
         void addDevice(Serial::SerialDevice* device);
 
         void setProgress(Serial::SerialDevice* device, Serial::SerialProvisionStatus status, int current, Serial::SerialProvisionError error);

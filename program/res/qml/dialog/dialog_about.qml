@@ -44,7 +44,7 @@ Dialog {
         }
 
         Text {
-            text: "Icons made by Freepik from www.flaticon.com"
+            text: "Icons made by <a href='http://www.flaticon.com/authors/google'>Google</a> from <a href='http://www.flaticon.com'>www.flaticon.com</a>"
             font.family: openSansRegularFont.name
             font.pixelSize: unit.em(1.1)
         }

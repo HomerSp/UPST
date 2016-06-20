@@ -279,7 +279,7 @@ ApplicationWindow {
                 anchors.leftMargin: unit.dp(8)
                 anchors.verticalCenter: parent.verticalCenter
 
-                source: "qrc:/res/images/icons/computer.svg"
+                source: "qrc:/res/images/icons/devices/computer.svg"
                 fillMode: Image.PreserveAspectFit
                 mipmap: true
                 sourceSize.height: connectedDevicesLabelText.height
@@ -562,7 +562,7 @@ ApplicationWindow {
 
                                 opacity: (progressStatus > 0)?1.0:0.0
 
-                                source: "qrc:/res/images/icons/" + ((progressStatus == 4)?"queued":(progressStatus == 3)?"failed":(progressStatus == 2)?(deviceFlagManualReboot?"restart":"done"):"download") + ".svg"
+                                source: "qrc:/res/images/icons/status/" + devicesModel.getStatusIcon(progressStatus, deviceFlagManualReboot) + ".svg"
                                 fillMode: Image.PreserveAspectFit
                                 mipmap: true
                                 sourceSize.height: deviceInfoText.height / 2

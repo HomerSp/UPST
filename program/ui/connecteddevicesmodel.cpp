@@ -89,7 +89,7 @@ QString UI::ConnectedDevicesModel::getDeviceIcon(Serial::SerialDevice* device) c
         break;
     }
 
-    return "qrc:/res/images/icons/" + type + ".svg";
+    return "qrc:/res/images/icons/devices/" + type + ".svg";
 }
 
 QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError error) const {
@@ -106,6 +106,24 @@ QString UI::ConnectedDevicesModel::getProgressError(Serial::SerialProvisionError
         return "The device is configured to read from SIM only.";
     default:
         return "";
+    }
+}
+
+QString UI::ConnectedDevicesModel::getStatusIcon(int progress, bool manualReboot) {
+    switch(progress) {
+    case Serial::SerialProvisionStatusDone:
+        if(manualReboot) {
+            return "restart";
+        }
+        return "done";
+    case Serial::SerialProvisionStatusError:
+        return "failed";
+    case Serial::SerialProvisionStatusQueue:
+        return "queued";
+    case Serial::SerialProvisionStatusDoneRTRE:
+        return "information";
+    default:
+        return "download";
     }
 }
 
