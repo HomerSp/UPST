@@ -268,6 +268,10 @@ bool SerialDevice::update() {
         mRTRE = rtreCommand.mode();
     }
 
+    if(mMdn.length() == 0) {
+        mNewMdn = "0000000000";
+    }
+
     qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin<<", RTRE:"<<mRTRE;
 
     return true;

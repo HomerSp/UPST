@@ -300,10 +300,6 @@ namespace Serial {
 
         QString newMdnStr() const {
             if(mNewMdn.length() == 0) {
-                if(mMdn.length() == 0) {
-                    return "0000000000";
-                }
-
                 return mMdn;
             }
 
