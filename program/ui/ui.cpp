@@ -294,8 +294,10 @@ void UI::MainUI::deviceRescheduleTimeout() {
     }
 
     QString port = timer->property("port").toString();
-    if(mDeviceRechecks.contains(port)) {
+    if(mDeviceRechecks.contains(port) && !QSerialPortInfo(port).isNull()) {
         deviceAdd(port);
+    } else {
+        mDeviceRechecks.remove(port);
     }
 
     timer->deleteLater();
@@ -389,6 +391,7 @@ void UI::MainUI::logout() {
 
     emit loggedOut();
 
+    mDeviceRechecks.clear();
     while(mDevices.size() > 0) {
         Serial::SerialDevice* device = mDevices.first();
 
