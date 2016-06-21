@@ -54,7 +54,6 @@ UI::UpdaterUI::UpdaterUI(const QGuiApplication& app)
         argumentsList << "task";
 
         Utils::WinUtils::executeElevated(QCoreApplication::applicationDirPath() + "/Updater.exe", argumentsList, QCoreApplication::applicationDirPath(), false);
-        QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater.exe", argumentsList, QCoreApplication::applicationDirPath());
     }
 #else
     QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater", argumentsList, QCoreApplication::applicationDirPath());
