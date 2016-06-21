@@ -86,6 +86,10 @@ namespace Serial {
             return mRTRESet;
         }
 
+        void resetRTRE() {
+            mRTRESet = false;
+        }
+
         bool wrongSPC() const {
             return mWrongSPC;
         }

@@ -428,7 +428,8 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             continue;
         }
 
-        if(mProvisionStop) {
+        // If we don't have an SPC, break here before any of the actual provisioning.
+        if(mProvisionStop || mSPC.length() == 0) {
             break;
         }
 
@@ -542,7 +543,7 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     // We need to check if the device is valid *before* the reset.
     bool valid = isValid();
 
-    if(!mProvisionStop && !mWrongSPC) {
+    if(!mProvisionStop && !mWrongSPC && mSPC.length() > 0) {
         qDebug()<<"Reset device started at"<<QDateTime::currentDateTime().toString(Qt::ISODate);
 
         qDebug()<<"===== RESETTING DEVICE AFTER =====";

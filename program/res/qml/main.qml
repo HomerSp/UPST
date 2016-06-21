@@ -981,7 +981,7 @@ ApplicationWindow {
                 headerColor: '#a78b4e'
                 headerTextColor: '#FFFFFF'
                 header: "Device is rebooting"
-                errorLine1: qsTr("The provision process will continue after a reboot.")
+                errorLine1: qsTr("The provision process will continue automatically after a reboot.\nClose this dialog to abort the automatic provision after reboot.")
             }
 
             UPErrorBox {
@@ -991,7 +991,7 @@ ApplicationWindow {
                 headerColor: '#a78b4e'
                 headerTextColor: '#FFFFFF'
                 header: "Wrong SPC"
-                errorLine1: qsTr("Input the correct SPC in the UI, please.")
+                errorLine1: qsTr("Please try another SPC.")
             }
 
             UPErrorBox {

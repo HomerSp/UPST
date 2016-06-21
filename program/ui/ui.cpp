@@ -71,6 +71,7 @@ UI::MainUI::MainUI(const QGuiApplication& app, Log::LogHandler* logHandler, bool
 
     QObject::connect(rootObject->findChild<QObject*>("provisionFailedContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
     QObject::connect(rootObject->findChild<QObject*>("provisionSuccessContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
+    QObject::connect(rootObject->findChild<QObject*>("provisionRebootingContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
     QObject::connect(rootObject->findChild<QObject*>("provisionWrongSPCContainer"), SIGNAL(closed()), this, SLOT(provisionFailedClose()));
 
     QObject::connect(rootObject->findChild<QObject*>("updateFailedContinueButton"), SIGNAL(clicked()), this, SLOT(updateFailedContinue()));
@@ -530,6 +531,7 @@ void UI::MainUI::provisionFailedClose() {
     }
 
     device->setProvisioning(false);
+    device->resetRTRE();
     mDevicesModel->setProgress(device, Serial::SerialProvisionStatusIdle, 0, Serial::SerialProvisionErrorNone);
 
     if(!device->isAvailable()) {
