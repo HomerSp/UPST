@@ -11,6 +11,9 @@
 
 #include "updater/updater.h"
 #include "utils/fileutils.h"
+#ifdef Q_OS_WIN32
+#include "utils/winutils.h"
+#endif
 #include "updaterui.h"
 
 UI::UpdaterUI::UpdaterUI(const QGuiApplication& app)
@@ -50,6 +53,7 @@ UI::UpdaterUI::UpdaterUI(const QGuiApplication& app)
         QStringList argumentsList;
         argumentsList << "task";
 
+        Utils::WinUtils::executeElevated(QCoreApplication::applicationDirPath() + "/Updater.exe", argumentsList, QCoreApplication::applicationDirPath(), false);
         QProcess::startDetached(QCoreApplication::applicationDirPath() + "/Updater.exe", argumentsList, QCoreApplication::applicationDirPath());
     }
 #else

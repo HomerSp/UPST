@@ -15,8 +15,8 @@ namespace Utils {
         static void createUpdaterTask();
         static void elevateUpdaterTask(const QString& user, const QString& password);
 
-        static bool executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir);
-        static bool executeElevated(const QString &path, const QString &arguments, const QString &workingDir);
+        static bool executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir, bool wait = true);
+        static bool executeElevated(const QString &path, const QString &arguments, const QString &workingDir, bool wait = true);
 
         static QString serialNumber();
 

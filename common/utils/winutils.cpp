@@ -82,7 +82,7 @@ QString Utils::WinUtils::serialNumber() {
     return output.trimmed();
 }
 
-bool Utils::WinUtils::executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir) {
+bool Utils::WinUtils::executeElevated(const QString &path, const QStringList &argumentsList, const QString &workingDir, bool wait) {
     QString arguments = "";
     foreach(const QString& arg, argumentsList) {
         if(arguments.size() > 0) {
@@ -92,10 +92,10 @@ bool Utils::WinUtils::executeElevated(const QString &path, const QStringList &ar
         arguments += "\"" + arg + "\"";
     }
 
-    return executeElevated(path, arguments, workingDir);
+    return executeElevated(path, arguments, workingDir, wait);
 }
 
-bool Utils::WinUtils::executeElevated(const QString &path, const QString &arguments, const QString &workingDir) {
+bool Utils::WinUtils::executeElevated(const QString &path, const QString &arguments, const QString &workingDir, bool wait) {
     wchar_t* wFile = new wchar_t[path.size() + 1];
     memset(wFile, 0x0, sizeof(wchar_t) * (path.size() + 1));
     path.toWCharArray(wFile);
@@ -108,18 +108,22 @@ bool Utils::WinUtils::executeElevated(const QString &path, const QString &argume
     memset(wDir, 0x0, sizeof(wchar_t) * (workingDir.size() + 1));
     workingDir.toWCharArray(wDir);
 
-    SHELLEXECUTEINFOW info;
-    memset(&info, 0, sizeof(SHELLEXECUTEINFOW));
-    info.cbSize = sizeof(SHELLEXECUTEINFOW);
-    info.fMask = SEE_MASK_NOCLOSEPROCESS;
-    info.lpVerb = L"runas";
-    info.lpFile = wFile;
-    info.lpParameters = wArgs;
-    info.lpDirectory = wDir;
-    info.nShow = SW_SHOW;
-    ::ShellExecuteExW(&info);
-    ::WaitForSingleObject(info.hProcess, INFINITE);
-    ::CloseHandle(info.hProcess);
+    if(wait) {
+        SHELLEXECUTEINFOW info;
+        memset(&info, 0, sizeof(SHELLEXECUTEINFOW));
+        info.cbSize = sizeof(SHELLEXECUTEINFOW);
+        info.fMask = SEE_MASK_NOCLOSEPROCESS;
+        info.lpVerb = L"runas";
+        info.lpFile = wFile;
+        info.lpParameters = wArgs;
+        info.lpDirectory = wDir;
+        info.nShow = SW_SHOW;
+        ::ShellExecuteExW(&info);
+        ::WaitForSingleObject(info.hProcess, INFINITE);
+        ::CloseHandle(info.hProcess);
+    } else {
+        ::ShellExecuteW(0, L"runas", wFile, wArgs, wDir, SW_SHOWNORMAL);
+    }
 
     delete [] wFile;
     delete [] wArgs;
