@@ -19,6 +19,7 @@
 #include "../commands/nvcommands/nvprovisioncommands/sidnidlistcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/authpasswordcommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/genericnaicommand.h"
+#include "../commands/nvcommands/nvprovisioncommands/seccodecommand.h"
 #include "../commands/nvcommands/nvprovisioncommands/provisioncommand.h"
 
 using namespace Serial::QCDM::Nv;
@@ -171,7 +172,6 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD_NULL("calibrationfilemd5");
             PROVISION_CMD_NULL("carrierprl");
             PROVISION_CMD_NULL("carrierprlmd5");
-            PROVISION_CMD_NULL("carrierspc");
             PROVISION_CMD_NULL("data");
             PROVISION_CMD_NULL("mobileip");
             PROVISION_CMD_NULL("nam");
@@ -182,6 +182,7 @@ Serial::SerialCommand* NvProvisionData::getCommand(const QString& parent, const 
             PROVISION_CMD_NULL("usertype");
             PROVISION_CMD_NULL("rtremode");
 
+            PROVISION_CMD("carrierspc", SecCodeCommand);
             PROVISION_CMD("genuserprof", GenUserProfCommand, user());
             PROVISION_CMD("genuserss", GenUserSSCommand);
             PROVISION_CMD("password", AuthPasswordCommand);

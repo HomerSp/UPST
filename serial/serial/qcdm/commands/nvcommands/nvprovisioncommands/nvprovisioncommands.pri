@@ -9,7 +9,8 @@ HEADERS += \
     $$PWD/mccimsicommand.h \
     $$PWD/mncimsicommand.h \
     $$PWD/hdranusercommand.h \
-    $$PWD/authpasswordcommand.h
+    $$PWD/authpasswordcommand.h \
+    $$PWD/seccodecommand.h
 SOURCES += \ 
     $$PWD/genuserprofcommand.cpp \
     $$PWD/genusersscommand.cpp \
