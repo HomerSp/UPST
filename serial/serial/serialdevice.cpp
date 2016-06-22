@@ -229,7 +229,6 @@ bool SerialDevice::update() {
     if(esnCmd.result()->success()) {
         mESN = esnCmd.result()->data().toUInt();
     } else {
-        // Could not retrieve ESN, reschedule the device check.
         return false;
     }
 
@@ -238,6 +237,8 @@ bool SerialDevice::update() {
     imeiCmd.execute();
     if(imeiCmd.result()->success()) {
         mIMEI = imeiCmd.result()->data().toULongLong();
+    } else if(imeiCmd.result()->timedOut()) {
+        return false;
     }
 
     qDebug()<<"===== GETTING MEID =====";
@@ -245,6 +246,8 @@ bool SerialDevice::update() {
     meidCmd.execute();
     if(meidCmd.result()->success()) {
         mMEID = meidCmd.result()->data().toULongLong();
+    } else if(meidCmd.result()->timedOut()) {
+        return false;
     }
 
     qDebug()<<"===== GETTING MDN =====";
@@ -252,6 +255,8 @@ bool SerialDevice::update() {
     mdnCmd.execute();
     if(mdnCmd.result()->success()) {
         mMdn = mdnCmd.result()->data().toString();
+    } else if(mdnCmd.result()->timedOut()) {
+        return false;
     }
 
     qDebug()<<"===== GETTING MIN =====";
@@ -259,6 +264,8 @@ bool SerialDevice::update() {
     minCmd.execute();
     if(minCmd.result()->success()) {
         mMin = minCmd.result()->data().toULongLong();
+    } else if(minCmd.result()->timedOut()) {
+        return false;
     }
 
     qDebug()<<"====== GETTING RTRE ======";
@@ -266,10 +273,17 @@ bool SerialDevice::update() {
     rtreCommand.execute();
     if(rtreCommand.result()->success()) {
         mRTRE = rtreCommand.mode();
+    } else if(rtreCommand.result()->timedOut()) {
+        return false;
     }
 
-    if(mMdn.length() == 0) {
-        mNewMdn = "0000000000";
+    mMin = -1;
+    if(mMin == static_cast<uint64_t>(-1)) {
+        QString number = QString("%1").arg(mMEID, 4, 10, QChar('0'));
+        qDebug()<<"number:"<<number;
+        number = number.mid(number.length() - 4, 4);
+        mNewMdn = "000000" + number;
+        mNewMin = number.toULongLong();
     }
 
     qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin<<", RTRE:"<<mRTRE;
@@ -330,6 +344,12 @@ void SerialDevice::updateFrom(SerialDevice *device, Serial::SerialDevice* other)
         device->mMin = other->mMin;
         device->mNewMdn = other->mMdn;
         device->mNewMin = other->mMin;
+
+        if(other->mMin == static_cast<uint64_t>(-1)) {
+            device->mNewMdn = "0000000000";
+            device->mNewMin = 0;
+        }
+
     }
 }
 
@@ -415,14 +435,44 @@ bool SerialDevice::provision(SerialProvisionData* data) {
     foreach(SerialDevice* device, devices) {
         qDebug()<<"===== Provisioning port"<<mPort<<"=====";
 
-        qDebug()<<"===== SETTING DEVICE OFFLINE BEFORE =====";
-        Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
-        radioCmdBefore.execute();
-
-        i += mod;
-        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
+        // If we don't have an SPC, break here before any of the actual provisioning.
+        if(mProvisionStop || mSPC.length() == 0) {
+            break;
+        }
 
         if(shouldSetRtre) {
+            if(data->password16().size() == 16) {
+                for(int i = 0; i < 5; i++) {
+                    qDebug()<<"===== Sending password =====";
+                    Serial::QCDM::Commands::PasswordCommand passwordCmd(device, data->password16());
+                    passwordCmd.setTimeout(10000);
+                    passwordCmd.execute();
+                    if(passwordCmd.result()->success()) {
+                        qDebug()<<"Result="<<passwordCmd.result()->data().toString();
+                    } else {
+                        qCritical()<<"Could not send password";
+                        ret = false;
+                        break;
+                    }
+                }
+            }
+
+            if(mProvisionStop) {
+                break;
+            }
+
+            qDebug()<<"===== Writing SPC =====";
+            if(!sendSPC(device)) {
+                qCritical()<<"Could not unlock SPC";
+                mWrongSPC = true;
+                ret = false;
+                break;
+            }
+
+            if(mProvisionStop) {
+                break;
+            }
+
             qDebug()<<"===== SETTING RTRE MODE =====";
 
             device->mRTRESet = true;
@@ -432,10 +482,16 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             continue;
         }
 
-        // If we don't have an SPC, break here before any of the actual provisioning.
-        if(mProvisionStop || mSPC.length() == 0) {
+        qDebug()<<"===== SETTING DEVICE OFFLINE BEFORE =====";
+        Serial::QCDM::Commands::RadioModeCommand radioCmdBefore(device, Serial::QCDM::MODE_RADIO_OFFLINE);
+        radioCmdBefore.execute();
+
+        if(mProvisionStop) {
             break;
         }
+
+        i += mod;
+        emit provisionProgressChanged(SerialProvisionStatusProgress, i);
 
         if(data->password16().size() == 16) {
             qDebug()<<"===== Sending password =====";
@@ -461,6 +517,20 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             mWrongSPC = true;
             ret = false;
             break;
+        }
+
+        if(mProvisionStop) {
+            break;
+        }
+
+        if(shouldSetRtre) {
+            qDebug()<<"===== SETTING RTRE MODE =====";
+
+            device->mRTRESet = true;
+
+            Serial::QCDM::Commands::Nv::RTRECommand rtreCommand(device, false, data->rtreMode());
+            rtreCommand.execute();
+            continue;
         }
 
         i += mod;

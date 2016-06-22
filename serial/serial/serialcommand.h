@@ -15,7 +15,7 @@ namespace Serial {
 
     class SerialCommandResult {
     public:
-        SerialCommandResult(bool success, QVariant data, uint16_t errorCode, uint8_t diagCode);
+        SerialCommandResult(bool success, QVariant data, uint16_t errorCode, uint8_t diagCode, bool timedOut);
 
         bool success() const {
             return mSuccess;
@@ -31,6 +31,10 @@ namespace Serial {
 
         uint8_t diagCode() const {
             return mDiagCode;
+        }
+
+        bool timedOut() const {
+            return mTimedOut;
         }
 
         void setSuccess(bool success) {
@@ -54,6 +58,7 @@ namespace Serial {
         QVariant mData;
         uint16_t mErrorCode;
         uint8_t mDiagCode;
+        bool mTimedOut;
     };
 
     class SerialCommand
@@ -115,8 +120,8 @@ namespace Serial {
             return mDevice;
         }
 
-        void addResult(bool success, QVariant data = 0, uint16_t errorCode = 0, uint8_t diagCode = 0) {
-            mResults.append(new SerialCommandResult(success, data, errorCode, diagCode));
+        void addResult(bool success, QVariant data = 0, uint16_t errorCode = 0, uint8_t diagCode = 0, bool timedOut = false) {
+            mResults.append(new SerialCommandResult(success, data, errorCode, diagCode, timedOut));
         }
 
         int offset() const {

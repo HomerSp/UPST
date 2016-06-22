@@ -43,7 +43,7 @@ void SerialCommunicator::clear() {
     mPort->clear();
 }
 
-bool SerialCommunicator::read(QByteArray& data, int timeout) {
+bool SerialCommunicator::read(QByteArray& data, int timeout, bool& timedout) {
     if(!mPort->isOpen()) {
         return false;
     }
@@ -52,6 +52,7 @@ bool SerialCommunicator::read(QByteArray& data, int timeout) {
         qDebug()<<"SerialCommunicator read waitForReadyRead"<<timeout;
         if(!mPort->waitForReadyRead(timeout)) {
             qDebug()<<"SerialCommunicator read waitForReadyRead timeout";
+            timedout = true;
             return false;
         }
     }

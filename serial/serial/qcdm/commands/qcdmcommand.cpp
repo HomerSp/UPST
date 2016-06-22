@@ -70,8 +70,9 @@ void QcdmCommand::execute(SerialDevice* device, bool obeyOffset) {
         int retryCount = 0;
         do {
             QByteArray buf;
-            if(!device->communicator()->read(buf, timeout())) {
-                addResult(false);
+            bool timedout = false;
+            if(!device->communicator()->read(buf, timeout(), timedout)) {
+                addResult(false, 0, 0, 0, timedout);
                 return;
             }
 

@@ -22,7 +22,7 @@ namespace Serial {
 
         void clear();
 
-        bool read(QByteArray& data, int timeout = 1000);
+        bool read(QByteArray& data, int timeout, bool& timedout);
         bool write(const QByteArray& data);
 
         const QString port() const {
