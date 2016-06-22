@@ -277,10 +277,8 @@ bool SerialDevice::update() {
         return false;
     }
 
-    mMin = -1;
     if(mMin == static_cast<uint64_t>(-1)) {
         QString number = QString("%1").arg(mMEID, 4, 10, QChar('0'));
-        qDebug()<<"number:"<<number;
         number = number.mid(number.length() - 4, 4);
         mNewMdn = "000000" + number;
         mNewMin = number.toULongLong();
