@@ -700,3 +700,119 @@ bool SerialDevice::sendSPC(SerialDevice* device) {
     spcCommand.execute();
     return (spcCommand.resultSuccess() && (spcCommand.result()->data().toByteArray().at(0) == 0x01));
 }
+
+QString SerialDevice::portStr() const {
+    if(mChildren.size() == 0) {
+        return mPort;
+    }
+
+    QString ret = mPort;
+    foreach(SerialDevice* d, mChildren) {
+        ret += ", " + d->port();
+    }
+
+    return ret;
+}
+QString SerialDevice::vidStr() const {
+    return QString("%1").arg(mVid, 4, 16, QChar('0')).toUpper();
+}
+QString SerialDevice::pidStr() const {
+    return QString("%1").arg(mPid, 4, 16, QChar('0')).toUpper();
+}
+QString SerialDevice::name() const {
+    QString ret = "";
+    if(mMake.length() != 0) {
+        ret += mMake;
+    }
+    if(mModel.length() != 0) {
+        if(ret.length() > 0) {
+            ret += " ";
+        }
+
+        ret += mModel;
+    }
+
+    return ret;
+}
+QString SerialDevice::makeStr() const {
+    if(mMake.length() == 0) {
+        return "-";
+    }
+
+    return mMake;
+}
+QString SerialDevice::modelStr() const {
+    if(mModel.length() == 0) {
+        return "-";
+    }
+
+    return mModel;
+}
+QString SerialDevice::mdnStr() const {
+    if(mMdn.length() == 0) {
+        return "-";
+    }
+
+    return mMdn;
+}
+QString SerialDevice::minStr() const {
+    if(mMin == static_cast<uint64_t>(-1)) {
+        return "-";
+    }
+
+    return QString("%1").arg(mMin, 10, 10, QChar('0'));
+}
+QString SerialDevice::esnStr() const {
+    if(mESN == 0) {
+        return "-";
+    }
+
+    return QString("%1").arg(mESN, 8, 16, QChar('0')).toUpper();
+}
+QString SerialDevice::meidStr() const {
+    if(mMEID == 0) {
+        return "-";
+    }
+
+    return QString("%1").arg(mMEID, 14, 16, QChar('0')).toUpper();
+}
+QString SerialDevice::imeiStr() const {
+    if(mIMEI == 0) {
+        return "-";
+    }
+
+    return QString("%1").arg(mIMEI, 14, 16, QChar('0')).toUpper();
+}
+QString SerialDevice::rtreStr() const {
+    switch(mRTRE) {
+    case Serial::QCDM::RTREModeRUIMOnly:
+        return "RUIM Only";
+    case Serial::QCDM::RTREModeNVOnly:
+        return "NV Only";
+    case Serial::QCDM::RTREModeRUIMPref:
+        return "RUIM Pref";
+    case Serial::QCDM::RTREMode1XGSM:
+        return "1xGSM";
+    default:
+        return "-";
+    }
+}
+QString SerialDevice::newMdnStr() const {
+    if(mNewMdn.length() == 0) {
+        return mMdn;
+    }
+
+    return mNewMdn;
+}
+QString SerialDevice::newMinStr() const {
+    if(mNewMin == static_cast<uint64_t>(-1)) {
+        QString ret = minStr();
+        if(ret == "-") {
+            return "";
+        }
+
+        return ret;
+    }
+
+    return QString("%1").arg(mNewMin, 10, 10, QChar('0'));
+}

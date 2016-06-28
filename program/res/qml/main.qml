@@ -937,7 +937,6 @@ ApplicationWindow {
                     DeviceInfoBox {
                         id: currentDeviceIMEI
                         objectName: "currentDeviceIMEI"
-                        Layout.columnSpan: 2
                         header: "IMEI"
                         value: ""
                     }
@@ -946,6 +945,13 @@ ApplicationWindow {
                         id: currentDeviceMDN
                         objectName: "currentDeviceMDN"
                         header: "MDN"
+                        value: ""
+                    }
+
+                    DeviceInfoBox {
+                        id: currentDeviceRTRE
+                        objectName: "currentDeviceRTRE"
+                        header: "RTRE"
                         value: ""
                     }
                 }

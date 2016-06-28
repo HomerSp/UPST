@@ -208,115 +208,24 @@ namespace Serial {
             return mMEID;
         }
 
-        QString portStr() const {
-            if(mChildren.size() == 0) {
-                return mPort;
-            }
-
-            QString ret = mPort;
-            foreach(SerialDevice* d, mChildren) {
-                ret += ", " + d->port();
-            }
-
-            return ret;
-        }
-
-        QString vidStr() const {
-            return QString("%1").arg(mVid, 4, 16, QChar('0')).toUpper();
-        }
-        QString pidStr() const {
-            return QString("%1").arg(mPid, 4, 16, QChar('0')).toUpper();
-        }
-
         QString id() const {
             return mID;
         }
 
-        QString name() const {
-            QString ret = "";
-            if(mMake.length() != 0) {
-                ret += mMake;
-            }
-            if(mModel.length() != 0) {
-                if(ret.length() > 0) {
-                    ret += " ";
-                }
-
-                ret += mModel;
-            }
-
-            return ret;
-        }
-
-        QString makeStr() const {
-            if(mMake.length() == 0) {
-                return "-";
-            }
-
-            return mMake;
-        }
-        QString modelStr() const {
-            if(mModel.length() == 0) {
-                return "-";
-            }
-
-            return mModel;
-        }
-        QString mdnStr() const {
-            if(mMdn.length() == 0) {
-                return "-";
-            }
-
-            return mMdn;
-        }
-        QString minStr() const {
-            if(mMin == static_cast<uint64_t>(-1)) {
-                return "-";
-            }
-
-            return QString("%1").arg(mMin, 10, 10, QChar('0'));
-        }
-        QString esnStr() const {
-            if(mESN == 0) {
-                return "-";
-            }
-
-            return QString("%1").arg(mESN, 8, 16, QChar('0')).toUpper();
-        }
-        QString meidStr() const {
-            if(mMEID == 0) {
-                return "-";
-            }
-
-            return QString("%1").arg(mMEID, 14, 16, QChar('0')).toUpper();
-        }
-        QString imeiStr() const {
-            if(mIMEI == 0) {
-                return "-";
-            }
-
-            return QString("%1").arg(mIMEI, 14, 16, QChar('0')).toUpper();
-        }
-
-        QString newMdnStr() const {
-            if(mNewMdn.length() == 0) {
-                return mMdn;
-            }
-
-            return mNewMdn;
-        }
-        QString newMinStr() const {
-            if(mNewMin == static_cast<uint64_t>(-1)) {
-                QString ret = minStr();
-                if(ret == "-") {
-                    return "";
-                }
-
-                return ret;
-            }
-
-            return QString("%1").arg(mNewMin, 10, 10, QChar('0'));
-        }
+        QString portStr() const;
+        QString vidStr() const;
+        QString pidStr() const;
+        QString name() const;
+        QString makeStr() const;
+        QString modelStr() const;
+        QString mdnStr() const;
+        QString minStr() const;
+        QString esnStr() const;
+        QString meidStr() const;
+        QString imeiStr() const;
+        QString rtreStr() const;
+        QString newMdnStr() const;
+        QString newMinStr() const;
 
         void stopProvision() {
             mProvisionStop = true;

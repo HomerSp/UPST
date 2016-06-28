@@ -595,6 +595,7 @@ void UI::UISection::startUpdate() {
             rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", currentDevice->esnStr());
             rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", currentDevice->meidStr());
             rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", currentDevice->imeiStr());
+            rootObject->findChild<QObject*>("currentDeviceRTRE")->setProperty("value", currentDevice->rtreStr());
         }
     }
 }
@@ -615,6 +616,7 @@ void UI::UISection::endUpdate() {
         rootObject->findChild<QObject*>("currentDeviceESN")->setProperty("value", "");
         rootObject->findChild<QObject*>("currentDeviceMEID")->setProperty("value", "");
         rootObject->findChild<QObject*>("currentDeviceIMEI")->setProperty("value", "");
+        rootObject->findChild<QObject*>("currentDeviceRTRE")->setProperty("value", "");
     }
 }
 
