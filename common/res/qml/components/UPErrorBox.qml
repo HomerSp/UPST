@@ -134,7 +134,7 @@ Rectangle {
 
        Rectangle {
            anchors {left: parent.left; right: parent.right}
-           height: errorLine1Text.height + errorLine2Text.height + errorLine3Text.height + unit.dp(32)
+           height: errorLine1Text.implicitHeight + errorLine2Text.implicitHeight + errorLine3Text.implicitHeight + unit.dp(32)
            color: '#232b2e'
 
            ColumnLayout {
