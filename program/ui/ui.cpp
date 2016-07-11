@@ -171,7 +171,7 @@ void UI::MainUI::deviceAddChecked(Serial::SerialDevice* device) {
 
             mDeviceWorker->addDeviceRemove(device);
 
-            if(d->rtreSet()) {
+            if(d->isAvailable() && (!d->flagMultiPort() || (d->flagMultiPort() && d->childrenAvailable())) && d->rtreSet()) {
                 d->setProvisioning(false);
 
                 if(d->canProvision()) {
