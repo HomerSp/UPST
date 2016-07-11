@@ -280,8 +280,12 @@ bool SerialDevice::update() {
     if(mMin == static_cast<uint64_t>(-1)) {
         QString number = QString("%1").arg(mMEID, 4, 10, QChar('0'));
         number = number.mid(number.length() - 4, 4);
-        mNewMdn = "000000" + number;
         mNewMin = number.toULongLong();
+    }
+    if(mMdn.length() == 0) {
+        QString number = QString("%1").arg(mMEID, 4, 10, QChar('0'));
+        number = number.mid(number.length() - 4, 4);
+        mNewMdn = "000000" + number;
     }
 
     qDebug()<<"ESN:"<<QString::number(mESN, 16)<<"IMEI:"<<QString::number(mIMEI, 16)<<"MEID:"<<QString::number(mMEID, 16)<<"MDN:"<<mMdn<<", MIN:"<<mMin<<", RTRE:"<<mRTRE;
