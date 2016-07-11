@@ -13,7 +13,7 @@ public:
     virtual bool nativeEventFilter(const QByteArray &eventType, void* message, long*) Q_DECL_OVERRIDE;
 
 protected:
-    virtual QSet<QString> getDevices();
+    virtual QMap<QString, DevicePortInfo*> getDevices();
 };
 
 #endif // DEVICEFILTEREVENT_WIN_H

@@ -3,9 +3,13 @@
 
 #include <QObject>
 #include <QAbstractNativeEventFilter>
-#include <QSet>
+#include <QMap>
 
 #include "serial/serialdevice.h"
+
+struct DevicePortInfo {
+    QString Location;
+};
 
 class DeviceFilterEvent: public QObject, public QAbstractNativeEventFilter
 {
@@ -30,14 +34,14 @@ protected:
         return mEnabled;
     }
 
-    virtual QSet<QString> getDevices() = 0;
+    virtual QMap<QString, DevicePortInfo*> getDevices() = 0;
 
     virtual void process();
 
 private:
     bool mEnabled;
 
-    QSet<QString> mConnectedDevices;
+    QMap<QString, DevicePortInfo*> mConnectedDevices;
 
 };
 

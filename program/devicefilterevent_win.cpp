@@ -36,8 +36,8 @@ bool DeviceFilterEventWin::nativeEventFilter(const QByteArray &eventType, void* 
     return false;
 }
 
-QSet<QString> DeviceFilterEventWin::getDevices() {
-    QSet<QString> ret;
+QMap<QString, DevicePortInfo*> DeviceFilterEventWin::getDevices() {
+    QMap<QString, DevicePortInfo*> ret;
 
     HDEVINFO deviceInfoSet = ::SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, nullptr, nullptr, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     if(deviceInfoSet == INVALID_HANDLE_VALUE) {
@@ -56,13 +56,28 @@ QSet<QString> DeviceFilterEventWin::getDevices() {
         }
 
         wchar_t data[256];
-        memset(data, 0, 256);
+        memset(data, 0, 256 * sizeof(wchar_t));
 
         DWORD size = 255;
         if(::RegQueryValueEx(key, L"PortName", nullptr, nullptr, reinterpret_cast<PBYTE>(data), &size) == ERROR_SUCCESS) {
+            data[255] = '\0';
+
             QString portName = QString::fromWCharArray(data);
-            if(!portName.isEmpty()) {
-                ret.insert(portName);
+            if(!portName.isEmpty() && !ret.contains(portName)) {
+                wchar_t locationData[256];
+                memset(locationData, 0, 256 * sizeof(wchar_t));
+
+                QString location = "";
+                DWORD regType = REG_SZ;
+                if(::SetupDiGetDeviceRegistryProperty(deviceInfoSet, &deviceInfoData, SPDRP_LOCATION_INFORMATION, &regType, reinterpret_cast<PBYTE>(locationData), 255, NULL) == ERROR_SUCCESS) {
+                    locationData[255] = '\0';
+                    location = QString::fromWCharArray(locationData);
+                }
+
+                DevicePortInfo* info = new DevicePortInfo;
+                info->Location = location;
+
+                ret.insert(portName, info);
             }
         }
 

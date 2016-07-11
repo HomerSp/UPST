@@ -34,13 +34,13 @@ void DeviceFilterEvent::process() {
         return;
     }
 
-    QSet<QString> devices = getDevices();
+    QMap<QString, DevicePortInfo*> devices = getDevices();
     if(mConnectedDevices.size() > 0) {
         for(int i = 0; i < mConnectedDevices.size(); i++) {
-            QString port = *(mConnectedDevices.begin() + i);
+            QString port = mConnectedDevices.keys().at(i);
 
             bool found = false;
-            foreach(QString d, devices) {
+            foreach(QString d, devices.keys()) {
                 if(port == d) {
                     found = true;
                     break;
@@ -55,11 +55,10 @@ void DeviceFilterEvent::process() {
         }
     }
 
-    foreach(QString d, devices) {
+    foreach(QString d, devices.keys()) {
         bool found = false;
-        for(int i = 0; i < mConnectedDevices.size(); i++) {
-            QString port = *(mConnectedDevices.begin() + i);
-            if(port == d) {
+        foreach(QString cd, mConnectedDevices.keys()) {
+            if(d == cd) {
                 found = true;
                 break;
             }
@@ -67,7 +66,7 @@ void DeviceFilterEvent::process() {
 
         if(!found) {
             emit deviceAdd(d);
-            mConnectedDevices.insert(d);
+            mConnectedDevices.insert(d, devices.value(d));
         }
     }
 }
