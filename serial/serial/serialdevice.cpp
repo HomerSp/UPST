@@ -481,6 +481,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
             Serial::QCDM::Commands::Nv::RTRECommand rtreCommand(device, false, data->rtreMode());
             rtreCommand.execute();
+
+            Serial::QCDM::Commands::Nv::NvCommand8Bit subSource(device, false, Serial::QCDM::NV_CDMA_SUBSCRIPTION_SOURCE_SIM, (data->rtreMode() == Serial::QCDM::RTREModeNVOnly)?0:1);
+            subSource.execute();
+
             continue;
         }
 
@@ -532,6 +536,10 @@ bool SerialDevice::provision(SerialProvisionData* data) {
 
             Serial::QCDM::Commands::Nv::RTRECommand rtreCommand(device, false, data->rtreMode());
             rtreCommand.execute();
+
+            Serial::QCDM::Commands::Nv::NvCommand8Bit subSource(device, false, Serial::QCDM::NV_CDMA_SUBSCRIPTION_SOURCE_SIM, (data->rtreMode() == Serial::QCDM::RTREModeNVOnly)?0:1);
+            subSource.execute();
+
             continue;
         }
 
