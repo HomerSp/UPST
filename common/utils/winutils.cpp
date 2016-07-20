@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QProcess>
 #include <QSysInfo>
+#include <QSettings>
 
 #include <windows.h>
 #include <shellapi.h>
@@ -36,6 +37,16 @@ void WinUtils::initTaskScheduler(const QString& user) {
 }
 
 void WinUtils::enableIntelHack() {
+    QSettings upstSettings(QCoreApplication::applicationDirPath() + "/UPST.ini", QSettings::IniFormat);
+    if(upstSettings.contains("Program/SoftwareRendering")) {
+        if(upstSettings.value("Program/SoftwareRendering", 0).toInt() == 1) {
+            qWarning()<<"Enabling software OpenGL due to setting";
+            QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
+        }
+
+        return;
+    }
+
     DISPLAY_DEVICE device;
     device.cb = sizeof(DISPLAY_DEVICE);
     EnumDisplayDevices(NULL, 0, &device, 0);
