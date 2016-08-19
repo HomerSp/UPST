@@ -43,6 +43,7 @@ namespace Serial {
         SerialDeviceFlagNone = 0x0,
         SerialDeviceFlagManualReboot = 0x1,
         SerialDeviceFlagMultiPort = 0x2,
+        SerialDeviceFlagNoSPC = 0x4,
     };
 
     class SerialDevice : public QObject
@@ -179,7 +180,9 @@ namespace Serial {
         bool flagMultiPort() const {
             return (mFlags & SerialDeviceFlagMultiPort) != 0;
         }
-
+        bool flagNoSpc() const {
+            return (mFlags & SerialDeviceFlagNoSPC) != 0;
+        }
 
         const QString &mdn() const {
             return mMdn;

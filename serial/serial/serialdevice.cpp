@@ -463,12 +463,16 @@ bool SerialDevice::provision(SerialProvisionData* data) {
                 break;
             }
 
-            qDebug()<<"===== Writing SPC =====";
-            if(!sendSPC(device)) {
-                qCritical()<<"Could not unlock SPC";
-                mWrongSPC = true;
-                ret = false;
-                break;
+            if(!device->flagNoSpc()) {
+                qDebug()<<"===== Writing SPC =====";
+                if(!sendSPC(device)) {
+                    qCritical()<<"Could not unlock SPC";
+                    mWrongSPC = true;
+                    ret = false;
+                    break;
+                }
+            } else {
+                qWarning()<<"Skip sending SPC as requested";
             }
 
             if(mProvisionStop) {
@@ -517,12 +521,16 @@ bool SerialDevice::provision(SerialProvisionData* data) {
             break;
         }
 
-        qDebug()<<"===== Writing SPC =====";
-        if(!sendSPC(device)) {
-            qCritical()<<"Could not unlock SPC";
-            mWrongSPC = true;
-            ret = false;
-            break;
+        if(!device->flagNoSpc()) {
+            qDebug()<<"===== Writing SPC =====";
+            if(!sendSPC(device)) {
+                qCritical()<<"Could not unlock SPC";
+                mWrongSPC = true;
+                ret = false;
+                break;
+            }
+        } else {
+            qWarning()<<"Skip sending SPC as requested.";
         }
 
         if(mProvisionStop) {
@@ -680,9 +688,13 @@ bool SerialDevice::provision(SerialDevice* device, SerialProvisionData* data, Se
             }
         }
 
-        if(!sendSPC(device)) {
-            qCritical()<<"Could not unlock SPC";
-            return false;
+        if(!device->flagNoSpc()) {
+            if(!sendSPC(device)) {
+                qCritical()<<"Could not unlock SPC";
+                return false;
+            }
+        } else {
+            qWarning()<<"Skip sending SPC as requested.";
         }
     }
 
