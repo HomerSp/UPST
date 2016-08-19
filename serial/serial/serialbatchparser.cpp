@@ -37,7 +37,7 @@ SerialBatchParser::SerialBatchParser(QString data) {
     }
 
     // No MIN or MDN column found.
-    if(minColumn == 0xFF && mdnColumn == 0xFF) {
+    if(minColumn == 0xFF && mdnColumn == 0xFF && spcColumn == 0xFF) {
         return;
     }
 
@@ -60,7 +60,14 @@ SerialBatchParser::SerialBatchParser(QString data) {
 
         bool ok;
         if(meidColumn != 0xFF && meidColumn < lineList.size()) {
-            item->ID = lineList.at(meidColumn).toULongLong(&ok, 16);
+            QString s = lineList.at(meidColumn);
+            if(s.length() == 14) {
+                item->ID = s.toULongLong(&ok, 16);
+            } else {
+                uint64_t first = s.mid(0, 10).toULongLong(&ok, 10);
+                uint64_t last = s.mid(10, 8).toULongLong(&ok, 10);
+                item->ID = QString(QString(QByteArray::number(first, 16)).leftJustified(8, '0') + QString(QByteArray::number(last, 16)).leftJustified(6, '0')).toULongLong(&ok, 16);
+            }
             if(ok) {
                 item->Type = SerialBatchItemTypeMEID;
             }
@@ -97,12 +104,6 @@ SerialBatchParser::SerialBatchParser(QString data) {
         // Just in case.
         if(item->MIN == 0 && item->MDN.size() > 0) {
             item->MIN = item->MDN.toULongLong();
-        }
-
-        // Don't add it if we don't have a valid MIN or MDN.
-        if(item->MIN == 0 && item->MDN.size() == 0) {
-            delete item;
-            continue;
         }
 
         mItems.append(item);
