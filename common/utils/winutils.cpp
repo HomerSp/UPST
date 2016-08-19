@@ -76,6 +76,18 @@ void WinUtils::elevateUpdaterTask(const QString& user, const QString& password) 
     schtasksProcess.waitForFinished();
 }
 
+bool WinUtils::taskExists(const QString& taskName) {
+    QProcess taskProcess;
+    QStringList params;
+    params << "/query" << "/tn" << taskName;
+
+    taskProcess.start("schtasks", params);
+    taskProcess.waitForFinished();
+
+    QString output(taskProcess.readAllStandardError());
+    return output.length() == 0 && !output.startsWith("ERROR");
+}
+
 QString Utils::WinUtils::serialNumber() {
     QProcess wmicProcess;
     QStringList params;

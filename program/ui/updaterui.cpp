@@ -43,13 +43,24 @@ UI::UpdaterUI::UpdaterUI(const QGuiApplication& app)
     mEngine->load(QUrl(QStringLiteral("qrc:/res/qml/updater.qml")));
 
 #ifdef Q_OS_WIN
+    bool runUAC = false;
+
     QSettings upstSettings(QCoreApplication::applicationDirPath() + "/UPST.ini", QSettings::IniFormat);
     if(upstSettings.value("Updater/UseTask", 0).toInt() == 1) {
-        QStringList argumentsList;
-        argumentsList << "/run" << "/tn" << TASK_NAME;
+        if(Utils::WinUtils::taskExists(TASK_NAME)) {
+            QStringList argumentsList;
+            argumentsList << "/run" << "/tn" << TASK_NAME;
 
-        QProcess::startDetached("schtasks", argumentsList, QCoreApplication::applicationDirPath());
+            QProcess::startDetached("schtasks", argumentsList, QCoreApplication::applicationDirPath());
+        } else {
+            qWarning()<<"Could not find updater task, running UAC";
+            runUAC = true;
+        }
     } else {
+        runUAC = true;
+    }
+
+    if(runUAC) {
         QStringList argumentsList;
         argumentsList << "task";
 
@@ -78,7 +89,7 @@ void UI::UpdaterUI::updaterConnection() {
     mHaveClient = true;
 
     QLocalSocket* client = mStatusServer->nextPendingConnection();
-    connect(client, &QLocalSocket::disconnected, client, &QObject::deleteLater);
+    connect(client, &QLocalSocket::disconnected, this, &UI::UpdaterUI::updaterDisconnected);
     connect(client, &QIODevice::readyRead, this, &UI::UpdaterUI::updaterDataReady);
 
     QByteArray block;
@@ -87,6 +98,13 @@ void UI::UpdaterUI::updaterConnection() {
 
     client->write(block);
     client->flush();
+}
+
+void UI::UpdaterUI::updaterDisconnected() {
+    QLocalSocket* client = static_cast<QLocalSocket*>(sender());
+    updaterDataReady();
+
+    client->deleteLater();
 }
 
 void UI::UpdaterUI::updaterDataReady() {
@@ -155,6 +173,13 @@ void UI::UpdaterUI::updaterDataReady() {
             break;
         }
         case Updater::UpdateStatusFinished: {
+            QByteArray block;
+            block.append(static_cast<uint8_t>(0x1));
+            block.append('\n');
+
+            client->write(block);
+            client->flush();
+
             installFinished();
             break;
         }

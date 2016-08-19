@@ -23,6 +23,7 @@ namespace UI {
         void updaterTimeout();
 
         void updaterConnection();
+        void updaterDisconnected();
         void updaterDataReady();
 
     protected:

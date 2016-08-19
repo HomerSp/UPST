@@ -170,6 +170,8 @@ void UI::UpdateWorker::process() {
 
     updateStatus(Updater::UpdateStatusFinished);
 
+    mSocket->waitForReadyRead();
+
     emit finished();
 }
 
