@@ -102,6 +102,10 @@ namespace Serial {
 
         void updateFrom(Serial::SerialDevice* other);
 
+        void updateSPC(const QString& newSPC) {
+            mSPC = newSPC;
+        }
+
         bool provision(const QString& userToken);
 
         void setBaudRate(QSerialPort::BaudRate baudRate) {
