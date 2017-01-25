@@ -41,5 +41,14 @@
         <file>res/data/devices.list</file>
         <file>res/data/devices.json</file>
         <file>res/data/prl/1023.prl</file>
+        <file>res/data/prl/2200.prl</file>
+        <file>res/data/calibration/MIO_HUAWEI_M866_Alpha_Tag_Item.txt</file>
+        <file>res/data/calibration/MIO_KYOCERA_Duraforce_SUB-NV-raw-items.txt</file>
+        <file>res/data/calibration/MIO_LG_AS730_RF_CALIBRATION.txt</file>
+        <file>res/data/calibration/MIO_LG_LG730_LG730_RFCalibration.txt</file>
+        <file>res/data/calibration/MIO_LG_US780_SUB-NV-raw-items.txt</file>
+        <file>res/data/calibration/MIO_LG_US990_SUB-NV-raw-items.txt</file>
+        <file>res/data/calibration/MIO_MOTO_XT1031_mio-motog-xt1031-raw-items.txt</file>
+        <file>res/data/calibration/MIO_SAMSUNG_R830_NV-SIM-UNLOCK.txt</file>
     </qresource>
 </RCC>

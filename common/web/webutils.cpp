@@ -33,7 +33,7 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
         if(url.fileName() == "login.php") {
             QString token = "";
             if(headers.contains("U-Token")) {
-                if(headers["U-Token"] == "choice" || headers["U-Token"] == "choicentua" || headers["U-Token"] == "choicevi") {
+                if(headers["U-Token"] == "choice" || headers["U-Token"] == "choicentua" || headers["U-Token"] == "choicevi" || headers["U-Token"] == "mio") {
                     token = headers["U-Token"];
                 } else {
                     if(headers["U-Token"] == "e63ebc5a6fbcf122bed17a83c494f7afb116cdf7ef488f5e770837f54a160b3f" || headers["U-Token"] == "d4dc072f30090262eda15c809cc3e80495de6c44eb51ed82d7b75fd0e67cde89" || headers["U-Token"] == "da4f4e24b61152ce2931af0eb9178783757041a1a4116a7d1aa689bb2dc94016") {
@@ -42,6 +42,8 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
                         token = "choicentua";
                     } else if(headers["U-Token"] == "252cac7d1da530dc7df84d64ac060ce05d0a284c1ea160e515cf819bf308cf36") {
                         token = "choicevi";
+                    } else if(headers["U-Token"] == "229a29893191c1eeaee59928af95b0e1485e55bc7c17c2860fdfb2398961fd78") {
+                        token = "mio";
                     }
                 }
             } else {
@@ -51,6 +53,8 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
                     token = "choicentua";
                 } else if(postData.contains("2a973bddfe0d42865d2c96409e8daf231a0c845f91877fea53309fa8a09b9708")) {
                     token = "choicevi";
+                } else if(postData.contains("ea31ac1d48d1880bfd2b4179f5da29f202f5daf778715f1aeb3a1f06149941a2")) {
+                    token = "mio";
                 }
             }
 
@@ -63,6 +67,8 @@ bool WebUtils::download(const QUrl& url, QByteArray& output, const QHash<QString
                 displayName = "Choice NTUA";
             } else if(token == "choicevi") {
                 displayName = "Choice VI";
+            } else if(token == "mio") {
+                displayName = "Mio";
             }
 
             output.clear();
