@@ -1091,11 +1091,23 @@ ApplicationWindow {
         z: 1000
 
         function show() {
+            if(opacity == 0.0) {
+                loginOverlayBehavior.enabled = false;
+                opacity = 0.1;
+                loginOverlayBehavior.enabled = true;
+            }
+
             visible = true;
             opacity = 1.0;
             loginOverlayAnimation.complete();
         }
         function hide() {
+            if(opacity == 1.0) {
+                loginOverlayBehavior.enabled = false;
+                opacity = 0.9;
+                loginOverlayBehavior.enabled = true;
+            }
+
             visible = false;
             opacity = 0.0;
             loginOverlayAnimation.complete();
@@ -1122,6 +1134,7 @@ ApplicationWindow {
         }
 
         Behavior on opacity {
+            id: loginOverlayBehavior
             NumberAnimation {
                 id: loginOverlayAnimation
                 duration: 300
