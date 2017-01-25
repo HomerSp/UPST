@@ -248,23 +248,21 @@ void UI::Worker::UIWorker::processLogin(LoginItem* item) {
             settings.setValue("user/display_name", displayName);
             settings.sync();
 
-            if(item->token.size() > 0) {
+            if(doc.object().contains("token")) {
+                QString token = doc.object()["token"].toString();
+
+                settings.setValue("user/token", token);
+                settings.sync();
+
+                if(!processLoginCheckUpdate(token)) {
+                    emit loginStatus(true);
+                }
+            } else if(item->token.size() > 0) {
                 if(!processLoginCheckUpdate(item->token)) {
                     emit loginStatus(true);
                 }
             } else {
-                if(doc.object().contains("token")) {
-                    QString token = doc.object()["token"].toString();
-
-                    settings.setValue("user/token", token);
-                    settings.sync();
-
-                    if(!processLoginCheckUpdate(token)) {
-                        emit loginStatus(true);
-                    }
-                } else {
-                    emit loginStatus(false);
-                }
+                emit loginStatus(false);
             }
         } else {
             emit loginStatus(false);

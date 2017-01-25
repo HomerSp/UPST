@@ -1,7 +1,45 @@
 <RCC>
     <qresource prefix="/">
         <file>res/images/up_arrow.png</file>
-        <file>res/data/devices.list</file>
         <file>res/data/provision_data.json</file>
+        <file>res/data/user_guide.json</file>
+        <file>res/data/prl/2023.prl</file>
+        <file>res/data/prl/3005.prl</file>
+        <file>res/data/calibration/Choice_E6762_Choice_NV.txt</file>
+        <file>res/data/calibration/Choice_R530_Choice_NV.txt</file>
+        <file>res/data/calibration/Choice_VM696_Choice_NV.txt</file>
+        <file>res/data/calibration/Choice_XT1031_choice-motog-xt1031-raw-items.txt</file>
+        <file>res/data/calibration/MIO_Novatel_4510L_LG070-raw-items.txt</file>
+        <file>res/data/calibration/MIO_SAMSUNG_G800R4_NV-SIM-UNLOCK.txt</file>
+        <file>res/data/calibration/UM_NVTL_LG070-raw-items.txt</file>
+        <file>res/images/userguide/device_connected.jpg</file>
+        <file>res/images/userguide/device_manager.jpg</file>
+        <file>res/images/userguide/fail.jpg</file>
+        <file>res/images/userguide/login.jpg</file>
+        <file>res/images/userguide/multiple_devices.jpg</file>
+        <file>res/images/userguide/provision.jpg</file>
+        <file>res/images/userguide/provision_all.jpg</file>
+        <file>res/images/userguide/provision_in_progress.jpg</file>
+        <file>res/images/userguide/provisioning_in_progress.jpg</file>
+        <file>res/images/userguide/queue.jpg</file>
+        <file>res/images/userguide/refresh.jpg</file>
+        <file>res/images/userguide/success.jpg</file>
+        <file>res/images/userguide/update.jpg</file>
+        <file>res/images/userguide/devices/272.jpg</file>
+        <file>res/images/userguide/devices/696.jpg</file>
+        <file>res/images/userguide/devices/730.jpg</file>
+        <file>res/images/userguide/devices/5510_guide.jpg</file>
+        <file>res/images/userguide/devices/discover.jpg</file>
+        <file>res/images/userguide/devices/dura.png</file>
+        <file>res/images/userguide/devices/inc.png</file>
+        <file>res/images/userguide/devices/logo_.png</file>
+        <file>res/images/userguide/devices/m840.jpg</file>
+        <file>res/images/userguide/devices/mobilink.png</file>
+        <file>res/images/userguide/devices/rez.png</file>
+        <file>res/images/userguide/devices/s3.jpg</file>
+        <file>res/images/userguide/devices/s5mini.jpg</file>
+        <file>res/data/devices.list</file>
+        <file>res/data/devices.json</file>
+        <file>res/data/prl/1023.prl</file>
     </qresource>
 </RCC>

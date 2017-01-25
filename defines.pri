@@ -12,4 +12,4 @@ win32 {
 }
 
 # Remove this on production builds
-DEFINES += TESTING_MODE
+# DEFINES += TESTING_MODE

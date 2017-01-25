@@ -99,7 +99,7 @@ QString DeviceGuideListModel::getDeviceIcon(Serial::SerialDevice* device) const 
         break;
     }
 
-    return "qrc:/res/images/icons/" + type + ".svg";
+    return "qrc:/res/images/icons/devices/" + type + ".svg";
 }
 
 void DeviceGuideListModel::setDeviceConfig(Serial::SerialDeviceConfig* config) {
